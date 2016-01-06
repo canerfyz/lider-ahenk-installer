@@ -1,0 +1,288 @@
+package tr.org.pardus.mys.ahenksetup.wizard.pages;
+
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
+
+import tr.org.pardus.mys.ahenksetup.config.AhenkSetupConfig;
+import tr.org.pardus.mys.lidersetup.i18n.Messages;
+
+public class AhenkSetupNetworkScanPage extends WizardPage {
+
+	private AhenkSetupConfig config = null;
+
+	//Widgets
+	private Composite mainContainer = null;
+	private Composite sudoInfoContainer = null;
+	private Composite tableContainer = null;
+	
+	private Button checkBox = null;
+
+	private Label sudoUser = null;
+	private Text sudoUserTxt = null;
+
+	private Label sudoPassword = null;
+	private Text sudoPassTxt = null;
+	
+	private Table table = null;
+	private Button checkAll = null;
+
+	private Group group = null;
+	
+	// Status variable for the possible errors on this page
+	IStatus ipStatus;
+	
+	public AhenkSetupNetworkScanPage(AhenkSetupConfig config) {
+		super(AhenkSetupNetworkScanPage.class.getName(),
+			Messages.getString("INSTALLATION_OF_AHENK"), null);
+		
+		setDescription(Messages.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK_(NETWORK_SCAN)"));
+		
+		this.config = config;
+		
+		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
+		
+		setPageComplete(false);
+	}
+	
+	@Override
+	public void createControl(Composite parent) {
+		
+		//create main container
+		mainContainer = new Composite(parent, SWT.NONE);
+		mainContainer.setLayout(new GridLayout(1, false));
+		setControl(mainContainer);
+		
+		//create child container(for sudo info)
+		sudoInfoContainer = new Composite(mainContainer, SWT.NONE);
+		sudoInfoContainer.setLayout(new GridLayout(1, false));
+		
+		//create child container(for IP table)
+		tableContainer = new Composite(mainContainer, SWT.NONE);
+		FormLayout fl = new FormLayout();
+		fl.marginLeft = 5;
+		
+		tableContainer.setLayout(fl);
+		
+		//------------ Create sudo info section ----------------------------//
+		
+		//Ask user whether wants to see system info or not
+		checkBox = new Button(sudoInfoContainer, SWT.CHECK);
+		checkBox.setText(Messages.getString("SHOW_OPERATING_SYSTEM_INFO"));
+		
+		checkBox.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				showHideSudoInfo(checkBox, group);
+				updatePageStatus(table, checkBox, sudoUserTxt, sudoPassTxt);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		//Group for username and password texts.
+		group = new Group(sudoInfoContainer, SWT.NONE);
+		group.setLayout(new GridLayout(4, false));
+		group.setVisible(false);
+		
+		sudoUser = new Label(group, SWT.SINGLE);
+		sudoUser.setText(Messages.getString("USER"));
+		
+		//Username text
+		sudoUserTxt = new Text(group, SWT.BORDER);
+		sudoUserTxt.setText("root");
+
+		GridData gdSudoUserTxt = new GridData();
+		gdSudoUserTxt.widthHint = 120;
+		sudoUserTxt.setLayoutData(gdSudoUserTxt);
+		
+		sudoUserTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageStatus(table, checkBox, sudoUserTxt, sudoPassTxt);
+			}
+		});
+		
+		//Password text
+		sudoPassword = new Label(group, SWT.SINGLE);
+		sudoPassword.setText(Messages.getString("PASSWORD"));
+		
+		sudoPassTxt = new Text(group, SWT.BORDER | SWT.PASSWORD);
+
+		GridData gdSudoPasswordTxt = new GridData();
+		gdSudoPasswordTxt.widthHint = 170;
+		sudoPassTxt.setLayoutData(gdSudoPasswordTxt);
+
+		sudoPassTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageStatus(table, checkBox, sudoUserTxt, sudoPassTxt);
+			}
+		});
+		//------------------------------------------------------------------//
+		
+		//Create select/deselect button.
+	    checkAll = new Button(tableContainer, SWT.CHECK);
+		
+	    FormData fd1 = new FormData();
+	    fd1.left = new FormAttachment(tableContainer, 1, SWT.LEFT);
+	    fd1.top = new FormAttachment(tableContainer, 1, SWT.TOP);
+	    checkAll.setLayoutData(fd1);
+	    
+	    checkAll.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				selectDeselectAll();
+				updatePageStatus(table, checkBox, sudoUserTxt, sudoPassTxt);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		//Create Table
+		table = new Table(tableContainer, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL
+		        | SWT.H_SCROLL);
+	    table.setHeaderVisible(true);
+	    
+	    String[] titles = { "",
+	    	Messages.getString("IP_ADDRESS"), Messages.getString("OPEN_PORTS"), Messages.getString("HOSTNAME") };
+
+	    FormData fd = new FormData();
+	    fd.width = 500;
+
+	    table.setLayoutData(fd);
+	    fillTableItems(table, titles);
+	    table.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				setCheckAllBtn(event, table);
+				updatePageStatus(table, checkBox, sudoUserTxt, sudoPassTxt);
+			}
+		});
+	}
+
+	//To fill table with items
+	private void fillTableItems(Table table, String[] titles) {
+
+		for (int i = 0; i < titles.length; i++) {
+	        TableColumn column = new TableColumn(table, SWT.NONE);
+	        column.setText(titles[i]);
+	        if (i == 0) {
+	        	column.setWidth(40);
+	        }
+	    }
+	    
+	    for (int i = 0; i < 8; i++) {
+	        TableItem item = new TableItem(table, SWT.NONE);
+	        item.setText(1, "192.168.1." + (i + 1));
+	        item.setText(2, "8080");
+	        item.setText(3, "admin");
+	    }	
+	    
+	    for (int i = 0; i < titles.length; i++) {
+	        table.getColumn(i).pack();
+	    }
+	}
+	
+	private void selectDeselectAll() {
+		TableItem[] items = table.getItems();
+
+		if (checkAll.getSelection()) {
+			for(int i = 0; i < items.length; i++) {
+				items[i].setChecked(true);
+			}
+		}
+		else {
+			for(int i = 0; i < items.length; i++) {
+				items[i].setChecked(false);
+			}
+		}
+	}
+	
+	private void setCheckAllBtn(Event event, Table table) {
+		if (event.detail == SWT.CHECK) {
+			int checkedItemCount = 0;
+			
+			TableItem[] items = table.getItems();
+			
+			for (int i = 0; i < items.length; i++) {
+				if(items[i].getChecked()) {
+					checkedItemCount++;
+				}
+			}
+			if (checkedItemCount != table.getItemCount()) {
+				checkAll.setSelection(false);
+			}
+			else {
+				checkAll.setSelection(true);
+			}
+		}
+	}
+	
+	private void showHideSudoInfo(Button checkBox, Group group) {
+		if (checkBox.getSelection()) {
+			group.setVisible(true);
+		}
+		else {
+			group.setVisible(false);
+		}
+	}
+	
+	private void updatePageStatus(Table table, Button checkBox, Text sudoUserTxt, Text sudoPassTxt) {
+		//At least one IP should be selected
+		int checkedItemCount = 0;
+		
+		TableItem[] items = table.getItems();
+		
+		for (int i = 0; i < items.length; i++) {
+			if (items[i].getChecked()) {
+				checkedItemCount++;
+			}
+		}
+		
+		//If show system info checkbox is selected, username and password columns should be entered.
+		boolean sysInfoEntered;
+		
+		if (checkBox.getSelection()) {
+			if ((!"".equals(sudoUserTxt.getText()) && sudoUserTxt.getText() != null) && (!"".equals(sudoPassTxt.getText()) && sudoPassTxt.getText() != null)) {
+				
+				sysInfoEntered = true;
+			}
+			else {
+				sysInfoEntered = false;
+			}
+		}
+		else {
+			sysInfoEntered = true;
+		}
+		
+		//If required info is entered and at least one IP is selected then
+		// set page complete.
+		setPageComplete(checkedItemCount > 0 && sysInfoEntered);
+	}
+}

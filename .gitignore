@@ -1,0 +1,12 @@
+bin/
+bin/**
+target/
+target/**
+.settings/
+.settings/**
+workspace/
+workspace/**
+runtime-ui.product/.idea/
+runtime-ui.product/.idea/**
+dependencies/META-INF/
+dependencies/META-INF/**
