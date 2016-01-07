@@ -1,147 +1,84 @@
 package tr.org.pardus.mys.liderahenksetup.main;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.AhenkSetupWizard;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.LiderSetupWizard;
-import tr.org.pardus.mys.liderahenksetup.utils.FontProvider;
-import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
 public class ApplicationWindowManager {
 
 	private static final Logger logger = Logger.getLogger(ApplicationWindowManager.class.getName());
 
+	private Composite comp;
 	@PostConstruct
 	public Control createContents(final Composite composite) {
+		
+		comp = new Composite(composite, SWT.NONE);
+		GridLayout gl = new GridLayout(2, true);
+		gl.marginTop = 300;
+		gl.marginLeft = 550;
+		comp.setLayout(gl);
+		
+		Image backgroundImage = new Image(Display.getCurrent(), getInputStream("KurulumEkran.png"));
+		comp.setBackgroundImage(backgroundImage);
+		comp.getShell().setSize(1200, 800);
+		comp.getShell().setMinimumSize(1200, 800);
+		
+		Image ahenkImage = new Image(Display.getCurrent(), getInputStream("AhenkButon.png"));
+		Image liderImage = new Image(Display.getCurrent(), getInputStream("LiderButon.png"));
 
-		composite.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WHITE));
-		composite.setLayout(new FillLayout(SWT.VERTICAL));
-
-		final TableViewer tblVwrSetup = new TableViewer(composite,
-				SWT.SINGLE | SWT.FULL_SELECTION | SWT.PUSH | SWT.V_SCROLL);
-
-		final Table table = tblVwrSetup.getTable();
-		table.setHeaderVisible(false);
-		table.setLinesVisible(false);
-		table.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-		tblVwrSetup.setContentProvider(new ArrayContentProvider());
-		createTableColumns(tblVwrSetup);
-		tblVwrSetup.setInput(createTableRows(composite));
-		tblVwrSetup.getControl().setBackground(GUIHelper.getApplicationBackground());
-		tblVwrSetup.getControl().setFont(FontProvider.getInstance().get(FontProvider.HEADER_FONT));
-		tblVwrSetup.addDoubleClickListener(new IDoubleClickListener() {
+		LiderAhenkUtils.ImageButton(comp, liderImage, ahenkImage, new MouseListener() {
 			@Override
-			public void doubleClick(DoubleClickEvent event) {
-				IStructuredSelection selection = (IStructuredSelection) tblVwrSetup.getSelection();
-				Object firstElement = selection.getFirstElement();
-				if (firstElement instanceof SetupTableItem) {
-					((SetupTableItem) firstElement).getListener().onClick();
-				}
-			}
-		});
-
-		logger.log(Level.FINE, "Created installer table");
-
-		return composite;
-	}
-
-	private Object createTableRows(final Composite composite) {
-
-		ArrayList<SetupTableItem> items = new ArrayList<SetupTableItem>();
-
-		Image image = new Image(Display.getCurrent(), getInputStream("lider-setup.png"));
-		SetupTableItem liderSetupItem = new SetupTableItem("Lider Kurulum", image, new IOnClickListener() {
-			@Override
-			public void onClick() {
+			public void mouseUp(MouseEvent e) {
 				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new LiderSetupWizard());
 				wizardDialog.open();
 			}
-		});
-		items.add(liderSetupItem);
-
-		image = new Image(Display.getCurrent(), getInputStream("ahenk-setup.png"));
-		SetupTableItem ahenkSetupItem = new SetupTableItem("Ahenk Kurulum", image, new IOnClickListener() {
 			@Override
-			public void onClick() {
+			public void mouseDown(MouseEvent e) {
+			}
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+			}
+		});
+		
+		LiderAhenkUtils.ImageButton(comp, ahenkImage, liderImage, new MouseListener() {
+			@Override
+			public void mouseUp(MouseEvent e) {
 				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new AhenkSetupWizard());
 				wizardDialog.open();
 			}
+			@Override
+			public void mouseDown(MouseEvent e) {
+			}
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {
+			}
 		});
-		items.add(ahenkSetupItem);
+		
+		logger.log(Level.FINE, "Created installer table");
 
-		return items;
+		return comp;
 	}
 
 	private InputStream getInputStream(String filename) {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		InputStream stream = loader.getResourceAsStream(filename);
 		return stream;
-	}
-
-	private void createTableColumns(final TableViewer tblVwrSetup) {
-
-		TableViewerColumn imageCol = createTableViewerColumn(tblVwrSetup, "", 200);
-		imageCol.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public Image getImage(Object element) {
-				if (element instanceof SetupTableItem) {
-					return ((SetupTableItem) element).getImage();
-				}
-				return null;
-			}
-
-			@Override
-			public String getText(Object element) {
-				return null;
-			}
-		});
-
-		TableViewerColumn descCol = createTableViewerColumn(tblVwrSetup, "", 200);
-		descCol.setLabelProvider(new ColumnLabelProvider() {
-			@Override
-			public String getText(Object element) {
-				if (element instanceof SetupTableItem) {
-					return ((SetupTableItem) element).getDescription();
-				}
-				return null;
-			}
-		});
-
-	}
-
-	private TableViewerColumn createTableViewerColumn(final TableViewer tblVwrSetup, String title, int width) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(tblVwrSetup, SWT.NONE);
-		final TableColumn column = viewerColumn.getColumn();
-		column.setText(title);
-		column.setWidth(width);
-		column.setResizable(true);
-		column.setMoveable(false);
-		column.setAlignment(SWT.CENTER);
-		return viewerColumn;
 	}
 
 }

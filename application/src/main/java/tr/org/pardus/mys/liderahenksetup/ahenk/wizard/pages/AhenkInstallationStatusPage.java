@@ -8,6 +8,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -39,6 +40,8 @@ public class AhenkInstallationStatusPage extends WizardPage {
 	private Table table;
 	
 	private Label label;
+	
+	private Composite childContainer = null;
 
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -62,20 +65,21 @@ public class AhenkInstallationStatusPage extends WizardPage {
 		mainContainer.setLayout(new GridLayout(1, false));
 		setControl(mainContainer);
 
-		label = new Label(mainContainer, SWT.NONE);
+		childContainer = new Composite(mainContainer, SWT.NONE);
+		childContainer.setLayout(new GridLayout(2, false));
+		
+		label = new Label(childContainer, SWT.NONE);
 		label.setText(Messages.getString("AHENK_WILL_BE_INSTALLED_TO_MACHINES_WITH_IPS_GIVEN_BELOW") + " " + Messages.getString("WOULD_YOU_LIKE_TO_CONTINUE"));		
 		
-		progressBar = new ProgressBar(mainContainer, SWT.SMOOTH);
-		progressBar.setMaximum(100);
-		progressBar.setMinimum(0);
-		progressBar.setSelection(0);
-		startInstallation = new Button(mainContainer, SWT.PUSH);
-		startInstallation.setText("start process");
+		startInstallation = new Button(childContainer, SWT.PUSH);
+		startInstallation.setText(Messages.getString("START_INSTALLATION"));
 		startInstallation.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 					try {
+						progressBar.setVisible(true);
+						startInstallation.setVisible(false);
 						AhenkInstallationUtil.installAhenk(config, progressBar, table, label);
 					} catch (Exception exception) {
 						
@@ -86,6 +90,14 @@ public class AhenkInstallationStatusPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		
+		progressBar = new ProgressBar(mainContainer, SWT.SMOOTH | SWT.HORIZONTAL);
+		progressBar.setSelection(0);
+		progressBar.setVisible(false);
+		GridData progressGd = new GridData();
+		progressGd.heightHint = 40;
+		progressGd.widthHint = 500;
+		progressBar.setLayoutData(progressGd);
 		
 	}
 
