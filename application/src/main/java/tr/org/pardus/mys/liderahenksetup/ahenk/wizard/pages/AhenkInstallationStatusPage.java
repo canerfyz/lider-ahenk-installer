@@ -19,11 +19,8 @@ import org.eclipse.swt.widgets.Table;
 import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
 
-
 /**
- * @author caner  
- * Caner Feyzullahoğlu
- * caner.feyzullahoglu@agem.com.tr
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
 public class AhenkInstallationStatusPage extends WizardPage {

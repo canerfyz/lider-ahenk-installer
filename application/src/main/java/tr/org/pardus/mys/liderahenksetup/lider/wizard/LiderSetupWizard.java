@@ -11,7 +11,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.pardus.mys.liderahenksetup.lider.config.LiderSetupConfig;
-import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBSetupLocationPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderComponentSelectionPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderDistributionSelectionPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderLocationOfComponentsPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBConfirmPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDbAccessPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBSetupMethodPage;
 
 public class LiderSetupWizard extends Wizard {
@@ -32,14 +36,21 @@ public class LiderSetupWizard extends Wizard {
 	 * 
 	 * Other pages will be added dynamically according to user action!
 	 */
-	MariaDBSetupLocationPage firstPage = new MariaDBSetupLocationPage(config);
-	MariaDBSetupMethodPage secondPage = new MariaDBSetupMethodPage(config);
+	LiderComponentSelectionPage firstPage = new LiderComponentSelectionPage(config);
+	LiderLocationOfComponentsPage secondPage = new LiderLocationOfComponentsPage(config);
+	MariaDbAccessPage thirdPage = new MariaDbAccessPage(config); 
+	LiderDistributionSelectionPage fourthPage = new LiderDistributionSelectionPage(config); //TODO DELETE
+	MariaDBSetupMethodPage mdbSetupMethodPage = new MariaDBSetupMethodPage(config);
+	MariaDBConfirmPage mdbConfirmPage = new MariaDBConfirmPage(config);
 
 	@Override
 	public void addPages() {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(firstPage);
 		addPage(secondPage);
+		addPage(thirdPage);
+		addPage(mdbSetupMethodPage);
+		addPage(mdbConfirmPage);
 
 		// set this to true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
@@ -190,6 +201,19 @@ public class LiderSetupWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		// TODO
+		return false;
+	}
+
+	@Override
+	public boolean canFinish() {
+		
+		// If current page is the last page of this wizard
+		// then enable finish button.
+		if (getContainer().getCurrentPage().getName()
+				.equals(this.getPagesList().getLast().getName())) {
+			return true;
+		}
+		
 		return false;
 	}
 

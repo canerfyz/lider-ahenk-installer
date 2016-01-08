@@ -22,7 +22,11 @@ import tr.org.pardus.mys.liderahenksetup.lider.config.LiderSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
-public class LiderMariaDbAccessPage extends WizardPage {
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
+
+public class MariaDbAccessPage extends WizardPage {
 
 	private LiderSetupConfig config;
 	
@@ -43,8 +47,8 @@ public class LiderMariaDbAccessPage extends WizardPage {
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
 	
-	public LiderMariaDbAccessPage(LiderSetupConfig config) {
-		super(LiderMariaDbAccessPage.class.getName(), 
+	public MariaDbAccessPage(LiderSetupConfig config) {
+		super(MariaDbAccessPage.class.getName(), 
 				Messages.getString("LIDER_INSTALLATION"), null);
 
 		setDescription("2.1 " + 
@@ -74,6 +78,8 @@ public class LiderMariaDbAccessPage extends WizardPage {
 		
 		username = GUIHelper.createLabel(childContainer, 
 				Messages.getString("USERNAME"));
+		
+		usernamePassword.setSelection(true);
 		
 		// Creating a text field with width 150px.
 		GridData gdForTextField = new GridData();
@@ -260,14 +266,18 @@ public class LiderMariaDbAccessPage extends WizardPage {
 		
 		if (usernamePassword.getSelection()) {
 			
-			config.setSudoUsername(usernameTxt.getText());
+			config.setUseSSHMaria(false);
+
+			config.setMariaDbSu(usernameTxt.getText());
 			
-			config.setSudoPassword(passwordTxt.getText());
+			config.setMariaDbSuPass(passwordTxt.getText());
 		}
 		else {
-			config.setKeyAbsolutePath(privateKeyTxt.getText());
+			config.setUseSSHMaria(true);
+
+			config.setKeyAbsPathMaria(privateKeyTxt.getText());
 			
-			config.setPassphrase(passphraseTxt.getText());
+			config.setPassphraseMaria(passphraseTxt.getText());
 		}
 	}
 

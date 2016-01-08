@@ -24,6 +24,9 @@ import tr.org.pardus.mys.liderahenksetup.lider.wizard.LiderSetupWizard;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
 public class LiderLocationOfComponentsPage extends WizardPage {
 
 	private LiderSetupConfig config;
@@ -406,10 +409,10 @@ public void disableNotSelectedComponents() {
 		
 		if (installCentral.getSelection()) {
 			if (local.getSelection()) {
-				config.setSingleIp("localhost");
+				config.setMariaDbIp("localhost");
 			}
 			else {
-				config.setSingleIp(remoteIp.getText());
+				config.setMariaDbIp(remoteIp.getText());
 			}
 		}
 		else {

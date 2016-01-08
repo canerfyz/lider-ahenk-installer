@@ -49,7 +49,7 @@ public class AhenkSetupLocationPage extends WizardPage {
 
 	@Override
 	public void createControl(final Composite parent) {
-
+		
 		Composite container = GUIHelper.createComposite(parent,
 				new GridLayout(1, false), new GridData(GridData.FILL,
 						GridData.FILL, false, false));

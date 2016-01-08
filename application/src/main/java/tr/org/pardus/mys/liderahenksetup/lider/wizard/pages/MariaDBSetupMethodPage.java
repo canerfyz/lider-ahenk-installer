@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,6 +22,9 @@ import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.lider.config.LiderSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
 public class MariaDBSetupMethodPage extends WizardPage {
 
 	private LiderSetupConfig config;
@@ -36,8 +40,8 @@ public class MariaDBSetupMethodPage extends WizardPage {
 
 	public MariaDBSetupMethodPage(LiderSetupConfig config) {
 		super(MariaDBSetupMethodPage.class.getName(), Messages
-				.getString("DB_SETUP_PAGE_TITLE"), null);
-		setDescription(Messages.getString("DB_SETUP_METHOD_DESC"));
+				.getString("LIDER_INSTALLATION"), null);
+		setDescription("2.2 " + Messages.getString("MARIA_DB_INSTALLATION_METHOD") + " - " + Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
 
@@ -65,6 +69,8 @@ public class MariaDBSetupMethodPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		
+		btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO,
 				Messages.getString("DB_SETUP_METHOD_DEB"));
@@ -147,5 +153,28 @@ public class MariaDBSetupMethodPage extends WizardPage {
 		return config.getDebFileName() != null
 				&& config.getDebContent() != null;
 	}
+	
+	// This method sets info which taken from user
+	// to appropriate variables in LiderSetupConfig.
+	private void setConfigVariables() {
+		
+		if (btnAptGet.getSelection()) {
+			config.setUseRepositoryMaria(true);
+		}
+		else {
+			config.setUseRepositoryMaria(false);
+			config.setMariaDebAbsPath(txtFileName.getText());
+		}
+	}
 
+	@Override
+	public IWizardPage getNextPage() {
+		
+		// Set variables before going to next page.
+		setConfigVariables();
+		
+		return super.getNextPage();
+	}
+	
+	
 }

@@ -7,6 +7,10 @@ import java.util.Map;
  * Contains configuration variables used throughout the whole setup process. 
  *
  */
+
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
 public class LiderSetupConfig {
 	
 	/**
@@ -58,30 +62,56 @@ public class LiderSetupConfig {
 	private String liderIp;
 	
 	/**
+	 * This variable is true 
+	 * if SSH is chosen as 
+	 * connection method
+	 * (for MariaDB).
+	 */
+	private boolean useSSHMaria;
+	
+	/**
 	 * This variable contains
 	 * given username to access
-	 * a computer via SSH.
+	 * a computer via SSH
+	 * (for MariaDB).
 	 */
-	private String sudoUsername;
+	private String mariaDbSu;
 
 	/**
 	 * This variable contains
 	 * given password to access
-	 * a computer via SSH.
+	 * a computer via SSH 
+	 * (for MariaDB).
 	 */
-	private String sudoPassword;
+	private String mariaDbSuPass;
 	
 	/**
 	 * This variable contains given 
-	 * SSH key's absolute path. 
+	 * SSH key's absolute path 
+	 * (for MariaDB).
 	 */
-	private String keyAbsolutePath;
+	private String keyAbsPathMaria;
 	
 	/**
 	 * This variable contains given 
-	 * passphrase of the SSH key.
+	 * passphrase of the SSH key
+	 * (for MariaDB).
 	 */
-	private String passphrase;
+	private String passphraseMaria;
+	
+	/**
+	 * This variable is true 
+	 * if repository is chosen as 
+	 * installation method (For MariaDB).
+	 */
+	private Boolean useRepositoryMaria = true;
+	
+	/**
+	 * Absolute path to MariaDB
+	 * deb file. 
+	 */
+	private String mariaDebAbsPath;
+	
 	/**
 	 * MariaDBSetupLocationPage variables
 	 */
@@ -95,6 +125,14 @@ public class LiderSetupConfig {
 	private String debFileName;
 	private byte[] debContent;
 
+	/**
+	 * Components' versions
+	 */
+	private String mariaDbVersion = "1.0";
+	private String openLDAPVersion = "1.0";
+	private String ejabberdVersion = "1.0";
+	private String liderVersion = "1.0";
+	
 	public boolean isInstallDatabaseOnRemote() {
 		return installDatabaseOnRemote;
 	}
@@ -192,36 +230,92 @@ public class LiderSetupConfig {
 		this.sameComputer = sameComputer;
 	}
 
-	public String getSudoUsername() {
-		return sudoUsername;
+	public String getMariaDbVersion() {
+		return mariaDbVersion;
 	}
 
-	public void setSudoUsername(String sudoUsername) {
-		this.sudoUsername = sudoUsername;
+	public void setMariaDbVersion(String mariaDbVersion) {
+		this.mariaDbVersion = mariaDbVersion;
 	}
 
-	public String getSudoPassword() {
-		return sudoPassword;
+	public String getOpenLDAPVersion() {
+		return openLDAPVersion;
 	}
 
-	public void setSudoPassword(String sudoPassword) {
-		this.sudoPassword = sudoPassword;
+	public void setOpenLDAPVersion(String openLDAPVersion) {
+		this.openLDAPVersion = openLDAPVersion;
 	}
 
-	public String getKeyAbsolutePath() {
-		return keyAbsolutePath;
+	public String getEjabberdVersion() {
+		return ejabberdVersion;
 	}
 
-	public void setKeyAbsolutePath(String keyAbsolutePath) {
-		this.keyAbsolutePath = keyAbsolutePath;
+	public void setEjabberdVersion(String ejabberdVersion) {
+		this.ejabberdVersion = ejabberdVersion;
 	}
 
-	public String getPassphrase() {
-		return passphrase;
+	public String getLiderVersion() {
+		return liderVersion;
 	}
 
-	public void setPassphrase(String passphrase) {
-		this.passphrase = passphrase;
+	public void setLiderVersion(String liderVersion) {
+		this.liderVersion = liderVersion;
+	}
+
+	public String getMariaDbSu() {
+		return mariaDbSu;
+	}
+
+	public void setMariaDbSu(String mariaDbSu) {
+		this.mariaDbSu = mariaDbSu;
+	}
+
+	public String getMariaDbSuPass() {
+		return mariaDbSuPass;
+	}
+
+	public void setMariaDbSuPass(String mariaDbSuPass) {
+		this.mariaDbSuPass = mariaDbSuPass;
+	}
+
+	public String getKeyAbsPathMaria() {
+		return keyAbsPathMaria;
+	}
+
+	public void setKeyAbsPathMaria(String keyAbsPathMaria) {
+		this.keyAbsPathMaria = keyAbsPathMaria;
+	}
+
+	public String getPassphraseMaria() {
+		return passphraseMaria;
+	}
+
+	public void setPassphraseMaria(String passphraseMaria) {
+		this.passphraseMaria = passphraseMaria;
+	}
+
+	public boolean isUseSSHMaria() {
+		return useSSHMaria;
+	}
+
+	public void setUseSSHMaria(boolean useSSHMaria) {
+		this.useSSHMaria = useSSHMaria;
+	}
+
+	public Boolean isUseRepositoryMaria() {
+		return useRepositoryMaria;
+	}
+
+	public void setUseRepositoryMaria(Boolean useRepositoryMaria) {
+		this.useRepositoryMaria = useRepositoryMaria;
+	}
+
+	public String getMariaDebAbsPath() {
+		return mariaDebAbsPath;
+	}
+
+	public void setMariaDebAbsPath(String mariaDebAbsPath) {
+		this.mariaDebAbsPath = mariaDebAbsPath;
 	}
 	
 }

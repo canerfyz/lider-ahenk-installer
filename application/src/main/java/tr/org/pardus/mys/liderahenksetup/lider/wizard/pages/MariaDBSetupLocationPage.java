@@ -20,6 +20,9 @@ import tr.org.pardus.mys.liderahenksetup.lider.config.LiderSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
 public class MariaDBSetupLocationPage extends WizardPage {
 
 	private LiderSetupConfig config;

@@ -11,6 +11,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,16 +37,20 @@ public class ApplicationWindowManager {
 		
 		Image backgroundImage = new Image(Display.getCurrent(), getInputStream("KurulumEkran.png"));
 		comp.setBackgroundImage(backgroundImage);
+		comp.setBackgroundMode(SWT.INHERIT_DEFAULT);
 		comp.getShell().setSize(1200, 800);
 		comp.getShell().setMinimumSize(1200, 800);
 		
 		Image ahenkImage = new Image(Display.getCurrent(), getInputStream("AhenkButon.png"));
 		Image liderImage = new Image(Display.getCurrent(), getInputStream("LiderButon.png"));
 
+		// Lider
 		LiderAhenkUtils.ImageButton(comp, liderImage, ahenkImage, new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new LiderSetupWizard());
+//				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new LiderSetupWizard());
+				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(composite.getShell(), 
+						new LiderSetupWizard(), new Point(800, 600));
 				wizardDialog.open();
 			}
 			@Override
@@ -56,10 +61,13 @@ public class ApplicationWindowManager {
 			}
 		});
 		
+		// Ahenk
 		LiderAhenkUtils.ImageButton(comp, ahenkImage, liderImage, new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new AhenkSetupWizard());
+//				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new AhenkSetupWizard());
+				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(composite.getShell(), 
+						new AhenkSetupWizard(), new Point(800, 600));
 				wizardDialog.open();
 			}
 			@Override
