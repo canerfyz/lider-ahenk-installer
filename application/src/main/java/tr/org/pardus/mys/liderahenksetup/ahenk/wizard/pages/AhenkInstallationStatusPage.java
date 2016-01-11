@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Table;
 
 import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.utils.AhenkInstallationUtil;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>

@@ -62,55 +62,70 @@ public class LiderSetupConfig {
 	private String liderIp;
 	
 	/**
-	 * This variable is true 
+	 * These variable are true 
 	 * if SSH is chosen as 
 	 * connection method
-	 * (for MariaDB).
+	 * (for each component).
 	 */
-	private boolean useSSHMaria;
+	private boolean mariaUseSSH;
+	private boolean karafUseSSH;
+	private boolean ldapUseSSH;
 	
 	/**
-	 * This variable contains
+	 * These variables contain
 	 * given username to access
 	 * a computer via SSH
-	 * (for MariaDB).
+	 * (for each component).
 	 */
 	private String mariaDbSu;
+	private String karafSu;
+	private String ldapSu;
 
 	/**
-	 * This variable contains
+	 * These variables contain
 	 * given password to access
 	 * a computer via SSH 
-	 * (for MariaDB).
+	 * (for each component).
 	 */
 	private String mariaDbSuPass;
+	private String karafSuPass;
+	private String ldapSuPass;
 	
 	/**
-	 * This variable contains given 
+	 * These variables contain given 
 	 * SSH key's absolute path 
-	 * (for MariaDB).
+	 * (for each component).
 	 */
-	private String keyAbsPathMaria;
+	private String mariaKeyAbsPath;
+	private String karafKeyAbsPath;
+	private String ldapKeyAbsPath;
 	
 	/**
-	 * This variable contains given 
+	 * These variables contains given 
 	 * passphrase of the SSH key
-	 * (for MariaDB).
+	 * (for each component).
 	 */
-	private String passphraseMaria;
+	private String mariaPassphrase;
+	private String karafPassphrase;
+	private String ldapPassphrase;
 	
 	/**
-	 * This variable is true 
-	 * if repository is chosen as 
-	 * installation method (For MariaDB).
+	 * These variables are true 
+	 * if repository is chosen 
+	 * as installation method 
+	 * (for each component).
 	 */
-	private Boolean useRepositoryMaria = true;
+	private Boolean mariaUseRepository = true;
+	private Boolean karafUseRepository = true;
+	private Boolean ldapUseRepository = true;
 	
 	/**
-	 * Absolute path to MariaDB
-	 * deb file. 
+	 * These variables keep absolute path to
+	 * deb files (for each component). 
 	 */
 	private String mariaDebAbsPath;
+	private String karafDebAbsPath;
+	private String ldapDebAbsPath;
 	
 	/**
 	 * MariaDBSetupLocationPage variables
@@ -278,44 +293,164 @@ public class LiderSetupConfig {
 		this.mariaDbSuPass = mariaDbSuPass;
 	}
 
-	public String getKeyAbsPathMaria() {
-		return keyAbsPathMaria;
-	}
-
-	public void setKeyAbsPathMaria(String keyAbsPathMaria) {
-		this.keyAbsPathMaria = keyAbsPathMaria;
-	}
-
-	public String getPassphraseMaria() {
-		return passphraseMaria;
-	}
-
-	public void setPassphraseMaria(String passphraseMaria) {
-		this.passphraseMaria = passphraseMaria;
-	}
-
-	public boolean isUseSSHMaria() {
-		return useSSHMaria;
-	}
-
-	public void setUseSSHMaria(boolean useSSHMaria) {
-		this.useSSHMaria = useSSHMaria;
-	}
-
-	public Boolean isUseRepositoryMaria() {
-		return useRepositoryMaria;
-	}
-
-	public void setUseRepositoryMaria(Boolean useRepositoryMaria) {
-		this.useRepositoryMaria = useRepositoryMaria;
-	}
-
 	public String getMariaDebAbsPath() {
 		return mariaDebAbsPath;
 	}
 
 	public void setMariaDebAbsPath(String mariaDebAbsPath) {
 		this.mariaDebAbsPath = mariaDebAbsPath;
+	}
+
+	public boolean isMariaUseSSH() {
+		return mariaUseSSH;
+	}
+
+	public void setMariaUseSSH(boolean mariaUseSSH) {
+		this.mariaUseSSH = mariaUseSSH;
+	}
+
+	public boolean isKarafUseSSH() {
+		return karafUseSSH;
+	}
+
+	public void setKarafUseSSH(boolean karafUseSSH) {
+		this.karafUseSSH = karafUseSSH;
+	}
+
+	public String getMariaKeyAbsPath() {
+		return mariaKeyAbsPath;
+	}
+
+	public void setMariaKeyAbsPath(String mariaKeyAbsPath) {
+		this.mariaKeyAbsPath = mariaKeyAbsPath;
+	}
+
+	public String getKarafKeyAbsPath() {
+		return karafKeyAbsPath;
+	}
+
+	public void setKarafKeyAbsPath(String karafKeyAbsPath) {
+		this.karafKeyAbsPath = karafKeyAbsPath;
+	}
+
+	public String getMariaPassphrase() {
+		return mariaPassphrase;
+	}
+
+	public void setMariaPassphrase(String mariaPassphrase) {
+		this.mariaPassphrase = mariaPassphrase;
+	}
+
+	public String getKarafPassphrase() {
+		return karafPassphrase;
+	}
+
+	public void setKarafPassphrase(String karafPassphrase) {
+		this.karafPassphrase = karafPassphrase;
+	}
+
+	public Boolean isMariaUseRepository() {
+		return mariaUseRepository;
+	}
+
+	public void setMariaUseRepository(Boolean mariaUseRepository) {
+		this.mariaUseRepository = mariaUseRepository;
+	}
+
+	public Boolean isKarafUseRepository() {
+		return karafUseRepository;
+	}
+
+	public void setKarafUseRepository(Boolean karafUseRepository) {
+		this.karafUseRepository = karafUseRepository;
+	}
+
+	public String getKarafDebAbsPath() {
+		return karafDebAbsPath;
+	}
+
+	public void setKarafDebAbsPath(String karafDebAbsPath) {
+		this.karafDebAbsPath = karafDebAbsPath;
+	}
+
+	public boolean isLdapUseSSH() {
+		return ldapUseSSH;
+	}
+
+	public void setLdapUseSSH(boolean ldapUseSSH) {
+		this.ldapUseSSH = ldapUseSSH;
+	}
+
+	public String getKarafSu() {
+		return karafSu;
+	}
+
+	public void setKarafSu(String karafSu) {
+		this.karafSu = karafSu;
+	}
+
+	public String getLdapSu() {
+		return ldapSu;
+	}
+
+	public void setLdapSu(String ldapSu) {
+		this.ldapSu = ldapSu;
+	}
+
+	public String getKarafSuPass() {
+		return karafSuPass;
+	}
+
+	public void setKarafSuPass(String karafSuPass) {
+		this.karafSuPass = karafSuPass;
+	}
+
+	public String getLdapSuPass() {
+		return ldapSuPass;
+	}
+
+	public void setLdapSuPass(String ldapSuPass) {
+		this.ldapSuPass = ldapSuPass;
+	}
+
+	public String getLdapKeyAbsPath() {
+		return ldapKeyAbsPath;
+	}
+
+	public void setLdapKeyAbsPath(String ldapKeyAbsPath) {
+		this.ldapKeyAbsPath = ldapKeyAbsPath;
+	}
+
+	public String getLdapPassphrase() {
+		return ldapPassphrase;
+	}
+
+	public void setLdapPassphrase(String ldapPassphrase) {
+		this.ldapPassphrase = ldapPassphrase;
+	}
+
+	public Boolean isLdapUseRepository() {
+		return ldapUseRepository;
+	}
+
+	public void setLdapUseRepository(Boolean ldapUseRepository) {
+		this.ldapUseRepository = ldapUseRepository;
+	}
+
+	public String getLdapDebAbsPath() {
+		return ldapDebAbsPath;
+	}
+
+	public void setLdapDebAbsPath(String ldapDebAbsPath) {
+		this.ldapDebAbsPath = ldapDebAbsPath;
+	}
+
+	public Boolean getMariaUseRepository() {
+		return mariaUseRepository;
+	}
+
+	public Boolean getKarafUseRepository() {
+		return karafUseRepository;
 	}
 	
 }

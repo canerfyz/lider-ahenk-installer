@@ -25,7 +25,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class MariaDBSetupMethodPage extends WizardPage {
+public class KarafSetupMethodPage extends WizardPage {
 
 	private LiderSetupConfig config;
 
@@ -38,10 +38,10 @@ public class MariaDBSetupMethodPage extends WizardPage {
 
 	private byte[] debContent;
 
-	public MariaDBSetupMethodPage(LiderSetupConfig config) {
-		super(MariaDBSetupMethodPage.class.getName(), Messages
+	public KarafSetupMethodPage(LiderSetupConfig config) {
+		super(KarafSetupMethodPage.class.getName(), Messages
 				.getString("LIDER_INSTALLATION"), null);
-		setDescription("2.2 " + Messages.getString("MARIA_DB_INSTALLATION_METHOD") + " - " + Messages.getString("DB_SETUP_METHOD_DESC"));
+		setDescription("5.2 " + Messages.getString("KARAF_INSTALLATION_METHOD") + " - " + Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
 
@@ -51,12 +51,11 @@ public class MariaDBSetupMethodPage extends WizardPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		// Ask user if MariaDB will be installed from a .deb package or via
+		// Ask user if Karaf will be installed from a .deb package or via
 		// apt-get
 		btnAptGet = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("DB_SETUP_METHOD_APT_GET"));
+				Messages.getString("KARAF_SETUP_METHOD_APT_GET"));
 		btnAptGet.addSelectionListener(new SelectionListener() {
-
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (btnAptGet.getSelection()) {
@@ -69,11 +68,10 @@ public class MariaDBSetupMethodPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
 		btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("DB_SETUP_METHOD_DEB"));
+				Messages.getString("KARAF_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -159,17 +157,16 @@ public class MariaDBSetupMethodPage extends WizardPage {
 	private void setConfigVariables() {
 		
 		if (btnAptGet.getSelection()) {
-			config.setMariaUseRepository(true);
+			config.setKarafUseRepository(true);
 		}
 		else {
-			config.setMariaUseRepository(false);
-			config.setMariaDebAbsPath(txtFileName.getText());
+			config.setKarafUseRepository(false);
+			config.setKarafDebAbsPath(txtFileName.getText());
 		}
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		
 		// Set variables before going to next page.
 		setConfigVariables();
 		

@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages;
+package tr.org.pardus.mys.liderahenksetup.utils;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -11,10 +11,17 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.pardus.mys.liderahenksetup.lider.config.LiderSetupConfig;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.KarafAccessPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.KarafConfirmPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.KarafSetupMethodPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LdapAccessPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LdapConfirmPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LdapSetupMethodPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderDistributionSelectionPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.LiderLocationOfComponentsPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBConfirmPage;
+import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBInstallationStatus;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDbAccessPage;
 import tr.org.pardus.mys.liderahenksetup.lider.wizard.pages.MariaDBSetupMethodPage;
 
@@ -36,21 +43,41 @@ public class LiderSetupWizard extends Wizard {
 	 * 
 	 * Other pages will be added dynamically according to user action!
 	 */
-	LiderComponentSelectionPage firstPage = new LiderComponentSelectionPage(config);
-	LiderLocationOfComponentsPage secondPage = new LiderLocationOfComponentsPage(config);
-	MariaDbAccessPage thirdPage = new MariaDbAccessPage(config); 
+	LiderComponentSelectionPage compSelect = new LiderComponentSelectionPage(config);
+	LiderLocationOfComponentsPage locatOfComps = new LiderLocationOfComponentsPage(config);
+	// TODO do we need that? If not delete
 	LiderDistributionSelectionPage fourthPage = new LiderDistributionSelectionPage(config); //TODO DELETE
-	MariaDBSetupMethodPage mdbSetupMethodPage = new MariaDBSetupMethodPage(config);
-	MariaDBConfirmPage mdbConfirmPage = new MariaDBConfirmPage(config);
-
+	
+	MariaDbAccessPage mariaAccess = new MariaDbAccessPage(config); 
+	MariaDBSetupMethodPage mariaSetup = new MariaDBSetupMethodPage(config);
+	MariaDBConfirmPage mariaConfirm = new MariaDBConfirmPage(config);
+	MariaDBInstallationStatus mariaStatus = new MariaDBInstallationStatus(config);
+	
+	LdapAccessPage ldapAccess = new LdapAccessPage(config);
+	LdapSetupMethodPage ldapSetup = new LdapSetupMethodPage(config);
+	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
+	
+	KarafAccessPage karafAccess = new KarafAccessPage(config);
+	KarafSetupMethodPage karafSetup = new KarafSetupMethodPage(config);
+	KarafConfirmPage karafConfirm = new KarafConfirmPage(config);
 	@Override
 	public void addPages() {
 		// Add first page as default, so the wizard can show it on startup
-		addPage(firstPage);
-		addPage(secondPage);
-		addPage(thirdPage);
-		addPage(mdbSetupMethodPage);
-		addPage(mdbConfirmPage);
+		addPage(compSelect);
+		addPage(locatOfComps);
+		
+		addPage(mariaAccess);
+		addPage(mariaSetup);
+		addPage(mariaConfirm);
+		addPage(mariaStatus);
+		
+		addPage(ldapAccess);
+		addPage(ldapSetup);
+		addPage(ldapConfirm);
+		
+		addPage(karafAccess);
+		addPage(karafSetup);
+		addPage(karafConfirm);
 
 		// set this to true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);

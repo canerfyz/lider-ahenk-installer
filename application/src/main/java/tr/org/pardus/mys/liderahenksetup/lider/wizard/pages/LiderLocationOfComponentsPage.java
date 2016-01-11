@@ -406,16 +406,64 @@ public void disableNotSelectedComponents() {
 	// This method sets the info taken
 	// from user to variables in config.
 	private void setConfigVariables() {
-		
+		/**
+		 * If components will be installed to same machine
+		 */
 		if (installCentral.getSelection()) {
+			/**
+			 * If all components will be installed to localhost
+			 */
 			if (local.getSelection()) {
-				config.setMariaDbIp("localhost");
+				/**
+				 * Set only selected components
+				 */
+				if (config.getComponentsToBeInstalled().get("MariaDB")) {
+					config.setMariaDbIp("localhost");
+				}
+				
+				if (config.getComponentsToBeInstalled().get("LDAP")) {
+					config.setLdapIp("localhost");
+				}
+				
+				if (config.getComponentsToBeInstalled().get("Ejabberd")) {
+					config.setEjabberdIp("localhost");
+				}
+				
+				if (config.getComponentsToBeInstalled().get("Lider")) {
+					config.setLiderIp("localhost");
+				}
 			}
+			/**
+			 * If all components will be installed to a remote computer
+			 */
 			else {
-				config.setMariaDbIp(remoteIp.getText());
+				/**
+				 * Set only selected components
+				 */
+				if (config.getComponentsToBeInstalled().get("MariaDB")) {
+					config.setMariaDbIp(remoteIp.getText());
+				}
+				
+				if (config.getComponentsToBeInstalled().get("LDAP")) {
+					config.setLdapIp(remoteIp.getText());
+				}
+				
+				if (config.getComponentsToBeInstalled().get("Ejabberd")) {
+					config.setEjabberdIp(remoteIp.getText());
+				}
+				
+				if (config.getComponentsToBeInstalled().get("Lider")) {
+					config.setLiderIp(remoteIp.getText());
+				}
 			}
 		}
+		/**
+		 * If components will be installed distributed.
+		 */
 		else {
+			/**
+			 * Set only selected components
+			 */
 			if (config.getComponentsToBeInstalled().get("MariaDB")) {
 				config.setMariaDbIp(mariaDbIp.getText());
 			}
@@ -433,7 +481,6 @@ public void disableNotSelectedComponents() {
 			}
 		}
 	}
-	
 	
 	// This method decides next page
 	// according to user's component choices

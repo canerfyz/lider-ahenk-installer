@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.TableItem;
 
 import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.AhenkSetupWizard;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkInstallationUtil;
 import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.utils.AhenkInstallationUtil;
 
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;

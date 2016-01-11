@@ -48,8 +48,7 @@ public class ApplicationWindowManager {
 		LiderAhenkUtils.ImageButton(comp, liderImage, ahenkImage, new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-//				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new LiderSetupWizard());
-				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(composite.getShell(), 
+				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(comp.getShell(), 
 						new LiderSetupWizard(), new Point(800, 600));
 				wizardDialog.open();
 			}
@@ -65,8 +64,7 @@ public class ApplicationWindowManager {
 		LiderAhenkUtils.ImageButton(comp, ahenkImage, liderImage, new MouseListener() {
 			@Override
 			public void mouseUp(MouseEvent e) {
-//				WizardDialog wizardDialog = new WizardDialog(composite.getShell(), new AhenkSetupWizard());
-				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(composite.getShell(), 
+				WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(comp.getShell(), 
 						new AhenkSetupWizard(), new Point(800, 600));
 				wizardDialog.open();
 			}

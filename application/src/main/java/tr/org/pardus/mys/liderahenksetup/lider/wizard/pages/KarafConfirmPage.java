@@ -14,22 +14,22 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
-public class MariaDBConfirmPage extends WizardPage {
+public class KarafConfirmPage extends WizardPage {
 
 	private LiderSetupConfig config;
 	
 	// Widgets
-	private Label mariaDb;
+	private Label karaf;
 	private Label ip;
 	private Label connectionMethod;
 	private Label setupMethod;
 	private Label question;
 	
-	public MariaDBConfirmPage(LiderSetupConfig config) {
-		super(MariaDBConfirmPage.class.getName(), 
+	public KarafConfirmPage(LiderSetupConfig config) {
+		super(KarafConfirmPage.class.getName(), 
 				Messages.getString("LIDER_INSTALLATION"), null);
 		
-		setDescription("2.3 " + Messages.getString("MARIA_DB_INSTALLATION_CONFIRM"));
+		setDescription("5.3 " + Messages.getString("KARAF_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
 
@@ -39,8 +39,8 @@ public class MariaDBConfirmPage extends WizardPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 		
-		mariaDb = GUIHelper.createLabel(container, "Maria DB " + 
-				Messages.getString("VERSION") + ": " + config.getMariaDbVersion() + ";");
+		karaf = GUIHelper.createLabel(container, "Apache Karaf " + 
+				Messages.getString("VERSION") + ": " + config.getLiderVersion() + ";");
 		
 		GridData gd = new GridData();
 		gd.widthHint = 200;
@@ -49,15 +49,15 @@ public class MariaDBConfirmPage extends WizardPage {
 		ip.setLayoutData(gd);
 		
 		connectionMethod = GUIHelper.createLabel(container, "- " + 
-				Messages.getString(config.isMariaUseSSH() ? 
+				Messages.getString(config.isKarafUseSSH() ? 
 						"ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 		
 		setupMethod = GUIHelper.createLabel(container, "- " +
-				Messages.getString(config.isMariaUseRepository() ? 
+				Messages.getString(config.isKarafUseRepository() ?
 						"USE_REPOSITORY" : "USE_GIVEN_DEB"));
 		
 		question = GUIHelper.createLabel(container, 
-				Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " " +
+				Messages.getString("KARAF_WILL_BE_INSTALLED") + " " +
 				Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 	
@@ -66,7 +66,7 @@ public class MariaDBConfirmPage extends WizardPage {
 		/**
 		 * Set the IP info in the opening of page
 		 */
-		ip.setText("- IP: " + config.getMariaDbIp());
+		ip.setText("- IP: " + config.getLiderIp());
 		
 		return super.getNextPage();
 	}

@@ -26,7 +26,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
-public class MariaDbAccessPage extends WizardPage {
+public class KarafAccessPage extends WizardPage {
 
 	private LiderSetupConfig config;
 	
@@ -47,12 +47,12 @@ public class MariaDbAccessPage extends WizardPage {
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
 	
-	public MariaDbAccessPage(LiderSetupConfig config) {
-		super(MariaDbAccessPage.class.getName(), 
+	public KarafAccessPage(LiderSetupConfig config) {
+		super(KarafAccessPage.class.getName(), 
 				Messages.getString("LIDER_INSTALLATION"), null);
 
-		setDescription("2.1 " + 
-				Messages.getString("MARIA_DB_ACCESS_FOR_INSTALLATION"));
+		setDescription("5.1 " + 
+				Messages.getString("KARAF_ACCESS_FOR_INSTALLATION"));
 		
 		this.config = config;
 		
@@ -264,20 +264,21 @@ public class MariaDbAccessPage extends WizardPage {
 	 * to appropriate variables in LiderSetupConfig.
 	 */
 	private void setConfigVariables() {
+		
 		if (usernamePassword.getSelection()) {
 			
-			config.setMariaUseSSH(false);
+			config.setKarafUseSSH(false);
 
-			config.setMariaDbSu(usernameTxt.getText());
+			config.setKarafSu(usernameTxt.getText());
 			
-			config.setMariaDbSuPass(passwordTxt.getText());
+			config.setKarafSuPass(passwordTxt.getText());
 		}
 		else {
-			config.setMariaUseSSH(true);
+			config.setKarafUseSSH(true);
 
-			config.setMariaKeyAbsPath(privateKeyTxt.getText());
+			config.setKarafKeyAbsPath(privateKeyTxt.getText());
 			
-			config.setMariaPassphrase(passphraseTxt.getText());
+			config.setKarafPassphrase(passphraseTxt.getText());
 		}
 	}
 
@@ -290,6 +291,16 @@ public class MariaDbAccessPage extends WizardPage {
 		
 		return super.getNextPage();
 	}
+
+	@Override
+	public IWizardPage getPreviousPage() {
+		/**
+		 * Do not allow to go back from this page.
+		 */
+		return null;
+	}
+	
+	
 	
 	
 
