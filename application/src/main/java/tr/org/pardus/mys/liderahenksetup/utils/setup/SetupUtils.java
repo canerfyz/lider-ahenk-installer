@@ -45,6 +45,10 @@ public class SetupUtils {
 	 * Install package via apt-get
 	 */
 	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "sudo -S apt-get install -y {0}={1}";
+	/**
+	 * Install package via apt-get (without version)
+	 */
+	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "sudo -S apt-get install -y {0}";
 
 	/**
 	 * Install given package via dpkg
@@ -174,13 +178,25 @@ public class SetupUtils {
 							"Failed to execute command: " + command);
 				}
 
-				boolean exists = StringUtils.convertStream(
-						process.getInputStream()).contains(version);
-
-				logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
-						new Object[] { packageName, version, exists });
-
-				return exists;
+				/**
+				 * If input stream starts with "N:"
+				 * it means that there is not such package.
+				 */
+				if (version == null || "".equals(version)) {
+					boolean exists = !StringUtils.convertStream(
+							process.getInputStream()).startsWith("N:");
+					
+					return exists;
+				}
+				else {
+					boolean exists = StringUtils.convertStream(
+							process.getInputStream()).contains(version);
+					
+					logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
+							new Object[] { packageName, version, exists });
+					
+					return exists;
+				}
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -213,12 +229,21 @@ public class SetupUtils {
 					});
 			manager.disconnect();
 
-			boolean exists = versions.contains(version);
-
-			logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
-					new Object[] { packageName, version, exists });
-
-			return exists;
+			/**
+			 * If input stream starts with "N:"
+			 * it means that there is not such package.
+			 */
+			if (version == null || "".equals(version)) {
+				boolean exists = !versions.startsWith("N:");
+				return exists;
+			}
+			else {
+				boolean exists = versions.contains(version);
+				logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
+						new Object[] { packageName, version, exists });
+				
+				return exists;
+			}
 		}
 
 		logger.log(Level.INFO, "Does package {0}:{1} exist: {2}", new Object[] {
@@ -302,29 +327,33 @@ public class SetupUtils {
 				}
 			}
 		} else {
-
-			logger.log(Level.INFO,
-					"Checking package remotely on: {0} with username: {1}",
-					new Object[] { ip, username });
-
-			SSHManager manager = new SSHManager(ip, username, password, port,
-					privateKey);
-			manager.connect();
-			String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD,
-					new Object[] { packageName }, new IOutputStreamProvider() {
-						@Override
-						public byte[] getStreamAsByteArray() {
-							return (password + "\n").getBytes();
-						}
-			});
-			manager.disconnect();
-
-			boolean installed = versions.contains(version);
-
-			logger.log(Level.INFO, "Is package {0}:{1} installed: {2}",
-					new Object[] { packageName, version, installed });
-
-			return installed;
+			try {
+				logger.log(Level.INFO,
+						"Checking package remotely on: {0} with username: {1}",
+						new Object[] { ip, username });
+				
+				SSHManager manager = new SSHManager(ip, username, password, port,
+						privateKey);
+				manager.connect();
+				String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD,
+						new Object[] { packageName }, new IOutputStreamProvider() {
+					@Override
+					public byte[] getStreamAsByteArray() {
+						return (password + "\n").getBytes();
+					}
+				});
+				manager.disconnect();
+				
+				boolean installed = versions.contains(version);
+				
+				logger.log(Level.INFO, "Is package {0}:{1} installed: {2}",
+						new Object[] { packageName, version, installed });
+				
+				return installed;
+				
+			} catch (CommandExecutionException | SSHConnectionException e) {
+				e.printStackTrace();
+			}
 		}
 
 		logger.log(Level.INFO, "Is package {0}:{1} installed: {2}",
@@ -357,10 +386,23 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Installing package locally.");
 
 			try {
-
-				String command = INSTALL_PACKAGE_FROM_REPO_CMD.replace("{0}",
-						packageName).replace("{1}", version);
-				Process process = Runtime.getRuntime().exec(command);
+				
+				String command;
+				String logMessage;
+				
+				// If version is not given
+				if (version == null || "".equals(version)) {
+					command = INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION.
+							replace("{0}", packageName);
+					logMessage = "Package {0} installed successfully";
+				}
+				else {
+					command = INSTALL_PACKAGE_FROM_REPO_CMD.replace("{0}",
+							packageName).replace("{1}", version);
+					logMessage = "Package {0}:{1} installed successfully";
+				}
+				
+				Process process = Runtime.getRuntime().exec(command);	
 
 				if (password != null) {
 					OutputStream stdIn = process.getOutputStream();
@@ -384,10 +426,14 @@ public class SetupUtils {
 					throw new CommandExecutionException(
 							"Failed to execute command: " + command);
 				}
-
-				logger.log(Level.INFO,
-						"Package {0}:{1} installed successfully",
-						new Object[] { packageName, version });
+				if (version == null || "".equals(version)) {
+					logger.log(Level.INFO, logMessage,
+							new Object[] { packageName, version });
+				}
+				else {
+					logger.log(Level.INFO, logMessage,
+							new Object[] { packageName });
+				}
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -396,25 +442,45 @@ public class SetupUtils {
 			}
 
 		} else {
-
-			logger.log(Level.INFO,
-					"Installing package remotely on: {0} with username: {1}",
-					new Object[] { ip, username });
-
-			SSHManager manager = new SSHManager(ip, username, password, port,
-					privateKey);
-			manager.connect();
-			manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD, new Object[] {
-					packageName, version }, new IOutputStreamProvider() {
+			try {
+				logger.log(Level.INFO,
+						"Installing package remotely on: {0} with username: {1}",
+						new Object[] { ip, username });
+				
+				SSHManager manager = new SSHManager(ip, username, password, port,
+						privateKey);
+				manager.connect();
+				
+				// If version is not given
+				if (version == null || "".equals(version)) {
+					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, 
+							new Object[] { packageName }, new IOutputStreamProvider() {
 						@Override
 						public byte[] getStreamAsByteArray() {
 							return (password + "\n").getBytes();
 						}
 					});
-			manager.disconnect();
 
-			logger.log(Level.INFO, "Package {0}:{1} installed successfully",
-					new Object[] { packageName, version });
+					logger.log(Level.INFO, "Package {0} installed successfully",
+							new Object[] { packageName });
+				}
+				else {
+					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD, new Object[] {
+							packageName, version }, new IOutputStreamProvider() {
+						@Override
+						public byte[] getStreamAsByteArray() {
+							return (password + "\n").getBytes();
+						}
+					});
+
+					logger.log(Level.INFO, "Package {0}:{1} installed successfully",
+							new Object[] { packageName, version });
+				}
+				manager.disconnect();
+				
+			} catch (CommandExecutionException | SSHConnectionException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -583,7 +649,6 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Package {0} installed successfully",
 					debPackage.getName());
 		}
-
 	}
 
 	/**
@@ -663,7 +728,6 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Package {0} uninstalled successfully",
 					packageName);
 		}
-
 	}
 
 	/**

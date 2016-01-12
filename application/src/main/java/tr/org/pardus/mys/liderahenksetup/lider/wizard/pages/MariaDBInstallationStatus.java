@@ -66,7 +66,7 @@ public class MariaDBInstallationStatus extends WizardPage{
 		 * set isInstallationFinished to true when its done. 
 		 */
 		if (!isInstallationFinished) {
-//			LiderInstallationUtil.installMariaDB();
+			LiderInstallationUtil.installMariaDB(config);
 			isInstallationFinished = true;
 			setPageComplete(isInstallationFinished);
 		}
