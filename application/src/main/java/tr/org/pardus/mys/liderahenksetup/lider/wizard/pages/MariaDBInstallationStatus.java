@@ -59,12 +59,11 @@ public class MariaDBInstallationStatus extends WizardPage{
 
 	@Override
 	public IWizardPage getNextPage() {
-		/**
-		 * Start MariaDB installation here.
-		 * To prevent triggering installMariaDB method again
-		 * (i.e. when clicked "next" after installation finished),
-		 * set isInstallationFinished to true when its done. 
-		 */
+		// Start MariaDB installation here.
+		// To prevent triggering installMariaDB method again
+		// (i.e. when clicked "next" after installation finished),
+		// set isInstallationFinished to true when its done.
+		// TODO burdan sonrasını ayrı threadde çalıştır.
 		if (!isInstallationFinished) {
 			LiderInstallationUtil.installMariaDB(config);
 			isInstallationFinished = true;

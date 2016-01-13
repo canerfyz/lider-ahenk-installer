@@ -178,10 +178,8 @@ public class SetupUtils {
 							"Failed to execute command: " + command);
 				}
 
-				/**
-				 * If input stream starts with "N:"
-				 * it means that there is not such package.
-				 */
+				// If input stream starts with "N:"
+			    // it means that there is not such package.
 				if (version == null || "".equals(version)) {
 					boolean exists = !StringUtils.convertStream(
 							process.getInputStream()).startsWith("N:");
@@ -404,6 +402,7 @@ public class SetupUtils {
 				
 				Process process = Runtime.getRuntime().exec(command);	
 
+				// TODO eğer lokale sshla bağlanacaksam case'ini ele almak lazım.
 				if (password != null) {
 					OutputStream stdIn = process.getOutputStream();
 					BufferedWriter writer = new BufferedWriter(
