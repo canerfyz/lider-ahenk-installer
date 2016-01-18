@@ -50,7 +50,7 @@ public class LiderAhenkUtils {
 	 * <strong>mouseListener</strong> parameters can be passed as <strong>null</strong>
 	 * if handling such event is not needed.
 	 */
-	public static Label ImageButton(Composite parent, final Image image, 
+	public static Label imageButton(Composite parent, final Image image, 
 			final Image mouseOverImage, MouseListener mouseListener) {
 		
 		final Label imageButton = new Label(parent, SWT.NONE);

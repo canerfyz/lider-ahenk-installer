@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
+   <extension-point id="tr.org.liderahenk.installer.rcp.mainview" name="Exception Point for RCP Main View Buttons" schema="schema/tr.org.liderahenk.installer.rcp.mainview.exsd"/>
    <extension
          id="lider-ahenk-installer"
          point="org.eclipse.core.runtime.products">

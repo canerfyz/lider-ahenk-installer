@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Display;
 import tr.org.liderahenk.installer.ahenk.wizard.AhenkSetupWizard;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
-public class AhenkSetupHandler extends AbstractHandler {
+public class AhenkInstallationHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
