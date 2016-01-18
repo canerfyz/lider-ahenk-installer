@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages;
+package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -17,8 +17,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.StatusLineManager;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -26,7 +24,6 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -41,7 +38,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
@@ -49,12 +45,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 import org.nmap4j.data.host.Address;
 import org.nmap4j.data.nmaprun.Host;
 
-import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
-import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
+import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
+import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.network.MapContentProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
@@ -64,14 +59,13 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.TableThreadHelper;
 
 public class AhenkNetworkScanPage extends WizardPage {
 
-	private static final Logger logger = Logger
-			.getLogger(AhenkNetworkScanPage.class.getName());
+	private static final Logger logger = Logger.getLogger(AhenkNetworkScanPage.class.getName());
 
 	private AhenkSetupConfig config = null;
 
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
-	
+
 	// Widgets
 	private TableViewer tblVwrSetup;
 	private ProgressBar bar;
@@ -90,35 +84,29 @@ public class AhenkNetworkScanPage extends WizardPage {
 	ThreadPoolExecutor executor = null;
 
 	// Host colours
-	Color HOST_UP_COLOR = Display.getCurrent().getSystemColor(
-			SWT.COLOR_DARK_GREEN);
-	Color HOST_DOWN_COLOR = Display.getCurrent().getSystemColor(
-			SWT.COLOR_DARK_RED);
+	Color HOST_UP_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
+	Color HOST_DOWN_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
 
 	// Progress bar colour
-	Color PROGRESS_BAR_COLOR = Display.getCurrent().getSystemColor(
-			SWT.COLOR_DARK_BLUE);
+	Color PROGRESS_BAR_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE);
 
 	private LinkedHashMap<String, Host> hosts;
 
 	private static int NUM_THREADS = 50;
+
 	static {
 		String maxThreadSize = PropertyReader.property("max.thread.size");
-		NUM_THREADS = maxThreadSize != null ? Integer.parseInt(maxThreadSize)
-				: NUM_THREADS;
+		NUM_THREADS = maxThreadSize != null ? Integer.parseInt(maxThreadSize) : NUM_THREADS;
 	}
 
 	// Used by Timing Template combo.
-	private final String[] timingTemplateArr = new String[] { "PARANOID",
-			"SNEAKY", "POLITE", "NORMAL", "AGGRESSIVE", "INSANE" };
-	private final String[] timingTemplateValArr = new String[] { "0", "1", "2",
-			"3", "4", "5" };
+	private final String[] timingTemplateArr = new String[] { "PARANOID", "SNEAKY", "POLITE", "NORMAL", "AGGRESSIVE",
+			"INSANE" };
+	private final String[] timingTemplateValArr = new String[] { "0", "1", "2", "3", "4", "5" };
 
 	public AhenkNetworkScanPage(AhenkSetupConfig config) {
-		super(AhenkNetworkScanPage.class.getName(), Messages
-				.getString("INSTALLATION_OF_AHENK"), null);
-		setDescription(Messages
-				.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK_(NETWORK_SCAN)"));
+		super(AhenkNetworkScanPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
+		setDescription(Messages.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK_(NETWORK_SCAN)"));
 		this.config = config;
 		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
 		setPageComplete(true);
@@ -135,18 +123,17 @@ public class AhenkNetworkScanPage extends WizardPage {
 		// Create nmap parameters inputs
 		createInputs(container);
 
-		tblVwrSetup = new TableViewer(container, SWT.SINGLE
-				| SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
-		
+		tblVwrSetup = new TableViewer(container,
+				SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.H_SCROLL | SWT.CHECK);
+
 		final Table table = tblVwrSetup.getTable();
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
-		tblVwrSetup.getControl().setLayoutData(
-				new GridData(GridData.FILL, GridData.FILL, true, true));
+		tblVwrSetup.getControl().setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 
 		tblVwrSetup.addSelectionChangedListener(new ISelectionChangedListener() {
-			
+
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
 				if (!event.getSelection().isEmpty()) {
@@ -154,7 +141,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 				}
 			}
 		});
-		
+
 		createTableColumns(tblVwrSetup);
 
 		hosts = findIpRange();
@@ -169,9 +156,9 @@ public class AhenkNetworkScanPage extends WizardPage {
 		bar.setMinimum(0);
 		bar.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
 		bar.setForeground(PROGRESS_BAR_COLOR);
-		
+
 		setPageComplete(false);
-		
+
 	}
 
 	/**
@@ -180,7 +167,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 	 * 
 	 * @param container
 	 */
-	
+
 	private void createInputs(final Composite container) {
 
 		final Composite inputContainer = new Composite(container, SWT.NONE);
@@ -190,10 +177,8 @@ public class AhenkNetworkScanPage extends WizardPage {
 		Label lblTimingTemplate = new Label(inputContainer, SWT.NONE);
 		lblTimingTemplate.setText(Messages.getString("TIMING_TEMPLATE"));
 
-		cmbTimingTemplate = new Combo(inputContainer, SWT.BORDER
-				| SWT.DROP_DOWN | SWT.READ_ONLY);
-		cmbTimingTemplate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				false));
+		cmbTimingTemplate = new Combo(inputContainer, SWT.BORDER | SWT.DROP_DOWN | SWT.READ_ONLY);
+		cmbTimingTemplate.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		for (int i = 0; i < timingTemplateArr.length; i++) {
 			String i18n = Messages.getString(timingTemplateArr[i]);
 			if (i18n != null && !i18n.isEmpty()) {
@@ -219,7 +204,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 				updatePageStatus(tblVwrSetup, btnOsGuess);
 				organizeSudoFields();
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -249,8 +234,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 		lblIpRange.setText(Messages.getString("IP_RANGE"));
 
 		txtIpRange = new Text(inputContainer, SWT.BORDER);
-		txtIpRange
-				.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		txtIpRange.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
 		// Network Scan Button
 		btnScan = new Button(inputContainer, SWT.NONE);
@@ -260,8 +244,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 
 				// Start a new scan!
-				if (executor == null || executor.isShutdown()
-						|| executor.isTerminated()) {
+				if (executor == null || executor.isShutdown() || executor.isTerminated()) {
 
 					btnScan.setText(Messages.getString("STOP_SCAN"));
 
@@ -269,10 +252,8 @@ public class AhenkNetworkScanPage extends WizardPage {
 					// otherwise find all IP addresses on the connected networks
 					List<String> ipAddresses = null;
 					try {
-						if (txtIpRange.getText() != null
-								&& !txtIpRange.getText().isEmpty()) {
-							ipAddresses = NetworkUtils
-									.convertToIpList(txtIpRange.getText());
+						if (txtIpRange.getText() != null && !txtIpRange.getText().isEmpty()) {
+							ipAddresses = NetworkUtils.convertToIpList(txtIpRange.getText());
 						} else {
 							ipAddresses = NetworkUtils.findIpAddresses();
 						}
@@ -289,15 +270,12 @@ public class AhenkNetworkScanPage extends WizardPage {
 						// Create thread pool executor!
 						LinkedBlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<Runnable>();
 						@SuppressWarnings({ "unchecked", "rawtypes" })
-						final List<Runnable> running = Collections
-								.synchronizedList(new ArrayList());
-						executor = new ThreadPoolExecutor(NUM_THREADS,
-								NUM_THREADS, 0L, TimeUnit.MILLISECONDS,
+						final List<Runnable> running = Collections.synchronizedList(new ArrayList());
+						executor = new ThreadPoolExecutor(NUM_THREADS, NUM_THREADS, 0L, TimeUnit.MILLISECONDS,
 								taskQueue, Executors.defaultThreadFactory()) {
 
 							@Override
-							protected <T> RunnableFuture<T> newTaskFor(
-									final Runnable runnable, T value) {
+							protected <T> RunnableFuture<T> newTaskFor(final Runnable runnable, T value) {
 								return new FutureTask<T>(runnable, value) {
 									@Override
 									public String toString() {
@@ -316,30 +294,24 @@ public class AhenkNetworkScanPage extends WizardPage {
 							protected void afterExecute(Runnable r, Throwable t) {
 								super.afterExecute(r, t);
 								running.remove(r);
-								logger.log(Level.INFO, "Running threads: {0}",
-										running);
+								logger.log(Level.INFO, "Running threads: {0}", running);
 							}
 						};
 
 						// Threads use this helper class to modify IP table.
-						TableThreadHelper tableHelper = new TableThreadHelper(
-								tblVwrSetup, hosts);
+						TableThreadHelper tableHelper = new TableThreadHelper(tblVwrSetup, hosts);
 
 						int numberOfHosts = ipAddresses.size();
 						int hostsPerThread = numberOfHosts / NUM_THREADS;
 
-						logger.log(
-								Level.INFO,
-								"Hosts: {0}, Threads:{1}, Host per Thread: {2}",
-								new Object[] { numberOfHosts, NUM_THREADS,
-										hostsPerThread });
+						logger.log(Level.INFO, "Hosts: {0}, Threads:{1}, Host per Thread: {2}",
+								new Object[] { numberOfHosts, NUM_THREADS, hostsPerThread });
 
 						for (int i = 0; i < numberOfHosts; i += hostsPerThread) {
 
 							int toIndex = i + hostsPerThread;
 							List<String> ipSubList = ipAddresses.subList(i,
-									toIndex < ipAddresses.size() ? toIndex
-											: ipAddresses.size() - 1);
+									toIndex < ipAddresses.size() ? toIndex : ipAddresses.size() - 1);
 
 							NmapParameters params = new NmapParameters();
 							params.setIpList(ipSubList);
@@ -348,8 +320,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 							params.setSudoUsername(getSudoUsernameIfExists());
 							params.setTimingTemplate(getSelectedTimingTemplate());
 
-							RunnableNmap4j nmap4jThread = new RunnableNmap4j(
-									tableHelper, params);
+							RunnableNmap4j nmap4jThread = new RunnableNmap4j(tableHelper, params);
 							executor.execute(nmap4jThread);
 						}
 
@@ -358,17 +329,17 @@ public class AhenkNetworkScanPage extends WizardPage {
 						executor.shutdown();
 
 						// Çok hantal! tabloyu kitliyor!
-//						Display.getCurrent().asyncExec(new Runnable() {
-//							public void run() {
-//								try {
-//									while (!executor.awaitTermination(2000,
-//											TimeUnit.MILLISECONDS));
-//									btnScan.setText(Messages.getString("START_SCAN"));
-//								} catch (InterruptedException e1) {
-//									e1.printStackTrace();
-//								}
-//							}
-//						});
+						// Display.getCurrent().asyncExec(new Runnable() {
+						// public void run() {
+						// try {
+						// while (!executor.awaitTermination(2000,
+						// TimeUnit.MILLISECONDS));
+						// btnScan.setText(Messages.getString("START_SCAN"));
+						// } catch (InterruptedException e1) {
+						// e1.printStackTrace();
+						// }
+						// }
+						// });
 						// Display.getCurrent().asyncExec(new Runnable() {
 						// public void run() {
 						// try {
@@ -407,10 +378,8 @@ public class AhenkNetworkScanPage extends WizardPage {
 							executor.shutdownNow();
 							// TODO print status: stopping threads
 							try {
-								while (!executor.awaitTermination(10,
-										TimeUnit.SECONDS)) {
-									logger.log(Level.INFO,
-											"Awaiting completion of threads.");
+								while (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+									logger.log(Level.INFO, "Awaiting completion of threads.");
 								}
 							} catch (InterruptedException e1) {
 							}
@@ -419,16 +388,14 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 					btnScan.setText(Messages.getString("START_SCAN"));
 				}
-				
+
 			}
 
 			private String getSelectedTimingTemplate() {
 				int selectionIndex = cmbTimingTemplate.getSelectionIndex();
-				if (selectionIndex > -1
-						&& cmbTimingTemplate.getItem(selectionIndex) != null
+				if (selectionIndex > -1 && cmbTimingTemplate.getItem(selectionIndex) != null
 						&& cmbTimingTemplate.getData(selectionIndex + "") != null) {
-					return cmbTimingTemplate.getData(selectionIndex + "")
-							.toString();
+					return cmbTimingTemplate.getData(selectionIndex + "").toString();
 				}
 				return "4";
 			}
@@ -442,16 +409,14 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 			private String getSudoUsernameIfExists() {
 				if (btnOsGuess.getSelection()) {
-					return (txtSudoUsername.getText() == null || txtSudoUsername
-							.getText().isEmpty()) ? "root" : txtSudoUsername
-							.getText();
+					return (txtSudoUsername.getText() == null || txtSudoUsername.getText().isEmpty()) ? "root"
+							: txtSudoUsername.getText();
 				}
 				return null;
 			}
 
 			private String getSudoPasswdIfExists() {
-				if (btnOsGuess.getSelection()
-						&& txtSudoPassword.getText() != null
+				if (btnOsGuess.getSelection() && txtSudoPassword.getText() != null
 						&& !txtSudoPassword.getText().isEmpty()) {
 					return txtSudoPassword.getText();
 				}
@@ -463,11 +428,11 @@ public class AhenkNetworkScanPage extends WizardPage {
 			}
 		});
 		new Label(inputContainer, SWT.NONE);
-		
+
 		// Create New Composite for Select All and Select Onlines Buttons
 		final Composite selectBtnContainer = new Composite(container, SWT.NONE);
 		selectBtnContainer.setLayout(new GridLayout(3, false));
-		
+
 		// Select All Button
 		btnSelectAll = new Button(selectBtnContainer, SWT.PUSH);
 		btnSelectAll.setText(Messages.getString("SELECT_ALL"));
@@ -476,6 +441,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				selectDeselectAll("S");
 			}
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -489,11 +455,12 @@ public class AhenkNetworkScanPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				selectDeselectAll("D");
 			}
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		// Select Online IPs
 		btnSelectOnlines = new Button(selectBtnContainer, SWT.PUSH);
 		btnSelectOnlines.setText(Messages.getString("SELECT_ONLINE_IPS"));
@@ -502,6 +469,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 				selectOnlineIps();
 			}
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -545,11 +513,10 @@ public class AhenkNetworkScanPage extends WizardPage {
 	 * @param tblVwrSetup
 	 */
 	private void createTableColumns(TableViewer tblVwrSetup) {
-		
+
 		CellEditor editor = new CheckboxCellEditor(tblVwrSetup.getTable());
 
-		TableViewerColumn ipCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("IP_ADDRESS"), 100);
+		TableViewerColumn ipCol = createTableViewerColumn(tblVwrSetup, Messages.getString("IP_ADDRESS"), 100);
 		ipCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -562,98 +529,84 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 			@Override
 			public Color getForeground(Object element) {
-				if (element instanceof Host && NetworkUtils
-						.isHostUp((Host) element)) {
+				if (element instanceof Host && NetworkUtils.isHostUp((Host) element)) {
 					return HOST_UP_COLOR;
-				}
-				else {
+				} else {
 					return HOST_DOWN_COLOR;
 				}
 			}
 		});
-		
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-//		tblVwrSetup.setCellEditors(new CellEditor[]{ editor });
-//		ipCol.setEditingSupport(new EnableEditingSupport(tblVwrSetup));
 
-		TableViewerColumn hostnameCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("HOST_NAME"), 50);
+		// TODO
+		// TODO
+		// TODO
+		// TODO
+		// TODO
+		// TODO
+		// tblVwrSetup.setCellEditors(new CellEditor[]{ editor });
+		// ipCol.setEditingSupport(new EnableEditingSupport(tblVwrSetup));
+
+		TableViewerColumn hostnameCol = createTableViewerColumn(tblVwrSetup, Messages.getString("HOST_NAME"), 50);
 		hostnameCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
 					String hostname = NetworkUtils.getHostname((Host) element);
-					return hostname != null ? hostname : Messages
-							.getString("UNTITLED");
+					return hostname != null ? hostname : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
 
-		TableViewerColumn portsCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("PORTS"), 150);
+		TableViewerColumn portsCol = createTableViewerColumn(tblVwrSetup, Messages.getString("PORTS"), 150);
 		portsCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
-					String openPorts = NetworkUtils
-							.getOpenPorts((Host) element);
-					return openPorts != null ? openPorts : Messages
-							.getString("UNTITLED");
+					String openPorts = NetworkUtils.getOpenPorts((Host) element);
+					return openPorts != null ? openPorts : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
 
-		TableViewerColumn osCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("OS_INFO"), 250);
+		TableViewerColumn osCol = createTableViewerColumn(tblVwrSetup, Messages.getString("OS_INFO"), 250);
 		osCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
 					String osGuess = NetworkUtils.getOsGuess((Host) element);
-					return osGuess != null ? osGuess : Messages
-							.getString("UNTITLED");
+					return osGuess != null ? osGuess : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
 
-		TableViewerColumn distanceCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("DISTANCE"), 30);
+		TableViewerColumn distanceCol = createTableViewerColumn(tblVwrSetup, Messages.getString("DISTANCE"), 30);
 		distanceCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
 					String distance = NetworkUtils.getDistance((Host) element);
-					return distance != null ? distance : Messages
-							.getString("UNTITLED");
+					return distance != null ? distance : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
 
-		TableViewerColumn uptimeCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("UPTIME"), 50);
+		TableViewerColumn uptimeCol = createTableViewerColumn(tblVwrSetup, Messages.getString("UPTIME"), 50);
 		uptimeCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
 					String uptime = NetworkUtils.getUptime((Host) element);
-					return uptime != null ? uptime : Messages
-							.getString("UNTITLED");
+					return uptime != null ? uptime : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
 
-		TableViewerColumn macAddressCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("MAC_ADDRESS"), 100);
+		TableViewerColumn macAddressCol = createTableViewerColumn(tblVwrSetup, Messages.getString("MAC_ADDRESS"), 100);
 		macAddressCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
@@ -665,20 +618,18 @@ public class AhenkNetworkScanPage extends WizardPage {
 			}
 		});
 
-		TableViewerColumn macVendorCol = createTableViewerColumn(tblVwrSetup,
-				Messages.getString("MAC_VENDOR"), 100);
+		TableViewerColumn macVendorCol = createTableViewerColumn(tblVwrSetup, Messages.getString("MAC_VENDOR"), 100);
 		macVendorCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
 				if (element instanceof Host) {
 					String vendor = NetworkUtils.getMacVendor((Host) element);
-					return vendor != null ? vendor : Messages
-							.getString("UNTITLED");
+					return vendor != null ? vendor : Messages.getString("UNTITLED");
 				}
 				return Messages.getString("UNTITLED");
 			}
 		});
-		
+
 	}
 
 	/**
@@ -689,10 +640,8 @@ public class AhenkNetworkScanPage extends WizardPage {
 	 * @param bound
 	 * @return
 	 */
-	private TableViewerColumn createTableViewerColumn(
-			final TableViewer tblVwrSetup, String title, int bound) {
-		final TableViewerColumn viewerColumn = new TableViewerColumn(
-				tblVwrSetup, SWT.NONE);
+	private TableViewerColumn createTableViewerColumn(final TableViewer tblVwrSetup, String title, int bound) {
+		final TableViewerColumn viewerColumn = new TableViewerColumn(tblVwrSetup, SWT.NONE);
 		final TableColumn column = viewerColumn.getColumn();
 		column.setText(title);
 		column.setWidth(bound);
@@ -701,46 +650,44 @@ public class AhenkNetworkScanPage extends WizardPage {
 		column.setAlignment(SWT.LEFT);
 		return viewerColumn;
 	}
-	
+
 	private void updatePageStatus(TableViewer tblVwrSetup, Button btnOsGuess) {
 
-		//At least one IP should be selected
+		// At least one IP should be selected
 		boolean ipSelected = false;
-		
+
 		TableItem[] items = tblVwrSetup.getTable().getItems();
 
 		for (int i = 0; i < items.length; i++) {
 			if (items[i].getChecked()) {
 				ipSelected = true;
-				//If one of the IP's is selected, that's enough
-				//do not iterate over all items
+				// If one of the IP's is selected, that's enough
+				// do not iterate over all items
 				i = items.length;
 			}
 		}
-		
-		//If show OS info checkbox is selected, sudo info should be entered.
+
+		// If show OS info checkbox is selected, sudo info should be entered.
 		boolean sudoInfoEntered = false;
-		
+
 		if (btnOsGuess.getSelection()) {
-			if ((!"".equals(txtSudoUsername.getText()) && txtSudoUsername.getText() != null) && 
-					(!"".equals(txtSudoPassword.getText()) && txtSudoPassword.getText() != null)) {
+			if ((!"".equals(txtSudoUsername.getText()) && txtSudoUsername.getText() != null)
+					&& (!"".equals(txtSudoPassword.getText()) && txtSudoPassword.getText() != null)) {
 				sudoInfoEntered = true;
-			}
-			else {
+			} else {
 				sudoInfoEntered = false;
 			}
-		}
-		else {
+		} else {
 			sudoInfoEntered = true;
 		}
-		
-		//If required info is entered and at least one IP is selected 
+
+		// If required info is entered and at least one IP is selected
 		// then set page complete.
 		setPageComplete(ipSelected && sudoInfoEntered);
 	}
-	
+
 	// TODO tablefilter
-	//Select or deselect all checkboxes
+	// Select or deselect all checkboxes
 	private void selectDeselectAll(String selectOrDeselect) {
 		TableItem[] items = tblVwrSetup.getTable().getItems();
 
@@ -748,40 +695,37 @@ public class AhenkNetworkScanPage extends WizardPage {
 			for (int i = 0; i < items.length; i++) {
 				items[i].setChecked(true);
 			}
-		}
-		else {
+		} else {
 			for (int i = 0; i < items.length; i++) {
 				items[i].setChecked(false);
 			}
 		}
 		updatePageStatus(tblVwrSetup, btnOsGuess);
 	}
-	
+
 	private void selectOnlineIps() {
 		TableItem[] items = tblVwrSetup.getTable().getItems();
 
 		for (int i = 0; i < items.length; i++) {
 			if (NetworkUtils.isHostUp((Host) items[i].getData())) {
 				items[i].setChecked(true);
-			}
-			else {
+			} else {
 				items[i].setChecked(false);
 			}
 		}
 		updatePageStatus(tblVwrSetup, btnOsGuess);
-	} 
-	
+	}
+
 	private void organizeSudoFields() {
-		
+
 		if (btnOsGuess.getSelection()) {
 			txtSudoUsername.setEnabled(true);
 			txtSudoPassword.setEnabled(true);
-		}
-		else {
+		} else {
 			txtSudoUsername.setEnabled(false);
 			txtSudoPassword.setEnabled(false);
 		}
-		
+
 	}
 
 	@Override
@@ -790,15 +734,15 @@ public class AhenkNetworkScanPage extends WizardPage {
 		TableItem[] items = tblVwrSetup.getTable().getItems();
 
 		List<String> selectedIpList = new ArrayList<String>();
-		
+
 		for (int i = 0; i < items.length; i++) {
 			if (items[i].getChecked()) {
 				selectedIpList.add(items[i].getText());
 			}
 		}
-		
+
 		config.setIpList(selectedIpList);
-		
+
 		return super.getNextPage();
 	}
 }

@@ -1,25 +1,24 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.config;
+package tr.org.liderahenk.installer.ahenk.config;
 
 import java.util.List;
 
-
 /**
- * Contains configuration variables used throughout the whole setup process. 
+ * Contains configuration variables used throughout the whole setup process.
  *
  */
 public class AhenkSetupConfig {
-	
+
 	/**
-	 * IP list that Ahenk will be installed 
+	 * IP list that Ahenk will be installed
 	 */
 	private List<String> ipList;
-	
+
 	/**
 	 * MariaDBSetupLocationPage variables
 	 */
 	private boolean installDatabaseOnRemote;
 	private String databaseIp;
-	
+
 	/**
 	 * MariaDBSetupMethodPage variables
 	 */
@@ -34,42 +33,37 @@ public class AhenkSetupConfig {
 	private boolean installAhenkLocally;
 	private boolean performNetworkScanning;
 	private boolean installOnGivenIps;
-//	private String[] remoteIpList;
 
 	/**
 	 * AhenkSetupNetworkScanPage variables
 	 */
-
 	private boolean showSystemInfo;
 	private String username;
 	private String password;
-	
+
 	/**
-	 * AhenkSetupConnectionMethodPage variables
-	 * (Cm: Connection Method)
+	 * AhenkSetupConnectionMethodPage variables (Cm: Connection Method)
 	 */
-	
 	private boolean usePrivateKey;
 	private boolean useUsernameAndPass;
 	private String usernameCm;
 	private String passwordCm;
 	private String privateKeyAbsPath;
 	private String passphrase;
-	
+
 	/**
 	 * AhenkSetupInstallationMethodPage variables
 	 */
-	
 	private boolean installByAptGet;
 	private boolean installByDebFile;
 	private String debFileAbsPath;
-	
+
 	/**
 	 * AhenkSetupDistributionMethodPage variables
 	 */
 	private boolean useScp;
 	private boolean useTorrent;
-	
+
 	public boolean isInstallDatabaseOnRemote() {
 		return installDatabaseOnRemote;
 	}
@@ -134,13 +128,13 @@ public class AhenkSetupConfig {
 		this.installOnGivenIps = installOnGivenIps;
 	}
 
-//	public String[] getRemoteIpList() {
-//		return remoteIpList;
-//	}
-//
-//	public void setRemoteIpList(String[] remoteIpList) {
-//		this.remoteIpList = remoteIpList;
-//	}
+	// public String[] getRemoteIpList() {
+	// return remoteIpList;
+	// }
+	//
+	// public void setRemoteIpList(String[] remoteIpList) {
+	// this.remoteIpList = remoteIpList;
+	// }
 
 	public boolean isShowSystemInfo() {
 		return showSystemInfo;

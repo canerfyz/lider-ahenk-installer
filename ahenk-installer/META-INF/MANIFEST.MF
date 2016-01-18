@@ -5,7 +5,14 @@ Bundle-SymbolicName: tr.org.liderahenk.installer.ahenk
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: tr.org.liderahenk.installer.ahenk.Activator
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.nmap4j,
+ org.eclipse.core.commands
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: Agem Bilişim
+Import-Package: tr.org.pardus.mys.liderahenksetup.exception,
+ tr.org.pardus.mys.liderahenksetup.utils,
+ tr.org.pardus.mys.liderahenksetup.utils.gui,
+ tr.org.pardus.mys.liderahenksetup.utils.network,
+ tr.org.pardus.mys.liderahenksetup.utils.setup

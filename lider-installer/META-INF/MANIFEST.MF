@@ -9,3 +9,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Import-Package: tr.org.pardus.mys.liderahenksetup.exception,
+ tr.org.pardus.mys.liderahenksetup.utils,
+ tr.org.pardus.mys.liderahenksetup.utils.gui,
+ tr.org.pardus.mys.liderahenksetup.utils.network,
+ tr.org.pardus.mys.liderahenksetup.utils.setup

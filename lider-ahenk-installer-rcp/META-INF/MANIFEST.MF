@@ -30,3 +30,8 @@ Require-Bundle: javax.inject,
  org.nmap4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
+Export-Package: tr.org.pardus.mys.liderahenksetup.exception,
+ tr.org.pardus.mys.liderahenksetup.utils,
+ tr.org.pardus.mys.liderahenksetup.utils.gui,
+ tr.org.pardus.mys.liderahenksetup.utils.network,
+ tr.org.pardus.mys.liderahenksetup.utils.setup

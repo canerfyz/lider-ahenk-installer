@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages;
+package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 
-import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.AhenkSetupWizard;
-import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
+import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
+import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+import tr.org.liderahenk.installer.ahenk.wizard.AhenkSetupWizard;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 

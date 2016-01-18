@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages;
+package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -17,15 +17,15 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
-import tr.org.pardus.mys.liderahenksetup.i18n.Messages;
+import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
+import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+
 
 /**
  * @author caner  
  * Caner Feyzullahoğlu
  * caner.feyzullahoglu@agem.com.tr
  */
-
 public class AhenkConnectionMethodPage extends WizardPage {
 
 	private AhenkSetupConfig config = null;

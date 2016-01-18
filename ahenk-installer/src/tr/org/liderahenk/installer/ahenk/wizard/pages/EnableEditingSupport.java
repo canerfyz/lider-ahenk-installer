@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages;
+package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CheckboxCellEditor;

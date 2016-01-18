@@ -1,4 +1,4 @@
-package tr.org.pardus.mys.liderahenksetup.ahenk.wizard;
+package tr.org.liderahenk.installer.ahenk.wizard;
 
 import java.util.LinkedList;
 
@@ -10,13 +10,13 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
-import tr.org.pardus.mys.liderahenksetup.ahenk.config.AhenkSetupConfig;
-import tr.org.pardus.mys.liderahenksetup.ahenk.statusdialog.AhenkStatusDialog;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkConnectionMethodPage;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkDistributionMethodPage;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkInstallationMethodPage;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkInstallationStatusPage;
-import tr.org.pardus.mys.liderahenksetup.ahenk.wizard.pages.AhenkSetupLocationPage;
+import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
+import tr.org.liderahenk.installer.ahenk.dialogs.AhenkStatusDialog;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConnectionMethodPage;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkDistributionMethodPage;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationStatusPage;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkSetupLocationPage;
 
 public class AhenkSetupWizard extends Wizard {
 
