@@ -58,7 +58,7 @@ public class KarafSetupMethodPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (btnAptGet.getSelection()) {
-					config.setInstallViaAptGet(true);
+//					config.setInstallViaAptGet(true);
 				}
 				updatePageCompleteStatus();
 			}
@@ -75,7 +75,7 @@ public class KarafSetupMethodPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (btnDebPackage.getSelection()) {
-					config.setInstallViaAptGet(false);
+//					config.setInstallViaAptGet(false);
 				}
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
@@ -124,8 +124,8 @@ public class KarafSetupMethodPage extends WizardPage {
 					}
 
 					// Set deb file
-					config.setDebFileName(debFileName);
-					config.setDebContent(debContent);
+//					config.setDebFileName(debFileName);
+//					config.setDebContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -144,19 +144,20 @@ public class KarafSetupMethodPage extends WizardPage {
 	}
 
 	private boolean checkFile() {
-		return config.getDebFileName() != null && config.getDebContent() != null;
+//		return config.getDebFileName() != null && config.getDebContent() != null;
+		return false;
 	}
 
 	// This method sets info which taken from user
 	// to appropriate variables in LiderSetupConfig.
 	private void setConfigVariables() {
-
-		if (btnAptGet.getSelection()) {
-			config.setKarafUseRepository(true);
-		} else {
-			config.setKarafUseRepository(false);
-			config.setKarafDebAbsPath(txtFileName.getText());
-		}
+//
+//		if (btnAptGet.getSelection()) {
+//			config.setKarafUseRepository(true);
+//		} else {
+//			config.setKarafUseRepository(false);
+//			config.setKarafDebAbsPath(txtFileName.getText());
+//		}
 	}
 
 	@Override

@@ -20,16 +20,16 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class MariaDBSetupMethodPage extends WizardPage {
+public class DatabaseInstallMethodPage extends WizardPage {
 
 	private LiderSetupConfig config;
 
-	// Widgets
 	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Text txtFileName;
@@ -38,10 +38,10 @@ public class MariaDBSetupMethodPage extends WizardPage {
 
 	private byte[] debContent;
 
-	public MariaDBSetupMethodPage(LiderSetupConfig config) {
-		super(MariaDBSetupMethodPage.class.getName(), Messages
-				.getString("LIDER_INSTALLATION"), null);
-		setDescription("2.2 " + Messages.getString("MARIA_DB_INSTALLATION_METHOD") + " - " + Messages.getString("DB_SETUP_METHOD_DESC"));
+	public DatabaseInstallMethodPage(LiderSetupConfig config) {
+		super(DatabaseInstallMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
+		setDescription("2.2 " + Messages.getString("DATABASE_INSTALLATION_METHOD") + " - "
+				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
 
@@ -51,16 +51,15 @@ public class MariaDBSetupMethodPage extends WizardPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		// Ask user if MariaDB will be installed from a .deb package or via
+		// Ask user if database will be installed from a .deb package or via
 		// apt-get
-		btnAptGet = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("DB_SETUP_METHOD_APT_GET"));
+		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_APT_GET"));
 		btnAptGet.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (btnAptGet.getSelection()) {
-					config.setInstallViaAptGet(true);
+					config.setDatabaseInstallMethod(InstallMethod.APT_GET);
 				}
 				updatePageCompleteStatus();
 			}
@@ -69,17 +68,16 @@ public class MariaDBSetupMethodPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		btnAptGet.setSelection(true);
 
-		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("DB_SETUP_METHOD_DEB"));
+		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (btnDebPackage.getSelection()) {
-					config.setInstallViaAptGet(false);
+					config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
 				}
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
@@ -91,16 +89,15 @@ public class MariaDBSetupMethodPage extends WizardPage {
 			}
 		});
 
-		Group grpDebPackage = GUIHelper.createGroup(container, new GridLayout(2,
-				false), new GridData(SWT.FILL, SWT.FILL, false, false));
+		Group grpDebPackage = GUIHelper.createGroup(container, new GridLayout(2, false),
+				new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		txtFileName = GUIHelper.createText(grpDebPackage, new GridData(SWT.FILL, SWT.FILL, true, false));
 		txtFileName.setEnabled(false); // do not let user to change it! It will
 										// be updated on file selection
 
 		// Upload deb package if necessary
-		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE,
-				Messages.getString("SELECT_FILE"));
+		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnFileSelect.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -130,7 +127,7 @@ public class MariaDBSetupMethodPage extends WizardPage {
 
 					// Set deb file
 					config.setDebFileName(debFileName);
-					config.setDebContent(debContent);
+					config.setDebFileContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -145,36 +142,16 @@ public class MariaDBSetupMethodPage extends WizardPage {
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection()
-				|| (btnDebPackage.getSelection() && checkFile()));
+		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()));
 	}
 
 	private boolean checkFile() {
-		return config.getDebFileName() != null
-				&& config.getDebContent() != null;
-	}
-	
-	// This method sets info which taken from user
-	// to appropriate variables in LiderSetupConfig.
-	private void setConfigVariables() {
-		
-		if (btnAptGet.getSelection()) {
-			config.setMariaUseRepository(true);
-		}
-		else {
-			config.setMariaUseRepository(false);
-			config.setMariaDebAbsPath(txtFileName.getText());
-		}
+		return config.getDebFileName() != null && config.getDebFileContent() != null;
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		
-		// Set variables before going to next page.
-		setConfigVariables();
-		
 		return super.getNextPage();
 	}
-	
-	
+
 }

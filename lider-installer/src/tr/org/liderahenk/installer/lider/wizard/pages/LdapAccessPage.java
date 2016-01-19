@@ -247,21 +247,21 @@ public class LdapAccessPage extends WizardPage {
 	 * LiderSetupConfig.
 	 */
 	private void setConfigVariables() {
-
-		if (usernamePassword.getSelection()) {
-
-			config.setLdapUseSSH(false);
-
-			config.setLdapSu(usernameTxt.getText());
-
-			config.setLdapSuPass(passwordTxt.getText());
-		} else {
-			config.setLdapUseSSH(true);
-
-			config.setLdapKeyAbsPath(privateKeyTxt.getText());
-
-			config.setLdapPassphrase(passphraseTxt.getText());
-		}
+//
+//		if (usernamePassword.getSelection()) {
+//
+//			config.setLdapUseSSH(false);
+//
+//			config.setLdapSu(usernameTxt.getText());
+//
+//			config.setLdapSuPass(passwordTxt.getText());
+//		} else {
+//			config.setLdapUseSSH(true);
+//
+//			config.setLdapKeyAbsPath(privateKeyTxt.getText());
+//
+//			config.setLdapPassphrase(passphraseTxt.getText());
+//		}
 	}
 
 	@Override

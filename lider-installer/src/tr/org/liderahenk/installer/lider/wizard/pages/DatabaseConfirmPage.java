@@ -8,26 +8,22 @@ import org.eclipse.swt.widgets.Label;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
-public class MariaDBConfirmPage extends WizardPage {
+public class DatabaseConfirmPage extends WizardPage {
 
 	private LiderSetupConfig config;
 
-	// Widgets
-	private Label mariaDb;
-	private Label ip;
-	private Label connectionMethod;
-	private Label setupMethod;
-	private Label question;
+	private Label lblIp;
 
-	public MariaDBConfirmPage(LiderSetupConfig config) {
-		super(MariaDBConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-
+	public DatabaseConfirmPage(LiderSetupConfig config) {
+		super(DatabaseConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("2.3 " + Messages.getString("MARIA_DB_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
@@ -38,22 +34,20 @@ public class MariaDBConfirmPage extends WizardPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		mariaDb = GUIHelper.createLabel(container,
-				"Maria DB " + Messages.getString("VERSION") + ": " + config.getMariaDbVersion() + ";");
-
 		GridData gd = new GridData();
 		gd.widthHint = 200;
 		gd.minimumWidth = 200;
-		ip = GUIHelper.createLabel(container, "localhost");
-		ip.setLayoutData(gd);
+		lblIp = GUIHelper.createLabel(container, "localhost");
+		lblIp.setLayoutData(gd);
 
-		connectionMethod = GUIHelper.createLabel(container, "- " + Messages.getString(
-				config.isMariaUseSSH() ? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
+		GUIHelper.createLabel(container,
+				"- " + Messages.getString(config.getDatabaseAccessMethod() == AccessMethod.PRIVATE_KEY
+						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 
-		setupMethod = GUIHelper.createLabel(container,
-				"- " + Messages.getString(config.isMariaUseRepository() ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+		GUIHelper.createLabel(container, "- " + Messages.getString(
+				config.getDatabaseInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
 
-		question = GUIHelper.createLabel(container, Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " "
+		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 
@@ -62,8 +56,9 @@ public class MariaDBConfirmPage extends WizardPage {
 		/**
 		 * Set the IP info in the opening of page
 		 */
-		ip.setText("- IP: " + config.getMariaDbIp());
+		lblIp.setText("- IP: " + config.getLiderIp());
 
 		return super.getNextPage();
 	}
+
 }

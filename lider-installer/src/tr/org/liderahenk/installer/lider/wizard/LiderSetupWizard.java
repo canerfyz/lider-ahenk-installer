@@ -18,12 +18,11 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapSetupMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderDistributionSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.MariaDBConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.MariaDBInstallationStatus;
-import tr.org.liderahenk.installer.lider.wizard.pages.MariaDBSetupMethodPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.MariaDbAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseAccessPage;
 
 public class LiderSetupWizard extends Wizard {
 
@@ -32,54 +31,52 @@ public class LiderSetupWizard extends Wizard {
 	 * setup process. It is shared by all wizard pages.
 	 */
 	private LiderSetupConfig config = new LiderSetupConfig();
-	
+
 	/**
 	 * This wizard's list of pages (element type: <code>IWizardPage</code>).
 	 */
 	private LinkedList<IWizardPage> pages = new LinkedList<IWizardPage>();
-	
+
 	/**
-	 * Setup wizard pages.
+	 * Installation wizard pages.
 	 * 
 	 * Other pages will be added dynamically according to user action!
 	 */
 	LiderComponentSelectionPage compSelect = new LiderComponentSelectionPage(config);
 	LiderLocationOfComponentsPage locatOfComps = new LiderLocationOfComponentsPage(config);
-	// TODO do we need that? If not delete
-	LiderDistributionSelectionPage fourthPage = new LiderDistributionSelectionPage(config); //TODO DELETE
-	
-	MariaDbAccessPage mariaAccess = new MariaDbAccessPage(config); 
-	MariaDBSetupMethodPage mariaSetup = new MariaDBSetupMethodPage(config);
-	MariaDBConfirmPage mariaConfirm = new MariaDBConfirmPage(config);
-	MariaDBInstallationStatus mariaStatus = new MariaDBInstallationStatus(config);
-	
+
+	DatabaseAccessPage dbAccess = new DatabaseAccessPage(config);
+	DatabaseInstallMethodPage dbInstallMethod = new DatabaseInstallMethodPage(config);
+	DatabaseConfirmPage dbConfirm = new DatabaseConfirmPage(config);
+	DatabaseInstallationStatus dbStatus = new DatabaseInstallationStatus(config);
+
 	LdapAccessPage ldapAccess = new LdapAccessPage(config);
-	LdapSetupMethodPage ldapSetup = new LdapSetupMethodPage(config);
+	LdapSetupMethodPage ldapInstallMethod = new LdapSetupMethodPage(config);
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
-	
-	KarafAccessPage karafAccess = new KarafAccessPage(config);
-	KarafSetupMethodPage karafSetup = new KarafSetupMethodPage(config);
-	KarafConfirmPage karafConfirm = new KarafConfirmPage(config);
+
+	KarafAccessPage liderAccess = new KarafAccessPage(config);
+	KarafSetupMethodPage liderInstallMethod = new KarafSetupMethodPage(config);
+	KarafConfirmPage liderConfirm = new KarafConfirmPage(config);
+
 	@Override
 	public void addPages() {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(compSelect);
 		addPage(locatOfComps);
-		
-		addPage(mariaAccess);
-		addPage(mariaSetup);
-		addPage(mariaConfirm);
-		addPage(mariaStatus);
-		
+		// Database configuration
+		addPage(dbAccess);
+		addPage(dbInstallMethod);
+		addPage(dbConfirm);
+		addPage(dbStatus);
+		// LDAP configuration
 		addPage(ldapAccess);
-		addPage(ldapSetup);
+		addPage(ldapInstallMethod);
 		addPage(ldapConfirm);
-		
-		addPage(karafAccess);
-		addPage(karafSetup);
-		addPage(karafConfirm);
-
-		// set this to true to override needsPreviousAndNextButtons() method
+		// Lider configuration
+		addPage(liderAccess);
+		addPage(liderInstallMethod);
+		addPage(liderConfirm);
+		// Set this to true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
 	}
 
@@ -105,126 +102,125 @@ public class LiderSetupWizard extends Wizard {
 		pages.add(index, page);
 		page.setWizard(this);
 	}
-	
+
 	public LinkedList<IWizardPage> getPagesList() {
 		return pages;
 	}
-	
-    /**
-     * The <code>Wizard</code> implementation of this <code>IWizard</code>
-     * method creates all the pages controls using
-     * <code>IDialogPage.createControl</code>. Subclasses should reimplement
-     * this method if they want to delay creating one or more of the pages
-     * lazily. The framework ensures that the contents of a page will be created
-     * before attempting to show it.
-     */
-    @Override
+
+	/**
+	 * The <code>Wizard</code> implementation of this <code>IWizard</code>
+	 * method creates all the pages controls using
+	 * <code>IDialogPage.createControl</code>. Subclasses should reimplement
+	 * this method if they want to delay creating one or more of the pages
+	 * lazily. The framework ensures that the contents of a page will be created
+	 * before attempting to show it.
+	 */
+	@Override
 	public void createPageControls(Composite pageContainer) {
-        // the default behavior is to create all the pages controls
-        for (int i = 0; i < pages.size(); i++) {
-            IWizardPage page = pages.get(i);
-            page.createControl(pageContainer);
+		// the default behaviour is to create all the pages controls
+		for (int i = 0; i < pages.size(); i++) {
+			IWizardPage page = pages.get(i);
+			page.createControl(pageContainer);
 			// page is responsible for ensuring the created control is
 			// accessible
-            // via getControl.
-			Assert.isNotNull(
-					page.getControl(),
+			// via getControl.
+			Assert.isNotNull(page.getControl(),
 					"getControl() of wizard page returns null. Did you call setControl() in your wizard page?"); //$NON-NLS-1$
-        }
-    }
-    
-    /**
-     * The <code>Wizard</code> implementation of this <code>IWizard</code>
-     * method disposes all the pages controls using
-     * <code>DialogPage.dispose</code>. Subclasses should extend this method
-     * if the wizard instance maintains addition SWT resource that need to be
-     * disposed.
-     */
-    @Override
+		}
+	}
+
+	/**
+	 * The <code>Wizard</code> implementation of this <code>IWizard</code>
+	 * method disposes all the pages controls using
+	 * <code>DialogPage.dispose</code>. Subclasses should extend this method if
+	 * the wizard instance maintains addition SWT resource that need to be
+	 * disposed.
+	 */
+	@Override
 	public void dispose() {
-    	super.dispose();
-        // notify pages
-        for (int i = 0; i < pages.size(); i++) {
+		super.dispose();
+		// notify pages
+		for (int i = 0; i < pages.size(); i++) {
 			try {
-	            pages.get(i).dispose();
+				pages.get(i).dispose();
 			} catch (Exception e) {
 				Status status = new Status(IStatus.ERROR, Policy.JFACE, IStatus.ERROR, e.getMessage(), e);
 				Policy.getLog().log(status);
 			}
-        }
-    }
-    
-    /*
-     * (non-Javadoc) Method declared on IWizard. The default behavior is to
-     * return the page that was added to this wizard after the given page.
-     */
-    @Override
-	public IWizardPage getNextPage(IWizardPage page) {
-        int index = pages.indexOf(page);
-        if (index == pages.size() - 1 || index == -1) {
-			// last page or page not found
-            return null;
 		}
-        return pages.get(index + 1);
-    }
-    
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
-    @Override
-	public IWizardPage getPage(String name) {
-        for (int i = 0; i < pages.size(); i++) {
-            IWizardPage page = pages.get(i);
-            String pageName = page.getName();
-            if (pageName.equals(name)) {
-				return page;
-			}
-        }
-        return null;
-    }
-    
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
-    @Override
-	public int getPageCount() {
-        return pages.size();
-    }
+	}
 
-    /*
-     * (non-Javadoc) Method declared on IWizard.
-     */
-    @Override
-	public IWizardPage[] getPages() {
-        return pages.toArray(new IWizardPage[pages.size()]);
-    }
-
-    /*
-     * (non-Javadoc) Method declared on IWizard. The default behavior is to
-     * return the page that was added to this wizard before the given page.
-     */
-    @Override
-	public IWizardPage getPreviousPage(IWizardPage page) {
-        int index = pages.indexOf(page);
-        if (index == 0 || index == -1) {
-			// first page or page not found
-            return null;
-		} 
-		return pages.get(index - 1);
-    }
-    
-    /*
-     * (non-Javadoc) Method declared on IWizard. By default this is the first
-     * page inserted into the wizard.
-     */
-    @Override
-	public IWizardPage getStartingPage() {
-        if (pages.size() == 0) {
+	/*
+	 * (non-Javadoc) Method declared on IWizard. The default behavior is to
+	 * return the page that was added to this wizard after the given page.
+	 */
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		int index = pages.indexOf(page);
+		if (index == pages.size() - 1 || index == -1) {
+			// last page or page not found
 			return null;
 		}
-        return pages.get(0);
-    }
-    
+		return pages.get(index + 1);
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
+	@Override
+	public IWizardPage getPage(String name) {
+		for (int i = 0; i < pages.size(); i++) {
+			IWizardPage page = pages.get(i);
+			String pageName = page.getName();
+			if (pageName.equals(name)) {
+				return page;
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
+	@Override
+	public int getPageCount() {
+		return pages.size();
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on IWizard.
+	 */
+	@Override
+	public IWizardPage[] getPages() {
+		return pages.toArray(new IWizardPage[pages.size()]);
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on IWizard. The default behavior is to
+	 * return the page that was added to this wizard before the given page.
+	 */
+	@Override
+	public IWizardPage getPreviousPage(IWizardPage page) {
+		int index = pages.indexOf(page);
+		if (index == 0 || index == -1) {
+			// first page or page not found
+			return null;
+		}
+		return pages.get(index - 1);
+	}
+
+	/*
+	 * (non-Javadoc) Method declared on IWizard. By default this is the first
+	 * page inserted into the wizard.
+	 */
+	@Override
+	public IWizardPage getStartingPage() {
+		if (pages.size() == 0) {
+			return null;
+		}
+		return pages.get(0);
+	}
+
 	@Override
 	public boolean performFinish() {
 		// TODO
@@ -233,14 +229,11 @@ public class LiderSetupWizard extends Wizard {
 
 	@Override
 	public boolean canFinish() {
-		
 		// If current page is the last page of this wizard
 		// then enable finish button.
-		if (getContainer().getCurrentPage().getName()
-				.equals(this.getPagesList().getLast().getName())) {
+		if (getContainer().getCurrentPage().getName().equals(this.getPagesList().getLast().getName())) {
 			return true;
 		}
-		
 		return false;
 	}
 

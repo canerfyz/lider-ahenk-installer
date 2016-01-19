@@ -25,53 +25,53 @@ public class LiderInstallationUtil {
 	private static final Logger logger = Logger.getLogger(SetupUtils.class.getName());
 
 	public static void installMariaDB(LiderSetupConfig config) {
-		if (config.isMariaUseSSH()) {
-			logger.log(Level.INFO, "Installer will connect with private key to: " + config.getMariaDbIp());
-			if (config.isMariaUseRepository()) {
-				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using repositories.");
-
-			} else {
-				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using given deb file.");
-			}
-		} else {
-			if (config.isMariaUseRepository()) {
-				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using repositories.");
-
-				if (SetupUtils.canConnectViaSsh(config.getMariaDbIp(), config.getMariaDbSu(),
-						config.getMariaDbSuPass())) {
-
-					try {
-						// TODO port null mı olacak hep?
-						if (SetupUtils.packageExists(config.getMariaDbIp(), config.getMariaDbSu(),
-								config.getMariaDbSuPass(), null, null, "mariadb-server", null)) {
-
-							// TODO burdan sonrasını ayrı thread'e çek.
-							// Uninstall all mariadb packages to clear all
-							// questions from debconf.
-							SetupUtils.uninstallPackage(config.getMariaDbIp(), config.getMariaDbSu(),
-									config.getMariaDbSuPass(), null, null, "mariadb-*");
-							logger.log(Level.INFO, "Installer successfully uninstalled mariadb packages.");
-
-							logger.log(Level.INFO, "Installer successfully installed package: mariadb-server");
-						} else {
-							// TODO throw error "package does not exist."
-						}
-					} catch (CommandExecutionException | SSHConnectionException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
-				} else {
-					// TODO throw error "cannot connect via SSH using these
-					// username and password"
-				}
-			} else {
-				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using given deb file.");
-			}
-		}
-
-		// TODO try catch
-		System.out.println("MariaDB installed.");
+//		if (config.isMariaUseSSH()) {
+//			logger.log(Level.INFO, "Installer will connect with private key to: " + config.getMariaDbIp());
+//			if (config.isMariaUseRepository()) {
+//				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using repositories.");
+//
+//			} else {
+//				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using given deb file.");
+//			}
+//		} else {
+//			if (config.isMariaUseRepository()) {
+//				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using repositories.");
+//
+//				if (SetupUtils.canConnectViaSsh(config.getMariaDbIp(), config.getMariaDbSu(),
+//						config.getMariaDbSuPass())) {
+//
+//					try {
+//						// TODO port null mı olacak hep?
+//						if (SetupUtils.packageExists(config.getMariaDbIp(), config.getMariaDbSu(),
+//								config.getMariaDbSuPass(), null, null, "mariadb-server", null)) {
+//
+//							// TODO burdan sonrasını ayrı thread'e çek.
+//							// Uninstall all mariadb packages to clear all
+//							// questions from debconf.
+//							SetupUtils.uninstallPackage(config.getMariaDbIp(), config.getMariaDbSu(),
+//									config.getMariaDbSuPass(), null, null, "mariadb-*");
+//							logger.log(Level.INFO, "Installer successfully uninstalled mariadb packages.");
+//
+//							logger.log(Level.INFO, "Installer successfully installed package: mariadb-server");
+//						} else {
+//							// TODO throw error "package does not exist."
+//						}
+//					} catch (CommandExecutionException | SSHConnectionException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//					}
+//
+//				} else {
+//					// TODO throw error "cannot connect via SSH using these
+//					// username and password"
+//				}
+//			} else {
+//				logger.log(Level.INFO, "Installer will try to install package: mariadb-server using given deb file.");
+//			}
+//		}
+//
+//		// TODO try catch
+//		System.out.println("MariaDB installed.");
 	}
 
 	private void modifyDebConf() {

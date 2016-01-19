@@ -39,7 +39,7 @@ public class SetupUtils {
 	 * Command used to check a package with the certain version number
 	 * installed.
 	 */
-	private static final String CHECK_PACKAGE_INSTALLED_CMD = "sudo -S dpkg -l  | grep \"{0}\" | awk '{ print $3; }'"; //apt-cache madison -q mariadb-server -v | awk '{ print $3; }' | uniq
+	private static final String CHECK_PACKAGE_INSTALLED_CMD = "sudo -S dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
 
 	/**
 	 * Install package via apt-get

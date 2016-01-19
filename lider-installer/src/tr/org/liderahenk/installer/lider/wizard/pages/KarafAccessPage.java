@@ -248,20 +248,20 @@ public class KarafAccessPage extends WizardPage {
 	 */
 	private void setConfigVariables() {
 
-		if (usernamePassword.getSelection()) {
-
-			config.setKarafUseSSH(false);
-
-			config.setKarafSu(usernameTxt.getText());
-
-			config.setKarafSuPass(passwordTxt.getText());
-		} else {
-			config.setKarafUseSSH(true);
-
-			config.setKarafKeyAbsPath(privateKeyTxt.getText());
-
-			config.setKarafPassphrase(passphraseTxt.getText());
-		}
+//		if (usernamePassword.getSelection()) {
+//
+//			config.setKarafUseSSH(false);
+//
+//			config.setKarafSu(usernameTxt.getText());
+//
+//			config.setKarafSuPass(passwordTxt.getText());
+//		} else {
+//			config.setKarafUseSSH(true);
+//
+//			config.setKarafKeyAbsPath(privateKeyTxt.getText());
+//
+//			config.setKarafPassphrase(passphraseTxt.getText());
+//		}
 	}
 
 	@Override

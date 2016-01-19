@@ -17,8 +17,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-
-public class MariaDBInstallationStatus extends WizardPage {
+public class DatabaseInstallationStatus extends WizardPage {
 
 	private LiderSetupConfig config;
 
@@ -33,13 +32,11 @@ public class MariaDBInstallationStatus extends WizardPage {
 	 */
 	IStatus ipStatus;
 
-	public MariaDBInstallationStatus(LiderSetupConfig config) {
-		super(MariaDBInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-
+	public DatabaseInstallationStatus(LiderSetupConfig config) {
+		super(DatabaseInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("2.4 " + Messages.getString("MARIA_DB_INSTALLATION_METHOD") + " - "
 				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
-
 	}
 
 	@Override
