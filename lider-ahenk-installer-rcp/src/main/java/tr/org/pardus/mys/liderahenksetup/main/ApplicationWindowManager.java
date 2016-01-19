@@ -13,12 +13,14 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.commands.common.NotDefinedException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.e4.core.commands.ECommandService;
+import org.eclipse.e4.core.commands.EHandlerService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -38,6 +40,9 @@ public class ApplicationWindowManager {
 	// See: http://stackoverflow.com/questions/22589884/ecommandservice-discouraged-access
 	// for suppressing warnings.
 	ECommandService commandService; 
+	
+	@Inject
+	EHandlerService handlerService;
 
 	private static final Logger logger = Logger.getLogger(ApplicationWindowManager.class.getName());
 
@@ -73,9 +78,16 @@ public class ApplicationWindowManager {
 					LiderAhenkUtils.imageButton(comp, image, image, new MouseListener() {
 						@Override
 						public void mouseUp(MouseEvent e) {
+							
+							ParameterizedCommand cmd =
+									  commandService.createCommand(commandId, null);
+							
+							if (handlerService.canExecute(cmd)) {
+								handlerService.executeHandler(cmd);
+							}
+							
 							@SuppressWarnings("restriction")
 							final Command command = commandService.getCommand(commandId);
-							IHandler handler = command.getHandler();
 							if (command != null) {
 								try {
 									command.executeWithChecks(new ExecutionEvent());
