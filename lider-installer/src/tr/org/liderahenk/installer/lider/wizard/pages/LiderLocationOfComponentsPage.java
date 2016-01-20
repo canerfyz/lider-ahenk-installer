@@ -32,11 +32,16 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private Button btnLocal;
 	private Button btnRemote;
 	private Text txtRemoteIp;
+	private Text txtRemotePort;
 	private Button btnInstallDistributed;
 	private Text txtDatabaseIp;
 	private Text txtLdapIp;
 	private Text txtXmppIp;
 	private Text txtLiderIp;
+	private Text txtDatabasePort;
+	private Text txtLdapPort;
+	private Text txtXmppPort;
+	private Text txtLiderPort;
 
 	public LiderLocationOfComponentsPage(LiderSetupConfig config) {
 		super(LiderLocationOfComponentsPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -56,21 +61,28 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 		// Creating a child container with two columns
 		// and extra indent.
-		GridLayout gl = new GridLayout(2, false);
+		GridLayout gl = new GridLayout(3, false);
 		gl.marginLeft = 30;
 		Composite childContainer = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
 		// Install locally
 		btnLocal = GUIHelper.createButton(childContainer, SWT.RADIO, Messages.getString("LOCAL_COMPUTER"));
 		GUIHelper.createLabel(childContainer, "");
+		GUIHelper.createLabel(childContainer, "");
 
 		// Install to a remote computer
 		btnRemote = GUIHelper.createButton(childContainer, SWT.RADIO, Messages.getString("REMOTE_COMPUTER"));
 
 		// Creating a text field with width 150px.
-		GridData gdForTextField = new GridData();
-		gdForTextField.widthHint = 150;
-		txtRemoteIp = GUIHelper.createText(childContainer, gdForTextField);
+		GridData gdForIpField = new GridData();
+		gdForIpField.widthHint = 150;
+		txtRemoteIp = GUIHelper.createText(childContainer, gdForIpField);
+
+		GridData gdForPortField = new GridData();
+		gdForPortField.widthHint = 50;
+		gdForPortField.grabExcessHorizontalSpace = false;
+		txtRemotePort = GUIHelper.createText(childContainer);
+		txtRemotePort.setText("22");
 
 		btnInstallDistributed = GUIHelper.createButton(mainContainer, SWT.RADIO,
 				Messages.getString("INSTALL_COMPONENT_TO_DIFFERENT_COMPUTERS"));
@@ -81,19 +93,31 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// IP's for components will be taken in this section.
 		GUIHelper.createLabel(secondChild, Messages.getString("DATABASE"));
 
-		txtDatabaseIp = GUIHelper.createText(secondChild, gdForTextField);
+		txtDatabaseIp = GUIHelper.createText(secondChild, gdForIpField);
+
+		txtDatabasePort = GUIHelper.createText(secondChild, gdForPortField);
+		txtDatabasePort.setText("22");
 
 		GUIHelper.createLabel(secondChild, Messages.getString("LDAP"));
 
-		txtLdapIp = GUIHelper.createText(secondChild, gdForTextField);
+		txtLdapIp = GUIHelper.createText(secondChild, gdForIpField);
+
+		txtLdapPort = GUIHelper.createText(secondChild, gdForPortField);
+		txtLdapPort.setText("22");
 
 		GUIHelper.createLabel(secondChild, Messages.getString("XMPP"));
 
-		txtXmppIp = GUIHelper.createText(secondChild, gdForTextField);
+		txtXmppIp = GUIHelper.createText(secondChild, gdForIpField);
+
+		txtXmppPort = GUIHelper.createText(secondChild, gdForPortField);
+		txtXmppPort.setText("22");
 
 		GUIHelper.createLabel(secondChild, Messages.getString("LIDER"));
 
-		txtLiderIp = GUIHelper.createText(secondChild, gdForTextField);
+		txtLiderIp = GUIHelper.createText(secondChild, gdForIpField);
+
+		txtLiderPort = GUIHelper.createText(secondChild, gdForPortField);
+		txtLiderPort.setText("22");
 
 		// Adding selection listeners for
 		// user's choices on radio buttons
@@ -281,15 +305,19 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				// Set only selected components
 				if (config.isInstallDatabase()) {
 					config.setDatabaseIp("localhost");
+					config.setDatabasePort(null);
 				}
 				if (config.isInstallLdap()) {
 					config.setLdapIp("localhost");
+					config.setLdapPort(null);
 				}
 				if (config.isInstallXmpp()) {
 					config.setXmppIp("localhost");
+					config.setXmppPort(null);
 				}
 				if (config.isInstallLider()) {
 					config.setLiderIp("localhost");
+					config.setLiderPort(null);
 				}
 			}
 			// If all components will be installed to a remote computer
@@ -297,15 +325,23 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				// Set only selected components
 				if (config.isInstallDatabase()) {
 					config.setDatabaseIp(txtRemoteIp.getText());
+					config.setDatabasePort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
+							? new Integer(txtRemotePort.getText()) : null);
 				}
 				if (config.isInstallLdap()) {
 					config.setLdapIp(txtRemoteIp.getText());
+					config.setLdapPort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
+							? new Integer(txtRemotePort.getText()) : null);
 				}
 				if (config.isInstallXmpp()) {
 					config.setXmppIp(txtRemoteIp.getText());
+					config.setXmppPort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
+							? new Integer(txtRemotePort.getText()) : null);
 				}
 				if (config.isInstallLider()) {
 					config.setLiderIp(txtRemoteIp.getText());
+					config.setLiderPort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
+							? new Integer(txtRemotePort.getText()) : null);
 				}
 			}
 		}
@@ -314,15 +350,23 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			// Set only selected components
 			if (config.isInstallDatabase()) {
 				config.setDatabaseIp(txtDatabaseIp.getText());
+				config.setDatabasePort(txtDatabasePort.getText() != null && !txtDatabasePort.getText().isEmpty()
+						? new Integer(txtDatabasePort.getText()) : null);
 			}
 			if (config.isInstallLdap()) {
 				config.setLdapIp(txtLdapIp.getText());
+				config.setLdapPort(txtLdapPort.getText() != null && !txtLdapPort.getText().isEmpty()
+						? new Integer(txtLdapPort.getText()) : null);
 			}
 			if (config.isInstallXmpp()) {
 				config.setXmppIp(txtXmppIp.getText());
+				config.setXmppPort(txtXmppPort.getText() != null && !txtXmppPort.getText().isEmpty()
+						? new Integer(txtXmppPort.getText()) : null);
 			}
 			if (config.isInstallLider()) {
 				config.setLiderIp(txtLiderIp.getText());
+				config.setLiderPort(txtLiderPort.getText() != null && !txtLiderPort.getText().isEmpty()
+						? new Integer(txtLiderPort.getText()) : null);
 			}
 		}
 	}

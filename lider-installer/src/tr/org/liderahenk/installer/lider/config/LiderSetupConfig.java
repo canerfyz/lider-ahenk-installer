@@ -106,6 +106,11 @@ public class LiderSetupConfig {
 	private String ldapIp;
 
 	/**
+	 * SSH port which is used to connect to server
+	 */
+	private Integer ldapPort;
+
+	/**
 	 * ###################################
 	 * 
 	 * XMPP Configuration
@@ -124,6 +129,11 @@ public class LiderSetupConfig {
 	private String xmppIp;
 
 	/**
+	 * SSH port which is used to connect to server
+	 */
+	private Integer xmppPort;
+
+	/**
 	 * ###################################
 	 * 
 	 * Lider Configuration
@@ -140,14 +150,19 @@ public class LiderSetupConfig {
 	 * Lider server IP
 	 */
 	private String liderIp;
-	
-	public LiderSetupConfig() {
-		super();
-		// TODO set these values from a new wizard page!
-		this.databasePort = new Integer(22);
-		this.setDatabasePackageName("mariadb-server");
-		this.setDatabaseRootPassword("12345");
-	}
+
+	/**
+	 * SSH port which is used to connect to server
+	 */
+	private Integer liderPort;
+
+	/**
+	 * ###################################
+	 * 
+	 * Getter/setter
+	 * 
+	 * ###################################
+	 */
 
 	public boolean isInstallDatabase() {
 		return installDatabase;
@@ -299,6 +314,30 @@ public class LiderSetupConfig {
 
 	public void setDatabasePort(Integer databasePort) {
 		this.databasePort = databasePort;
+	}
+
+	public Integer getLdapPort() {
+		return ldapPort;
+	}
+
+	public void setLdapPort(Integer ldapPort) {
+		this.ldapPort = ldapPort;
+	}
+
+	public Integer getXmppPort() {
+		return xmppPort;
+	}
+
+	public void setXmppPort(Integer xmppPort) {
+		this.xmppPort = xmppPort;
+	}
+
+	public Integer getLiderPort() {
+		return liderPort;
+	}
+
+	public void setLiderPort(Integer liderPort) {
+		this.liderPort = liderPort;
 	}
 
 }

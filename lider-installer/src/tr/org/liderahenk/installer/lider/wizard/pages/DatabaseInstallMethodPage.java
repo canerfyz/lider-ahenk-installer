@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -21,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -35,6 +38,7 @@ public class DatabaseInstallMethodPage extends WizardPage {
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
+	private Text txtDatabaseRootPassword;
 
 	private byte[] debContent;
 
@@ -133,6 +137,20 @@ public class DatabaseInstallMethodPage extends WizardPage {
 			}
 		});
 
+		Group grpRootPasswd = GUIHelper.createGroup(container, new GridLayout(2, false),
+				new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		GUIHelper.createLabel(grpRootPasswd, Messages.getString("DATABASE_ROOT_PASSWORD"));
+
+		txtDatabaseRootPassword = GUIHelper.createPasswordText(grpRootPasswd);
+		txtDatabaseRootPassword.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
+
 		updateConfig();
 		updatePageCompleteStatus();
 	}
@@ -140,13 +158,17 @@ public class DatabaseInstallMethodPage extends WizardPage {
 	protected void updateConfig() {
 		if (btnDebPackage.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
+			config.setDatabasePackageName(null);
 		} else {
 			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
+			config.setDatabasePackageName(PropertyReader.property("database.package.name"));
 		}
+		config.setDatabaseRootPassword(txtDatabaseRootPassword.getText());
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()));
+		setPageComplete((btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()))
+				&& txtDatabaseRootPassword.getText() != null && !txtDatabaseRootPassword.getText().isEmpty());
 	}
 
 	private boolean checkFile() {

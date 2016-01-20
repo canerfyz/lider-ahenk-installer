@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
-import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -61,72 +61,84 @@ public class DatabaseInstallationStatus extends WizardPage {
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
 		if (super.isCurrentPage() && !isInstallationFinished) {
-			// TODO i18n messages
-			appendLog("Initializing installation...");
 
-			appendLog("Setting up setup parameters for database password");
-			// TODO read from properties file...
-			String debconfPwd = "mariadb-server-10.1 mysql-server/root_password password " + config.getDatabaseRootPassword();
-			String deboconfPwdAgain = "mariadb-server-10.1 mysql-server/root_password_again password "
-					+ config.getDatabaseRootPassword();
-			String[] debconfValues = new String[] { debconfPwd, deboconfPwdAgain };
+			printMessage("Initializing installation...");
 
-			appendLog("Installing package...");
-			boolean success = false;
+			printMessage("Setting up parameters for database password.");
+			final String[] debconfValues = generateDebconfValues();
 
-			// TODO we might be able to get rid of these if-else blocks if Jsch
-			// gives private key priority over username-password or vice
-			// versa...
-			if (config.getDatabaseAccessMethod() == AccessMethod.PRIVATE_KEY) {
-				if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
-					SetupUtils.installPackageNoninteractively(config.getDatabaseIp(), null, null,
-							config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-							config.getDatabasePackageName(), null, debconfValues);
-				} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
-					File deb = new File(config.getDebFileName());
-					SetupUtils.installPackageNonInteractively(config.getDatabaseIp(), null, null,
-							config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
-				} else {
-					appendLog("Invalid installation method");
+			printMessage("Installing package...");
+
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					Display.getCurrent().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							progressBar.setSelection(50);
+						}
+					});
+
+					if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
+						SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
+								config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
+								config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
+								config.getDatabasePackageName(), null, debconfValues);
+					} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
+						File deb = new File(config.getDebFileName());
+						SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
+								config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
+								config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
+					} else {
+						printMessage("Invalid installation method. Installation cancelled.");
+					}
+					// TODO handle failed installation attempts!
+
+					isInstallationFinished = true;
+					setPageComplete(isInstallationFinished);
 				}
-			} else if (config.getDatabaseAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
-				if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
-					SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
-							config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-							config.getDatabasePort(), null, config.getDatabasePackageName(), null, debconfValues);
-				} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
-					File deb = new File(config.getDebFileName());
-					SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
-							config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-							config.getDatabasePort(), null, deb, debconfValues);
-				} else {
-					appendLog("Invalid installation method");
-				}
-			} else {
-				appendLog("Invalid access method");
-			}
 
-			if (success) {
-				appendLog("Successfully installed database server: " + config.getDatabasePackageName());
-			}
+			};
 
-			// TODO handle failed installation attempts!
+			Thread thread = new Thread(runnable);
+			thread.start();
 
-			isInstallationFinished = true;
-			setPageComplete(isInstallationFinished);
 		}
 
 		return super.getNextPage();
 	}
 
-	public void appendLog(final String message) {
+	/**
+	 * Prints log message to the log console widget
+	 * 
+	 * @param message
+	 */
+	public void printMessage(final String message) {
 		Display.getCurrent().asyncExec(new Runnable() {
 			@Override
 			public void run() {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 						? txtLogConsole.getText() + "\n" : "") + message);
 			}
 		});
+	}
+
+	/**
+	 * Generates debconf values for database root password
+	 * 
+	 * @return
+	 */
+	public String[] generateDebconfValues() {
+		String debconfPwd = PropertyReader.property("database.debconf.password") + " "
+				+ config.getDatabaseRootPassword();
+		String deboconfPwdAgain = PropertyReader.property("database.debconf.password.again") + " "
+				+ config.getDatabaseRootPassword();
+		return new String[] { debconfPwd, deboconfPwdAgain };
 	}
 
 	@Override

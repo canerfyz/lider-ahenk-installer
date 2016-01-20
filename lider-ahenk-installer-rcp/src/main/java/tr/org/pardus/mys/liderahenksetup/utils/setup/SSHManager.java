@@ -5,20 +5,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
-import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
-import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+
+import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
+import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
 public class SSHManager {
 
@@ -34,20 +33,6 @@ public class SSHManager {
 	private String ip;
 	private int port;
 	private String privateKey;
-
-	/**
-	 * 
-	 * @param ip
-	 * @param username
-	 * @param password
-	 */
-	public SSHManager(String ip, String username, String password) {
-		init();
-		this.ip = ip;
-		this.username = username;
-		this.password = password;
-		this.port = Integer.parseInt(PropertyReader.property("connection.port"));
-	}
 
 	/**
 	 * 
@@ -119,9 +104,7 @@ public class SSHManager {
 			((ChannelExec) channel).setCommand(command);
 
 			InputStream inputStream = channel.getInputStream();
-			// ((ChannelExec)channel).setErrStream(System.err); // TODO
-//			InputStream errStream = ((ChannelExec)channel).getErrStream();
-			((ChannelExec)channel).setPty(true);
+			((ChannelExec) channel).setPty(true);
 			OutputStream outputStream = null;
 			if (outputStreamProvider != null) {
 				outputStream = channel.getOutputStream();
@@ -129,8 +112,7 @@ public class SSHManager {
 			channel.connect();
 
 			if (outputStream != null) {
-				// outputStream.write(outputStreamProvider.getStreamAsByteArray());
-				outputStream.write(("oner5644\n").getBytes(StandardCharsets.UTF_8));
+				outputStream.write(outputStreamProvider.getStreamAsByteArray());
 				outputStream.flush();
 			}
 
