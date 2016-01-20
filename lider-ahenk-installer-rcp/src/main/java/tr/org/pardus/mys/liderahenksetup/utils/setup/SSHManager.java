@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,8 +22,7 @@ import com.jcraft.jsch.Session;
 
 public class SSHManager {
 
-	private static final Logger logger = Logger.getLogger(SSHManager.class
-			.getName());
+	private static final Logger logger = Logger.getLogger(SSHManager.class.getName());
 
 	private JSch SSHChannel;
 	private Session session;
@@ -46,8 +46,7 @@ public class SSHManager {
 		this.ip = ip;
 		this.username = username;
 		this.password = password;
-		this.port = Integer
-				.parseInt(PropertyReader.property("connection.port"));
+		this.port = Integer.parseInt(PropertyReader.property("connection.port"));
 	}
 
 	/**
@@ -58,23 +57,23 @@ public class SSHManager {
 	 * @param port
 	 * @param privateKey
 	 */
-	public SSHManager(String ip, String username, String password,
-			Integer port, String privateKey) {
+	public SSHManager(String ip, String username, String password, Integer port, String privateKey) {
 		init();
 		this.ip = ip;
 		this.username = username;
 		this.password = password;
-		this.port = (port == null ? Integer.parseInt(PropertyReader
-				.property("connection.port")) : port);
+		this.port = (port == null ? Integer.parseInt(PropertyReader.property("connection.port")) : port);
 		this.privateKey = privateKey;
 	}
 
 	private void init() {
 		JSch.setLogger(new SSHLogger());
 		SSHChannel = new JSch();
-		
+
 		config = new Properties();
-		config.put("kex", "diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
+		// TODO check kex value
+		config.put("kex",
+				"diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
 		config.put("StrictHostKeyChecking", "no");
 	}
 
@@ -87,16 +86,14 @@ public class SSHManager {
 	public void connect() throws SSHConnectionException {
 		try {
 			if (privateKey != null && !privateKey.isEmpty()) {
-				SSHChannel.addIdentity(privateKey);
+				SSHChannel.addIdentity(privateKey); // TODO passphrase
 			}
 			session = SSHChannel.getSession(username, ip, port);
 			if (password != null && !password.isEmpty()) {
 				session.setPassword(password);
 			}
-//			session.setConfig("StrictHostKeyChecking", "no");
 			session.setConfig(config);
-			session.connect(Integer.parseInt(PropertyReader
-					.property("network.timeout")));
+			session.connect(Integer.parseInt(PropertyReader.property("network.timeout")));
 		} catch (JSchException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 			throw new SSHConnectionException(e.getMessage());
@@ -110,7 +107,8 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(String command, IOutputStreamProvider outputStreamProvider) throws CommandExecutionException {
+	public String execCommand(String command, IOutputStreamProvider outputStreamProvider)
+			throws CommandExecutionException {
 
 		StringBuilder outputBuffer = new StringBuilder();
 
@@ -121,21 +119,37 @@ public class SSHManager {
 			((ChannelExec) channel).setCommand(command);
 
 			InputStream inputStream = channel.getInputStream();
+			// ((ChannelExec)channel).setErrStream(System.err); // TODO
+//			InputStream errStream = ((ChannelExec)channel).getErrStream();
+			((ChannelExec)channel).setPty(true);
 			OutputStream outputStream = null;
 			if (outputStreamProvider != null) {
 				outputStream = channel.getOutputStream();
 			}
 			channel.connect();
-			
+
 			if (outputStream != null) {
-				outputStream.write(outputStreamProvider.getStreamAsByteArray());
+				// outputStream.write(outputStreamProvider.getStreamAsByteArray());
+				outputStream.write(("oner5644\n").getBytes(StandardCharsets.UTF_8));
 				outputStream.flush();
 			}
-			
-			int readByte = inputStream.read();
-			while (readByte != 0xffffffff) {
-				outputBuffer.append((char) readByte);
-				readByte = inputStream.read();
+
+			byte[] tmp = new byte[1024];
+			while (true) {
+				while (inputStream.available() > 0) {
+					int i = inputStream.read(tmp, 0, 1024);
+					if (i < 0)
+						break;
+					System.out.print(new String(tmp, 0, i));
+				}
+				if (channel.isClosed()) {
+					System.out.println("exit status: " + channel.getExitStatus());
+					break;
+				}
+				try {
+					Thread.sleep(1000);
+				} catch (Exception ee) {
+				}
 			}
 
 			channel.disconnect();
@@ -147,7 +161,7 @@ public class SSHManager {
 
 		return outputBuffer.toString();
 	}
-	
+
 	/**
 	 * Executes command string via SSH. Replaces parameter indicators with
 	 * values from the params array before execution.
@@ -157,8 +171,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(String command, Object[] params)
-			throws CommandExecutionException {
+	public String execCommand(String command, Object[] params) throws CommandExecutionException {
 		return execCommand(command, params, null);
 	}
 
@@ -173,8 +186,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(String command, Object[] params,
-			IOutputStreamProvider outputStreamProvider)
+	public String execCommand(String command, Object[] params, IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 		String tmpCommand = command;
 		if (params != null) {
@@ -194,16 +206,16 @@ public class SSHManager {
 	 * @param preserveTimestamp
 	 * @throws CommandExecutionException
 	 */
-	public void copyFileToRemote(File fileToTransfer, String destDirectory,
-			boolean preserveTimestamp) throws CommandExecutionException {
+	public void copyFileToRemote(File fileToTransfer, String destDirectory, boolean preserveTimestamp)
+			throws CommandExecutionException {
 
 		FileInputStream fis = null;
 		String error = null;
 
 		try {
 
-			String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t "
-					+ destDirectory + fileToTransfer.getName();
+			String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t " + destDirectory
+					+ fileToTransfer.getName();
 
 			logger.log(Level.INFO, "Command: {0}", command);
 
@@ -233,8 +245,7 @@ public class SSHManager {
 
 			// send scp command
 			long filesize = fileToTransfer.length();
-			command = "C0644 " + filesize + " " + fileToTransfer.getName()
-					+ "\n";
+			command = "C0644 " + filesize + " " + fileToTransfer.getName() + "\n";
 			out.write(command.getBytes());
 			out.flush();
 			if ((error = checkAck(in)) != null) {
@@ -269,8 +280,7 @@ public class SSHManager {
 		}
 
 	}
-	
-	
+
 	static String checkAck(InputStream in) throws IOException {
 		int b = in.read();
 		// b may be 0 for success,

@@ -20,25 +20,24 @@ public class StringUtils {
 		}
 		return null;
 	}
-	
-    /**
-     * Converts the given InputStream to a String. This is how the streams from
-     * executing NMap are converted and later stored in the ExecutionResults.
-     * 
-     * @param is
-     * @return
-     * @throws IOException
-     */
-    public static String convertStream( InputStream is ) throws IOException {
-        String output ;
-        StringBuffer outputBuffer = new StringBuffer() ;
-        BufferedReader streamReader = new BufferedReader(
-                new InputStreamReader( is ) ) ;
-        while ( ( output = streamReader.readLine() ) != null ) {
-            outputBuffer.append( output ) ;
-            outputBuffer.append( "\n" ) ;
-        }
-        return outputBuffer.toString() ;
-    }
-	
+
+	/**
+	 * Converts the given InputStream to a String. This is how the streams from
+	 * executing NMap are converted and later stored in the ExecutionResults.
+	 * 
+	 * @param is
+	 * @return
+	 * @throws IOException
+	 */
+	public static String convertStream(InputStream is) throws IOException {
+		String output;
+		StringBuffer outputBuffer = new StringBuffer();
+		BufferedReader streamReader = new BufferedReader(new InputStreamReader(is));
+		while ((output = streamReader.readLine()) != null) {
+			outputBuffer.append(output);
+			outputBuffer.append("\n");
+		}
+		return outputBuffer.toString();
+	}
+
 }

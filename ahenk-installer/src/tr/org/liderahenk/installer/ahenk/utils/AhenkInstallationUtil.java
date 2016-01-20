@@ -48,20 +48,20 @@ public class AhenkInstallationUtil {
 						public void run() {
 							table.getItem(j).setText(1, Messages.getString("INSTALLATION_STARTED"));
 
-							try {
-								SetupUtils.installPackage(config.getIpList().get(j), config.getUsernameCm(),
-										config.getPasswordCm(), null, null, debFile, false);
-
-								table.getItem(j).setText(1, Messages.getString("INSTALLATION_SUCCESSFULLY_COMPLETED"));
-
-								progressBar.setSelection(progressBar.getSelection() + 1);
-
-							} catch (SSHConnectionException | CommandExecutionException e) {
-
-								table.getItem(j).setText(1, Messages.getString("AN_ERROR_OCCURED_DURING_INSTALLATION"));
-
-								e.printStackTrace();
-							}
+//							try {
+//								SetupUtils.installPackage(config.getIpList().get(j), config.getUsernameCm(),
+//										config.getPasswordCm(), null, null, debFile, false);
+//
+//								table.getItem(j).setText(1, Messages.getString("INSTALLATION_SUCCESSFULLY_COMPLETED"));
+//
+//								progressBar.setSelection(progressBar.getSelection() + 1);
+//
+//							} catch (SSHConnectionException | CommandExecutionException e) {
+//
+//								table.getItem(j).setText(1, Messages.getString("AN_ERROR_OCCURED_DURING_INSTALLATION"));
+//
+//								e.printStackTrace();
+//							}
 						}
 					});
 				}
@@ -97,18 +97,18 @@ public class AhenkInstallationUtil {
 
 						@Override
 						public void run() {
-							try {
-								SetupUtils.installPackage(config.getIpList().get(j), "root", null, null,
-										config.getPrivateKeyAbsPath(), debFile, false);
-
-								table.getItem(j).setText(1, Messages.getString("INSTALLATION_SUCCESSFULLY_COMPLETED"));
-
-							} catch (SSHConnectionException | CommandExecutionException e) {
-
-								table.getItem(j).setText(1, Messages.getString("AN_ERROR_OCCURED_DURING_INSTALLATION"));
-
-								e.printStackTrace();
-							}
+//							try {
+//								SetupUtils.installPackage(config.getIpList().get(j), "root", null, null,
+//										config.getPrivateKeyAbsPath(), debFile, false);
+//
+//								table.getItem(j).setText(1, Messages.getString("INSTALLATION_SUCCESSFULLY_COMPLETED"));
+//
+//							} catch (SSHConnectionException | CommandExecutionException e) {
+//
+//								table.getItem(j).setText(1, Messages.getString("AN_ERROR_OCCURED_DURING_INSTALLATION"));
+//
+//								e.printStackTrace();
+//							}
 
 							progressBar.setSelection(progressBar.getSelection() + 1);
 						}

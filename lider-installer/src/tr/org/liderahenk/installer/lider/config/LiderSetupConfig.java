@@ -25,9 +25,24 @@ public class LiderSetupConfig {
 	private boolean installDatabase;
 
 	/**
+	 * Package name to be installed as database server
+	 */
+	private String databasePackageName;
+
+	/**
+	 * Root password for the database server
+	 */
+	private String databaseRootPassword;
+
+	/**
 	 * Database server IP
 	 */
 	private String databaseIp;
+
+	/**
+	 * Port number which is used for SSH connection
+	 */
+	private Integer databasePort;
 
 	/**
 	 * Indicates access method which is either via username-password pair or
@@ -125,6 +140,14 @@ public class LiderSetupConfig {
 	 * Lider server IP
 	 */
 	private String liderIp;
+	
+	public LiderSetupConfig() {
+		super();
+		// TODO set these values from a new wizard page!
+		this.databasePort = new Integer(22);
+		this.setDatabasePackageName("mariadb-server");
+		this.setDatabaseRootPassword("12345");
+	}
 
 	public boolean isInstallDatabase() {
 		return installDatabase;
@@ -252,6 +275,30 @@ public class LiderSetupConfig {
 
 	public void setDatabaseAccessMethod(AccessMethod databaseAccessMethod) {
 		this.databaseAccessMethod = databaseAccessMethod;
+	}
+
+	public String getDatabasePackageName() {
+		return databasePackageName;
+	}
+
+	public void setDatabasePackageName(String databasePackageName) {
+		this.databasePackageName = databasePackageName;
+	}
+
+	public String getDatabaseRootPassword() {
+		return databaseRootPassword;
+	}
+
+	public void setDatabaseRootPassword(String databaseRootPassword) {
+		this.databaseRootPassword = databaseRootPassword;
+	}
+
+	public Integer getDatabasePort() {
+		return databasePort;
+	}
+
+	public void setDatabasePort(Integer databasePort) {
+		this.databasePort = databasePort;
 	}
 
 }

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PropertyReader {
-	
+
 	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());
 
 	private static HashMap<String, String> propertyMap = null;
@@ -22,8 +22,9 @@ public class PropertyReader {
 		try {
 
 			Properties properties = new Properties();
-			InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFile);
-			
+			InputStream inputStream = Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream(propertiesFile);
+
 			if (inputStream == null) {
 				logger.log(Level.WARNING, "Could not find properties file: {0}", propertiesFile);
 				return;
@@ -51,5 +52,5 @@ public class PropertyReader {
 		}
 		return propertyMap.get(key);
 	}
-	
+
 }

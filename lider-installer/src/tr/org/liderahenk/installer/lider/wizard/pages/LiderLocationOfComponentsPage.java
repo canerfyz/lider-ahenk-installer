@@ -79,19 +79,19 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		Composite secondChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
 		// IP's for components will be taken in this section.
-		GUIHelper.createLabel(secondChild, Messages.getString("DATABASE") + " 1.0");
+		GUIHelper.createLabel(secondChild, Messages.getString("DATABASE"));
 
 		txtDatabaseIp = GUIHelper.createText(secondChild, gdForTextField);
 
-		GUIHelper.createLabel(secondChild, Messages.getString("LDAP") + " 1.0");
+		GUIHelper.createLabel(secondChild, Messages.getString("LDAP"));
 
 		txtLdapIp = GUIHelper.createText(secondChild, gdForTextField);
 
-		GUIHelper.createLabel(secondChild, Messages.getString("XMPP") + " 1.0");
+		GUIHelper.createLabel(secondChild, Messages.getString("XMPP"));
 
 		txtXmppIp = GUIHelper.createText(secondChild, gdForTextField);
 
-		GUIHelper.createLabel(secondChild, Messages.getString("LIDER") + " 1.0");
+		GUIHelper.createLabel(secondChild, Messages.getString("LIDER"));
 
 		txtLiderIp = GUIHelper.createText(secondChild, gdForTextField);
 
@@ -197,6 +197,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// This method sets fields enable/disable
 		// according to user's radio button choices
 		organizeFields();
+		updatePageCompleteStatus();
 	}
 
 	// This method organizes button, fields etc.
@@ -260,32 +261,16 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			} else {
 				setPageComplete(false);
 			}
-		} else {
-			if (checkRequiredIps()) {
-				setPageComplete(true);
-			} else {
-				setPageComplete(false);
-			}
+		} else { // btnInstallDistributed
+			setPageComplete(checkRequiredIps());
 		}
 	}
 
 	private boolean checkRequiredIps() {
-		// If a component is selected
-		// then entering a valid IP is mandatory.
-		if (config.isInstallDatabase() && !NetworkUtils.isIpValid(txtDatabaseIp.getText())) {
-			return false;
-		}
-		if (config.isInstallLdap() && !NetworkUtils.isIpValid(txtLdapIp.getText())) {
-			return false;
-		}
-		if (config.isInstallXmpp() && !NetworkUtils.isIpValid(txtXmppIp.getText())) {
-			return false;
-		}
-		if (config.isInstallLider() && !NetworkUtils.isIpValid(txtLiderIp.getText())) {
-			return false;
-		}
-		// If all IP's are entered and valid then return true.
-		return true;
+		return ((config.isInstallDatabase() && NetworkUtils.isIpValid(txtDatabaseIp.getText()))
+				|| (config.isInstallLdap() && NetworkUtils.isIpValid(txtLdapIp.getText()))
+				|| (config.isInstallXmpp() && NetworkUtils.isIpValid(txtXmppIp.getText()))
+				|| (config.isInstallLider() && NetworkUtils.isIpValid(txtLiderIp.getText())));
 	}
 
 	private void setConfigVariables() {
@@ -348,7 +333,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	 * @return
 	 */
 	private IWizardPage selectNextPage() {
-		// TODO get these list indices programmatically!
+		// TODO get these list indices dynamically!
 		LinkedList<IWizardPage> pagesList = ((LiderSetupWizard) this.getWizard()).getPagesList();
 		if (config.isInstallDatabase()) {
 			return pagesList.get(2);

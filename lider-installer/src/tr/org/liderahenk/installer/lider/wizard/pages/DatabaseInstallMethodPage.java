@@ -58,9 +58,7 @@ public class DatabaseInstallMethodPage extends WizardPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnAptGet.getSelection()) {
-					config.setDatabaseInstallMethod(InstallMethod.APT_GET);
-				}
+				updateConfig();
 				updatePageCompleteStatus();
 			}
 
@@ -68,7 +66,6 @@ public class DatabaseInstallMethodPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-
 		btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_DEB"));
@@ -76,9 +73,7 @@ public class DatabaseInstallMethodPage extends WizardPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnDebPackage.getSelection()) {
-					config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
-				}
+				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
 				updatePageCompleteStatus();
@@ -138,7 +133,16 @@ public class DatabaseInstallMethodPage extends WizardPage {
 			}
 		});
 
+		updateConfig();
 		updatePageCompleteStatus();
+	}
+
+	protected void updateConfig() {
+		if (btnDebPackage.getSelection()) {
+			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
+		} else {
+			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
+		}
 	}
 
 	private void updatePageCompleteStatus() {

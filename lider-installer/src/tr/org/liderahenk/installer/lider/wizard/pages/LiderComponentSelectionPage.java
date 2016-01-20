@@ -136,6 +136,8 @@ public class LiderComponentSelectionPage extends WizardPage {
 		btnCheckXmpp.setSelection(true);
 
 		btnCheckLider.setSelection(true);
+		
+		updatePageCompleteStatus();
 	}
 
 	private void setSelectionOfCheckAll() {
