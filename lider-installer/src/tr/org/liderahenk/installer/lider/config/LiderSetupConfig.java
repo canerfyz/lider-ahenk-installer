@@ -99,6 +99,16 @@ public class LiderSetupConfig {
 	 * Indicates whether to install LDAP server
 	 */
 	private boolean installLdap;
+	
+	/**
+	 * Package name to be installed as ldap server
+	 */
+	private String ldapPackageName;
+
+	/**
+	 * Root password for the ldap server
+	 */
+	private String ldapRootPassword;
 
 	/**
 	 * LDAP server IP
@@ -109,6 +119,33 @@ public class LiderSetupConfig {
 	 * SSH port which is used to connect to server
 	 */
 	private Integer ldapPort;
+	
+	/**
+	 * Indicates access method which is either via username-password pair or
+	 * private key.
+	 */
+	private AccessMethod ldapAccessMethod;
+
+	/**
+	 * User name which is used for accessing target machine via SSH
+	 */
+	private String ldapAccessUsername;
+
+	/**
+	 * Password which is used for accessing target machine via SSH
+	 */
+	private String ldapAccessPasswd;
+
+	/**
+	 * Absolute path of the private key that is used for accessing target
+	 * machine via SSH
+	 */
+	private String ldapAccessKeyPath;
+
+	/**
+	 * Passphrase which is used for accessing target machine via SSH (Optional)
+	 */
+	private String ldapAccessPassphrase;
 
 	/**
 	 * ###################################
@@ -338,6 +375,62 @@ public class LiderSetupConfig {
 
 	public void setLiderPort(Integer liderPort) {
 		this.liderPort = liderPort;
+	}
+
+	public String getLdapPackageName() {
+		return ldapPackageName;
+	}
+
+	public void setLdapPackageName(String ldapPackageName) {
+		this.ldapPackageName = ldapPackageName;
+	}
+
+	public String getLdapRootPassword() {
+		return ldapRootPassword;
+	}
+
+	public void setLdapRootPassword(String ldapRootPassword) {
+		this.ldapRootPassword = ldapRootPassword;
+	}
+
+	public AccessMethod getLdapAccessMethod() {
+		return ldapAccessMethod;
+	}
+
+	public void setLdapAccessMethod(AccessMethod ldapAccessMethod) {
+		this.ldapAccessMethod = ldapAccessMethod;
+	}
+
+	public String getLdapAccessUsername() {
+		return ldapAccessUsername;
+	}
+
+	public void setLdapAccessUsername(String ldapAccessUsername) {
+		this.ldapAccessUsername = ldapAccessUsername;
+	}
+
+	public String getLdapAccessPasswd() {
+		return ldapAccessPasswd;
+	}
+
+	public void setLdapAccessPasswd(String ldapAccessPasswd) {
+		this.ldapAccessPasswd = ldapAccessPasswd;
+	}
+
+	public String getLdapAccessKeyPath() {
+		return ldapAccessKeyPath;
+	}
+
+	public void setLdapAccessKeyPath(String ldapAccessKeyPath) {
+		this.ldapAccessKeyPath = ldapAccessKeyPath;
+	}
+
+	public String getLdapAccessPassphrase() {
+		return ldapAccessPassphrase;
+	}
+
+	public void setLdapAccessPassphrase(String ldapAccessPassphrase) {
+		this.ldapAccessPassphrase = ldapAccessPassphrase;
 	}
 
 }

@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -20,28 +22,30 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LdapSetupMethodPage extends WizardPage {
+public class LdapInstallMethodPage extends WizardPage {
 
 	private LiderSetupConfig config;
 
-	// Widgets
 	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
+	private Text txtLdapRootPassword;
 
 	private byte[] debContent;
 
-	public LdapSetupMethodPage(LiderSetupConfig config) {
-		super(LdapSetupMethodPage.class.getName(), Messages
-				.getString("LIDER_INSTALLATION"), null);
-		setDescription("3.2 " + Messages.getString("LDAP_INSTALLATION_METHOD") + " - " + Messages.getString("DB_SETUP_METHOD_DESC"));
+	public LdapInstallMethodPage(LiderSetupConfig config) {
+		super(LdapInstallMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
+		setDescription("3.2 " + Messages.getString("LDAP_INSTALLATION_METHOD") + " - "
+				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
 
@@ -53,14 +57,11 @@ public class LdapSetupMethodPage extends WizardPage {
 
 		// Ask user if LDAP will be installed from a .deb package or via
 		// apt-get
-		btnAptGet = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("LDAP_SETUP_METHOD_APT_GET"));
+		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LDAP_SETUP_METHOD_APT_GET"));
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnAptGet.getSelection()) {
-//					config.setInstallViaAptGet(true);
-				}
+				updateConfig();
 				updatePageCompleteStatus();
 			}
 
@@ -70,15 +71,12 @@ public class LdapSetupMethodPage extends WizardPage {
 		});
 		btnAptGet.setSelection(true);
 
-		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO,
-				Messages.getString("LDAP_SETUP_METHOD_DEB"));
+		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LDAP_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnDebPackage.getSelection()) {
-//					config.setInstallViaAptGet(false);
-				}
+				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
 				updatePageCompleteStatus();
@@ -89,16 +87,15 @@ public class LdapSetupMethodPage extends WizardPage {
 			}
 		});
 
-		Group grpDebPackage = GUIHelper.createGroup(container, new GridLayout(2,
-				false), new GridData(SWT.FILL, SWT.FILL, false, false));
+		Group grpDebPackage = GUIHelper.createGroup(container, new GridLayout(2, false),
+				new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		txtFileName = GUIHelper.createText(grpDebPackage, new GridData(SWT.FILL, SWT.FILL, true, false));
 		txtFileName.setEnabled(false); // do not let user to change it! It will
 										// be updated on file selection
 
 		// Upload deb package if necessary
-		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE,
-				Messages.getString("SELECT_FILE"));
+		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnFileSelect.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -128,7 +125,7 @@ public class LdapSetupMethodPage extends WizardPage {
 
 					// Set deb file
 					config.setDebFileName(debFileName);
-//					config.setDebContent(debContent);
+					config.setDebFileContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -139,40 +136,47 @@ public class LdapSetupMethodPage extends WizardPage {
 			}
 		});
 
+		Group grpRootPasswd = GUIHelper.createGroup(container, new GridLayout(2, false),
+				new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		GUIHelper.createLabel(grpRootPasswd, Messages.getString("LDAP_ROOT_PASSWORD"));
+
+		txtLdapRootPassword = GUIHelper.createPasswordText(grpRootPasswd);
+		txtLdapRootPassword.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
+
+		updateConfig();
 		updatePageCompleteStatus();
 	}
 
+	protected void updateConfig() {
+		if (btnDebPackage.getSelection()) {
+			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
+			config.setDatabasePackageName(null);
+		} else {
+			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
+			config.setDatabasePackageName(PropertyReader.property("ldap.package.name"));
+		}
+		config.setDatabaseRootPassword(txtLdapRootPassword.getText());
+	}
+
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection()
-				|| (btnDebPackage.getSelection() && checkFile()));
+		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile())
+				&& txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty());
 	}
 
 	private boolean checkFile() {
-//		return config.getDebFileName() != null
-//				&& config.getDebContent() != null;
-		return false;
-	}
-	
-	// This method sets info which taken from user
-	// to appropriate variables in LiderSetupConfig.
-	private void setConfigVariables() {
-//		
-//		if (btnAptGet.getSelection()) {
-//			config.setLdapUseRepository(true);
-//		}
-//		else {
-//			config.setLdapUseRepository(false);
-//			config.setLdapDebAbsPath(txtFileName.getText());
-//		}
+		return config.getDebFileName() != null && config.getDebFileContent() != null;
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		// Set variables before going to next page.
-		setConfigVariables();
-		
 		return super.getNextPage();
 	}
-	
-	
+
 }

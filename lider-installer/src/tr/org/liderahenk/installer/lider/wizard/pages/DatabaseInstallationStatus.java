@@ -27,7 +27,7 @@ public class DatabaseInstallationStatus extends WizardPage {
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
-
+	
 	boolean isInstallationFinished = false;
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
@@ -62,22 +62,19 @@ public class DatabaseInstallationStatus extends WizardPage {
 		// set isInstallationFinished to true when its done.
 		if (super.isCurrentPage() && !isInstallationFinished) {
 
-			printMessage("Initializing installation...");
-
-			printMessage("Setting up parameters for database password.");
-			final String[] debconfValues = generateDebconfValues();
-
-			printMessage("Installing package...");
-
+			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
-					Display.getCurrent().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							progressBar.setSelection(50);
-						}
-					});
+
+					printMessage("Initializing installation...");
+					setProgressBar(10);
+
+					printMessage("Setting up parameters for database password.");
+					final String[] debconfValues = generateDebconfValues();
+					setProgressBar(20);
+
+					printMessage("Installing package...");
 
 					if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
 						SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
@@ -94,8 +91,38 @@ public class DatabaseInstallationStatus extends WizardPage {
 					}
 					// TODO handle failed installation attempts!
 
+					setProgressBar(100);
 					isInstallationFinished = true;
 					setPageComplete(isInstallationFinished);
+				}
+
+				/**
+				 * Prints log message to the log console widget
+				 * 
+				 * @param message
+				 */
+				private void printMessage(final String message) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+									? txtLogConsole.getText() + "\n" : "") + message);
+						}
+					});
+				}
+
+				private void setProgressBar(final int selection) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							progressBar.setSelection(selection);
+						}
+					});
 				}
 
 			};
@@ -106,26 +133,6 @@ public class DatabaseInstallationStatus extends WizardPage {
 		}
 
 		return super.getNextPage();
-	}
-
-	/**
-	 * Prints log message to the log console widget
-	 * 
-	 * @param message
-	 */
-	public void printMessage(final String message) {
-		Display.getCurrent().asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
-						? txtLogConsole.getText() + "\n" : "") + message);
-			}
-		});
 	}
 
 	/**

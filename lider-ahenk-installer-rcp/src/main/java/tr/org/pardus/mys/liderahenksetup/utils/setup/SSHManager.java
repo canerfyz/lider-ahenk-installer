@@ -56,7 +56,6 @@ public class SSHManager {
 		SSHChannel = new JSch();
 
 		config = new Properties();
-		// TODO check kex value
 		config.put("kex",
 				"diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
 		config.put("StrictHostKeyChecking", "no");
@@ -111,8 +110,9 @@ public class SSHManager {
 			}
 			channel.connect();
 
-			if (outputStream != null) {
-				outputStream.write(outputStreamProvider.getStreamAsByteArray());
+			byte[] byteArray = outputStreamProvider.getStreamAsByteArray();
+			if (outputStream != null && byteArray != null) {
+				outputStream.write(byteArray);
 				outputStream.flush();
 			}
 

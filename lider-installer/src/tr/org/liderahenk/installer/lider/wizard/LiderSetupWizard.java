@@ -16,7 +16,8 @@ import tr.org.liderahenk.installer.lider.wizard.pages.KarafConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.KarafSetupMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LdapSetupMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
@@ -51,8 +52,9 @@ public class LiderSetupWizard extends Wizard {
 	DatabaseInstallationStatus dbStatus = new DatabaseInstallationStatus(config);
 
 	LdapAccessPage ldapAccess = new LdapAccessPage(config);
-	LdapSetupMethodPage ldapInstallMethod = new LdapSetupMethodPage(config);
+	LdapInstallMethodPage ldapInstallMethod = new LdapInstallMethodPage(config);
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
+	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
 	KarafAccessPage liderAccess = new KarafAccessPage(config);
 	KarafSetupMethodPage liderInstallMethod = new KarafSetupMethodPage(config);
@@ -225,6 +227,11 @@ public class LiderSetupWizard extends Wizard {
 	public boolean performFinish() {
 		// TODO
 		return false;
+	}
+	
+	@Override
+	public boolean performCancel() {
+		return super.performCancel();
 	}
 
 	@Override

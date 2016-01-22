@@ -31,37 +31,44 @@ public class SetupUtils {
 	/**
 	 * Command used to check a package with the certain version number exists.
 	 */
-	private static final String CHECK_PACKAGE_EXIST_CMD = "sudo -S -p '' apt-cache policy {0}";
+//	private static final String CHECK_PACKAGE_EXIST_CMD = "sudo -S -p '' apt-cache policy {0}";
+	private static final String CHECK_PACKAGE_EXIST_CMD = "apt-cache policy {0}";
 
 	/**
 	 * Command used to check a package with the certain version number
 	 * installed.
 	 */
-	private static final String CHECK_PACKAGE_INSTALLED_CMD = "sudo -S -p '' dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
+//	private static final String CHECK_PACKAGE_INSTALLED_CMD = "sudo -S -p '' dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
+	private static final String CHECK_PACKAGE_INSTALLED_CMD = "dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
 
 	/**
 	 * Install package via apt-get
 	 */
-	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "sudo -S -p '' apt-get install -y {0}={1}";
+//	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "sudo -S -p '' apt-get install -y --force-yes {0}={1}";
+	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "apt-get install -y --force-yes {0}={1}";
 	/**
 	 * Install package via apt-get (without version)
 	 */
-	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "sudo -S -p '' apt-get install -y {0}";
+//	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "sudo -S -p '' apt-get install -y --force-yes {0}";
+	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "apt-get install -y --force-yes {0}";
 
 	/**
 	 * Install given package via dpkg
 	 */
-	private static final String INSTALL_PACKAGE = "sudo -S -p '' dpkg -i {0}";
+//	private static final String INSTALL_PACKAGE = "sudo -S -p '' dpkg -i {0}";
+	private static final String INSTALL_PACKAGE = "dpkg -i {0}";
 
 	/**
 	 * Uninstall package via apt-get
 	 */
-	private static final String UNINSTALL_PACKAGE_CMD = "sudo -S -p '' apt-get remove --purge -y {0}";
+//	private static final String UNINSTALL_PACKAGE_CMD = "sudo -S -p '' apt-get remove --purge -y {0}";
+	private static final String UNINSTALL_PACKAGE_CMD = "apt-get remove --purge -y {0}";
 
 	/**
 	 * Add new repository
 	 */
-	private static final String ADD_APP_REPO_CMD = "sudo -S -p '' add-apt-repository -y {0} && sudo apt-get update";
+//	private static final String ADD_APP_REPO_CMD = "sudo -S -p '' add-apt-repository -y {0} && sudo apt-get update";
+	private static final String ADD_APP_REPO_CMD = "add-apt-repository -y {0} && sudo apt-get update";
 
 	/**
 	 * Turns off "frontend" (prompts) during installation
@@ -71,7 +78,9 @@ public class SetupUtils {
 	/**
 	 * Sets default values which used during the noninteractive installation
 	 */
-	private static final String DEBCONF_SET_SELECTIONS = "sudo -S -p '' debconf-set-selections <<< '{0}'";
+	// FIXME won't work for sudo user!
+//	private static final String DEBCONF_SET_SELECTIONS = "sudo -S -p '' debconf-set-selections <<< '{0}'";
+	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
@@ -373,12 +382,13 @@ public class SetupUtils {
 				Process process = Runtime.getRuntime().exec(command);
 
 				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-										// press.
-					writer.flush();
+					// TODO
+//					OutputStream stdIn = process.getOutputStream();
+//					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
+//					writer.write(password);
+//					writer.write("\n"); // write newline char to mimic 'enter'
+//										// press.
+//					writer.flush();
 				}
 
 				int exitValue = process.waitFor();
@@ -413,7 +423,8 @@ public class SetupUtils {
 							new IOutputStreamProvider() {
 								@Override
 								public byte[] getStreamAsByteArray() {
-									return (password + "\n").getBytes();
+//									return (password + "\n").getBytes();
+									return null; // TODO
 								}
 							});
 
@@ -423,7 +434,8 @@ public class SetupUtils {
 							new IOutputStreamProvider() {
 								@Override
 								public byte[] getStreamAsByteArray() {
-									return (password + "\n").getBytes();
+//									return (password + "\n").getBytes();
+									return null; // TODO
 								}
 							});
 
@@ -476,13 +488,14 @@ public class SetupUtils {
 					Process process = Runtime.getRuntime().exec(command);
 
 					if (password != null) {
-						OutputStream stdIn = process.getOutputStream();
-						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-						writer.write(password);
-						writer.write("\n"); // write newline char to mimic
-											// 'enter'
-											// press.
-						writer.flush();
+						// TODO
+//						OutputStream stdIn = process.getOutputStream();
+//						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
+//						writer.write(password);
+//						writer.write("\n"); // write newline char to mimic
+//											// 'enter'
+//											// press.
+//						writer.flush();
 					}
 
 					int exitValue = process.waitFor();
@@ -499,13 +512,14 @@ public class SetupUtils {
 						process = Runtime.getRuntime().exec(command);
 
 						if (password != null) {
-							OutputStream stdIn = process.getOutputStream();
-							BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-							writer.write(password);
-							writer.write("\n"); // write newline char to mimic
-												// 'enter'
-												// press.
-							writer.flush();
+							// TODO
+//							OutputStream stdIn = process.getOutputStream();
+//							BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
+//							writer.write(password);
+//							writer.write("\n"); // write newline char to mimic
+//												// 'enter'
+//												// press.
+//							writer.flush();
 						}
 
 						exitValue = process.waitFor();
@@ -537,24 +551,29 @@ public class SetupUtils {
 				manager.execCommand(SET_DEBIAN_FRONTEND, new IOutputStreamProvider() {
 					@Override
 					public byte[] getStreamAsByteArray() {
-						return (password + "\n").getBytes();
+						// TODO
+//						return (password + "\n").getBytes();
+						return null;
 					}
 				});
 				
 				manager.disconnect();
+				manager = new SSHManager(ip, username, password, port, privateKey);
+				manager.connect();
 
 				// Set debconf values
 				for (String value : debconfValues) {
-					manager = new SSHManager(ip, username, password, port, privateKey);
-					manager.connect();
 					manager.execCommand(DEBCONF_SET_SELECTIONS, new Object[] { value }, new IOutputStreamProvider() {
 						@Override
 						public byte[] getStreamAsByteArray() {
-							return (password + "\n").getBytes();
+							// TODO
+//							return (password + "\n").getBytes();
+							return null;
 						}
 					});
-					manager.disconnect();
 				}
+				
+				manager.disconnect();
 
 				// Finally, install the package
 				SetupUtils.installPackage(ip, username, password, port, privateKey, packageName, version);
@@ -689,12 +708,13 @@ public class SetupUtils {
 				Process process = Runtime.getRuntime().exec(command);
 
 				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-										// press.
-					writer.flush();
+					// TODO
+//					OutputStream stdIn = process.getOutputStream();
+//					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
+//					writer.write(password);
+//					writer.write("\n"); // write newline char to mimic 'enter'
+//										// press.
+//					writer.flush();
 				}
 
 				int exitValue = process.waitFor();
@@ -722,7 +742,8 @@ public class SetupUtils {
 			manager.execCommand(UNINSTALL_PACKAGE_CMD, new Object[] { packageName }, new IOutputStreamProvider() {
 				@Override
 				public byte[] getStreamAsByteArray() {
-					return (password + "\n").getBytes();
+//					return (password + "\n").getBytes();
+					return null; // TODO
 				}
 			});
 			manager.disconnect();

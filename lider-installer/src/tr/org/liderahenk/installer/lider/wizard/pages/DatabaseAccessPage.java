@@ -65,6 +65,9 @@ public class DatabaseAccessPage extends WizardPage {
 		GridData gdForTextField = new GridData();
 		gdForTextField.widthHint = 150;
 		usernameTxt = GUIHelper.createText(childContainer, gdForTextField);
+		// Force 'root' password until defconf-set-selections command is fixed
+		usernameTxt.setText("root");
+		usernameTxt.setEditable(false);
 
 		GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
 

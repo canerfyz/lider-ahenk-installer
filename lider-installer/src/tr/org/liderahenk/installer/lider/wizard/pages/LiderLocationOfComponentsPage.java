@@ -227,40 +227,47 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	// This method organizes button, fields etc.
 	// according to selections etc.
 	private void organizeFields() {
-
 		if (btnInstallDistributed.getSelection()) {
 
 			// Disable first option
 			btnLocal.setEnabled(false);
-
 			btnRemote.setEnabled(false);
-
 			txtRemoteIp.setEnabled(false);
+			txtRemotePort.setEnabled(false);
 
 			// Enable second option
-			txtDatabaseIp.setEnabled(true);
-
-			txtLdapIp.setEnabled(true);
-
-			txtXmppIp.setEnabled(true);
-
-			txtLiderIp.setEnabled(true);
+			if (config.isInstallDatabase()) {
+				txtDatabaseIp.setEnabled(true);
+				txtDatabasePort.setEnabled(true);
+			}
+			if (config.isInstallLdap()) {
+				txtLdapIp.setEnabled(true);
+				txtLdapPort.setEnabled(true);
+			}
+			if (config.isInstallXmpp()) {
+				txtXmppIp.setEnabled(true);
+				txtXmppPort.setEnabled(true);
+			}
+			if (config.isInstallLider()) {
+				txtLiderIp.setEnabled(true);
+				txtLiderPort.setEnabled(true);
+			}
 		} else {
 			// Enable first option
 			btnLocal.setEnabled(true);
-
 			btnRemote.setEnabled(true);
 
 			organizeInnerFields();
 
 			// Disable second option
 			txtDatabaseIp.setEnabled(false);
-
+			txtDatabasePort.setEnabled(false);
 			txtLdapIp.setEnabled(false);
-
+			txtLdapPort.setEnabled(false);
 			txtXmppIp.setEnabled(false);
-
+			txtXmppPort.setEnabled(false);
 			txtLiderIp.setEnabled(false);
+			txtLiderPort.setEnabled(false);
 		}
 	}
 
@@ -269,10 +276,10 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// then select local installation as default
 		// (that means both of them not selected)
 		btnLocal.setSelection(!(btnLocal.getSelection() && btnRemote.getSelection()));
-
 		// If 'install to remote' is selected
 		// then enable IP text field
 		txtRemoteIp.setEnabled(btnRemote.getSelection());
+		txtRemotePort.setEnabled(btnRemote.getSelection());
 	}
 
 	// This method decides to next button's status.

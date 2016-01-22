@@ -155,7 +155,7 @@ public class DatabaseInstallMethodPage extends WizardPage {
 		updatePageCompleteStatus();
 	}
 
-	protected void updateConfig() {
+	private void updateConfig() {
 		if (btnDebPackage.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDatabasePackageName(null);

@@ -1,7 +1,5 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -14,11 +12,11 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
@@ -30,8 +28,6 @@ public class LdapAccessPage extends WizardPage {
 	private LiderSetupConfig config;
 
 	private Button usernamePassword;
-	private Label username;
-	private Label password;
 	private Text usernameTxt;
 	private Text passwordTxt;
 
@@ -40,26 +36,18 @@ public class LdapAccessPage extends WizardPage {
 	private Button uploadKey;
 	private FileDialog dialog;
 	private String selectedFile;
-	private Label passphrase;
 	private Text passphraseTxt;
-
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
 
 	public LdapAccessPage(LiderSetupConfig config) {
 		super(LdapAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-
 		setDescription("3.1 " + Messages.getString("LDAP_ACCESS_FOR_INSTALLATION"));
-
 		this.config = config;
-
-		ipStatus = new Status(IStatus.OK, "not_used", "");
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 
+		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 		setControl(mainContainer);
 
 		// Access with username and password
@@ -73,15 +61,17 @@ public class LdapAccessPage extends WizardPage {
 		gl.marginLeft = 30;
 		Composite childContainer = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
-		username = GUIHelper.createLabel(childContainer, Messages.getString("USERNAME"));
+		GUIHelper.createLabel(childContainer, Messages.getString("USERNAME"));
 
 		// Creating a text field with width 150px.
 		GridData gdForTextField = new GridData();
 		gdForTextField.widthHint = 150;
 
 		usernameTxt = GUIHelper.createText(childContainer, gdForTextField);
+		usernameTxt.setText("root");
+		usernameTxt.setEditable(false);
 
-		password = GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
+		GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
 
 		// Creating password style text field.
 		passwordTxt = GUIHelper.createText(childContainer, gdForTextField,
@@ -109,7 +99,7 @@ public class LdapAccessPage extends WizardPage {
 		// Creating another child container.
 		Composite thirdChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
-		passphrase = GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE(OPTIONAL)"));
+		GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE"));
 
 		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField,
 				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);
@@ -140,7 +130,7 @@ public class LdapAccessPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				canNext();
+				updatePageCompleteStatus();
 			}
 		});
 
@@ -148,7 +138,7 @@ public class LdapAccessPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				canNext();
+				updatePageCompleteStatus();
 			}
 		});
 
@@ -165,13 +155,13 @@ public class LdapAccessPage extends WizardPage {
 		});
 
 		uploadKey.addSelectionListener(new SelectionListener() {
-
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				// When clicked open a dialog.
-				openDialog();
-
-				canNext();
+				selectedFile = dialog.open();
+				if (selectedFile != null && !"".equals(selectedFile)) {
+					privateKeyTxt.setText(selectedFile);
+				}
+				updatePageCompleteStatus();
 			}
 
 			@Override
@@ -180,55 +170,30 @@ public class LdapAccessPage extends WizardPage {
 		});
 
 		setPageComplete(false);
-
 	}
 
-	// This method organizes button, fields etc.
-	// according to selections etc.
+	/**
+	 * This method organises button, fields etc. according to selections etc.
+	 */
 	private void organizeFields() {
-
 		if (usernamePassword.getSelection()) {
-
 			usernameTxt.setEnabled(true);
-
 			passwordTxt.setEnabled(true);
-
 			uploadKey.setEnabled(false);
-
 			privateKeyTxt.setEnabled(false);
-
 			passphraseTxt.setEnabled(false);
 		} else {
 			usernameTxt.setEnabled(false);
-
 			passwordTxt.setEnabled(false);
-
 			uploadKey.setEnabled(true);
-
 			privateKeyTxt.setEnabled(true);
-
 			passphraseTxt.setEnabled(true);
 		}
-
 	}
 
-	// This method opens a dialog when triggered,
-	// and sets the private key text field.
-	private void openDialog() {
-
-		selectedFile = dialog.open();
-
-		if (selectedFile != null && !"".equals(selectedFile)) {
-			privateKeyTxt.setText(selectedFile);
-		}
-	}
-
-	// This method decides to next button's status
-	private void canNext() {
+	private void updatePageCompleteStatus() {
 		if (usernamePassword.getSelection()) {
-
 			if (!LiderAhenkUtils.isEmpty(usernameTxt.getText()) && !LiderAhenkUtils.isEmpty(passwordTxt.getText())) {
-
 				setPageComplete(true);
 			} else {
 				setPageComplete(false);
@@ -247,30 +212,20 @@ public class LdapAccessPage extends WizardPage {
 	 * LiderSetupConfig.
 	 */
 	private void setConfigVariables() {
-//
-//		if (usernamePassword.getSelection()) {
-//
-//			config.setLdapUseSSH(false);
-//
-//			config.setLdapSu(usernameTxt.getText());
-//
-//			config.setLdapSuPass(passwordTxt.getText());
-//		} else {
-//			config.setLdapUseSSH(true);
-//
-//			config.setLdapKeyAbsPath(privateKeyTxt.getText());
-//
-//			config.setLdapPassphrase(passphraseTxt.getText());
-//		}
+		if (usernamePassword.getSelection()) {
+			config.setLdapAccessMethod(AccessMethod.USERNAME_PASSWORD);
+			config.setLdapAccessUsername(usernameTxt.getText());
+			config.setLdapAccessPasswd(passwordTxt.getText());
+		} else {
+			config.setLdapAccessMethod(AccessMethod.PRIVATE_KEY);
+			config.setLdapAccessKeyPath(privateKeyTxt.getText());
+			config.setLdapAccessPassphrase(passphraseTxt.getText());
+		}
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		/**
-		 * Set variables before going to next page.
-		 */
 		setConfigVariables();
-
 		return super.getNextPage();
 	}
 
