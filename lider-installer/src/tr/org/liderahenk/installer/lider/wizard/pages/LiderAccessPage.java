@@ -25,7 +25,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class KarafAccessPage extends WizardPage {
+public class LiderAccessPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 
@@ -46,8 +46,8 @@ public class KarafAccessPage extends WizardPage {
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
 
-	public KarafAccessPage(LiderSetupConfig config) {
-		super(KarafAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
+	public LiderAccessPage(LiderSetupConfig config) {
+		super(LiderAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 
 		setDescription("5.1 " + Messages.getString("KARAF_ACCESS_FOR_INSTALLATION"));
 

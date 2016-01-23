@@ -387,14 +387,26 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// TODO get these list indices dynamically!
 		LinkedList<IWizardPage> pagesList = ((LiderSetupWizard) this.getWizard()).getPagesList();
 		if (config.isInstallDatabase()) {
-			return pagesList.get(2);
+			// Find first IDatabasePage instance
+			return findFirstInstance(pagesList, IDatabasePage.class);
 		} else if (config.isInstallLdap()) {
-			return pagesList.get(6);
+			return findFirstInstance(pagesList, ILdapPage.class);
 		} else if (config.isInstallXmpp()) {
-			return pagesList.get(10);
+			return findFirstInstance(pagesList, IXmppPage.class);
 		} else { // Lider
-			return pagesList.get(14);
+			return findFirstInstance(pagesList, ILiderPage.class);
 		}
+	}
+
+	private IWizardPage findFirstInstance(LinkedList<IWizardPage> pagesList, Class<?> cls) {
+		if (pagesList != null) {
+			for (IWizardPage page : pagesList) {
+				if (cls.isInstance(page)) {
+					return page;
+				}
+			}
+		}
+		return null;
 	}
 
 	public void updatePage() {

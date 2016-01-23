@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.IHandler;
 import org.eclipse.core.commands.NotEnabledException;
 import org.eclipse.core.commands.NotHandledException;
 import org.eclipse.core.commands.ParameterizedCommand;
@@ -33,14 +32,15 @@ import org.eclipse.swt.widgets.Display;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallerConstants;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
+@SuppressWarnings("restriction")
 public class ApplicationWindowManager {
-	
-	@SuppressWarnings("restriction")
-	@Inject 
-	// See: http://stackoverflow.com/questions/22589884/ecommandservice-discouraged-access
+
+	@Inject
+	// See:
+	// http://stackoverflow.com/questions/22589884/ecommandservice-discouraged-access
 	// for suppressing warnings.
-	ECommandService commandService; 
-	
+	ECommandService commandService;
+
 	@Inject
 	EHandlerService handlerService;
 
@@ -67,7 +67,7 @@ public class ApplicationWindowManager {
 		IExtensionRegistry registry = Platform.getExtensionRegistry();
 		IExtensionPoint extensionPoint = registry.getExtensionPoint(InstallerConstants.ExtensionPoints.MAIN_VIEW);
 		IConfigurationElement[] config = extensionPoint.getConfigurationElements();
-		
+
 		if (config != null) {
 			for (IConfigurationElement e : config) {
 				try {
@@ -78,15 +78,13 @@ public class ApplicationWindowManager {
 					LiderAhenkUtils.imageButton(comp, image, image, new MouseListener() {
 						@Override
 						public void mouseUp(MouseEvent e) {
-							
-							ParameterizedCommand cmd =
-									  commandService.createCommand(commandId, null);
-							
+
+							ParameterizedCommand cmd = commandService.createCommand(commandId, null);
+
 							if (handlerService.canExecute(cmd)) {
 								handlerService.executeHandler(cmd);
 							}
-							
-							@SuppressWarnings("restriction")
+
 							final Command command = commandService.getCommand(commandId);
 							if (command != null) {
 								try {

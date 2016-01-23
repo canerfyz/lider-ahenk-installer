@@ -8,25 +8,21 @@ import org.eclipse.swt.widgets.Label;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LdapConfirmPage extends WizardPage {
+public class LdapConfirmPage extends WizardPage implements ILdapPage {
 
 	private LiderSetupConfig config;
 
-	// Widgets
-	private Label ldap;
-	private Label ip;
-	private Label connectionMethod;
-	private Label setupMethod;
-	private Label question;
+	private Label lblIp;
 
 	public LdapConfirmPage(LiderSetupConfig config) {
 		super(LdapConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-
 		setDescription("3.3 " + Messages.getString("LDAP_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
@@ -40,17 +36,18 @@ public class LdapConfirmPage extends WizardPage {
 		GridData gd = new GridData();
 		gd.widthHint = 200;
 		gd.minimumWidth = 200;
-		ip = GUIHelper.createLabel(container, "localhost");
-		ip.setLayoutData(gd);
+		lblIp = GUIHelper.createLabel(container, "localhost");
+		lblIp.setLayoutData(gd);
 
-//		connectionMethod = GUIHelper.createLabel(container, "- " + Messages.getString(
-//				config.isLdapUseSSH() ? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
-//
-//		setupMethod = GUIHelper.createLabel(container,
-//				"- " + Messages.getString(config.isLdapUseRepository() ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
-//
-//		question = GUIHelper.createLabel(container,
-//				Messages.getString("LDAP_WILL_BE_INSTALLED") + " " + Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
+		GUIHelper.createLabel(container,
+				"- " + Messages.getString(config.getLdapAccessMethod() == AccessMethod.PRIVATE_KEY
+						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
+
+		GUIHelper.createLabel(container, "- " + Messages.getString(
+				config.getLdapInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+
+		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " "
+				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 
 	@Override
@@ -58,7 +55,7 @@ public class LdapConfirmPage extends WizardPage {
 		/**
 		 * Set the IP info in the opening of page
 		 */
-		ip.setText("- IP: " + config.getLdapIp());
+		lblIp.setText("- IP: " + config.getLdapIp());
 
 		return super.getNextPage();
 	}

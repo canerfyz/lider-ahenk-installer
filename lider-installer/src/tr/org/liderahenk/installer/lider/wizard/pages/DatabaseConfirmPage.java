@@ -16,7 +16,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
-public class DatabaseConfirmPage extends WizardPage {
+public class DatabaseConfirmPage extends WizardPage implements IDatabasePage {
 
 	private LiderSetupConfig config;
 
@@ -56,7 +56,7 @@ public class DatabaseConfirmPage extends WizardPage {
 		/**
 		 * Set the IP info in the opening of page
 		 */
-		lblIp.setText("- IP: " + config.getLiderIp());
+		lblIp.setText("- IP: " + config.getDatabaseIp());
 
 		return super.getNextPage();
 	}

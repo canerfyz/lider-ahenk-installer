@@ -13,15 +13,15 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class KarafConfirmPage extends WizardPage {
+public class LiderConfirmPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 	
 	// Widgets
 	private Label ip;
 	
-	public KarafConfirmPage(LiderSetupConfig config) {
-		super(KarafConfirmPage.class.getName(), 
+	public LiderConfirmPage(LiderSetupConfig config) {
+		super(LiderConfirmPage.class.getName(), 
 				Messages.getString("LIDER_INSTALLATION"), null);
 		
 		setDescription("5.3 " + Messages.getString("KARAF_INSTALLATION_CONFIRM"));

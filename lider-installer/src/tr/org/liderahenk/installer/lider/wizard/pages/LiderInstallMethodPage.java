@@ -25,7 +25,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class KarafSetupMethodPage extends WizardPage {
+public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 
@@ -38,8 +38,8 @@ public class KarafSetupMethodPage extends WizardPage {
 
 	private byte[] debContent;
 
-	public KarafSetupMethodPage(LiderSetupConfig config) {
-		super(KarafSetupMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
+	public LiderInstallMethodPage(LiderSetupConfig config) {
+		super(LiderInstallMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("5.2 " + Messages.getString("KARAF_INSTALLATION_METHOD") + " - "
 				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;

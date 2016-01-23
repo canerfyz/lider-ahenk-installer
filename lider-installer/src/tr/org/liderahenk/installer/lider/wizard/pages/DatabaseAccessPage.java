@@ -23,7 +23,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class DatabaseAccessPage extends WizardPage {
+public class DatabaseAccessPage extends WizardPage implements IDatabasePage {
 
 	private LiderSetupConfig config;
 

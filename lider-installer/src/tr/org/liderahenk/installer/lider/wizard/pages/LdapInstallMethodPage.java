@@ -29,7 +29,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LdapInstallMethodPage extends WizardPage {
+public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 	private LiderSetupConfig config;
 
@@ -124,8 +124,8 @@ public class LdapInstallMethodPage extends WizardPage {
 					}
 
 					// Set deb file
-					config.setDebFileName(debFileName);
-					config.setDebFileContent(debContent);
+					config.setLdapDebFileName(debFileName);
+					config.setLdapDebFileContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -171,7 +171,7 @@ public class LdapInstallMethodPage extends WizardPage {
 	}
 
 	private boolean checkFile() {
-		return config.getDebFileName() != null && config.getDebFileContent() != null;
+		return config.getLdapDebFileName() != null && config.getLdapDebFileContent() != null;
 	}
 
 	@Override

@@ -11,9 +11,9 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
-import tr.org.liderahenk.installer.lider.wizard.pages.KarafAccessPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.KarafConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.KarafSetupMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
@@ -56,9 +56,11 @@ public class LiderSetupWizard extends Wizard {
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
 	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
-	KarafAccessPage liderAccess = new KarafAccessPage(config);
-	KarafSetupMethodPage liderInstallMethod = new KarafSetupMethodPage(config);
-	KarafConfirmPage liderConfirm = new KarafConfirmPage(config);
+	LiderAccessPage liderAccess = new LiderAccessPage(config);
+	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
+	LiderConfirmPage liderConfirm = new LiderConfirmPage(config);
+	
+	// TODO IXmppPage 
 
 	@Override
 	public void addPages() {
@@ -78,7 +80,7 @@ public class LiderSetupWizard extends Wizard {
 		addPage(liderAccess);
 		addPage(liderInstallMethod);
 		addPage(liderConfirm);
-		// Set this to true to override needsPreviousAndNextButtons() method
+		// Set this as true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
 	}
 
@@ -228,7 +230,7 @@ public class LiderSetupWizard extends Wizard {
 		// TODO
 		return false;
 	}
-	
+
 	@Override
 	public boolean performCancel() {
 		return super.performCancel();

@@ -21,7 +21,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class DatabaseInstallationStatus extends WizardPage {
+public class DatabaseInstallationStatus extends WizardPage implements IDatabasePage {
 
 	private LiderSetupConfig config;
 
@@ -57,7 +57,7 @@ public class DatabaseInstallationStatus extends WizardPage {
 	@Override
 	public IWizardPage getNextPage() {
 		// Start MariaDB installation here.
-		// To prevent triggering installMariaDB method again
+		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
 		if (super.isCurrentPage() && !isInstallationFinished) {
@@ -82,7 +82,7 @@ public class DatabaseInstallationStatus extends WizardPage {
 								config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
 								config.getDatabasePackageName(), null, debconfValues);
 					} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getDebFileName());
+						File deb = new File(config.getDatabaseDebFileName());
 						SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
 								config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 								config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
@@ -116,6 +116,11 @@ public class DatabaseInstallationStatus extends WizardPage {
 					});
 				}
 
+				/**
+				 * Sets progress bar selection
+				 * 
+				 * @param selection
+				 */
 				private void setProgressBar(final int selection) {
 					display.asyncExec(new Runnable() {
 						@Override
@@ -129,7 +134,6 @@ public class DatabaseInstallationStatus extends WizardPage {
 
 			Thread thread = new Thread(runnable);
 			thread.start();
-
 		}
 
 		return super.getNextPage();
@@ -143,9 +147,9 @@ public class DatabaseInstallationStatus extends WizardPage {
 	public String[] generateDebconfValues() {
 		String debconfPwd = PropertyReader.property("database.debconf.password") + " "
 				+ config.getDatabaseRootPassword();
-		String deboconfPwdAgain = PropertyReader.property("database.debconf.password.again") + " "
+		String debconfPwdAgain = PropertyReader.property("database.debconf.password.again") + " "
 				+ config.getDatabaseRootPassword();
-		return new String[] { debconfPwd, deboconfPwdAgain };
+		return new String[] { debconfPwd, debconfPwdAgain };
 	}
 
 	@Override

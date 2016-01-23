@@ -80,12 +80,12 @@ public class LiderSetupConfig {
 	/**
 	 * File name of the provided DEB package
 	 */
-	private String debFileName;
+	private String databaseDebFileName;
 
 	/**
 	 * File content of the provided DEB package
 	 */
-	private byte[] debFileContent;
+	private byte[] databaseDebFileContent;
 
 	/**
 	 * ###################################
@@ -99,7 +99,7 @@ public class LiderSetupConfig {
 	 * Indicates whether to install LDAP server
 	 */
 	private boolean installLdap;
-	
+
 	/**
 	 * Package name to be installed as ldap server
 	 */
@@ -119,7 +119,7 @@ public class LiderSetupConfig {
 	 * SSH port which is used to connect to server
 	 */
 	private Integer ldapPort;
-	
+
 	/**
 	 * Indicates access method which is either via username-password pair or
 	 * private key.
@@ -146,6 +146,22 @@ public class LiderSetupConfig {
 	 * Passphrase which is used for accessing target machine via SSH (Optional)
 	 */
 	private String ldapAccessPassphrase;
+
+	/**
+	 * Indicates installation method which is either via apt-get or provided DEB
+	 * package
+	 */
+	private InstallMethod ldapInstallMethod;
+
+	/**
+	 * File name of the provided DEB package
+	 */
+	private String ldapDebFileName;
+
+	/**
+	 * File content of the provided DEB package
+	 */
+	private byte[] ldapDebFileContent;
 
 	/**
 	 * ###################################
@@ -305,22 +321,6 @@ public class LiderSetupConfig {
 		this.databaseInstallMethod = databaseInstallMethod;
 	}
 
-	public String getDebFileName() {
-		return debFileName;
-	}
-
-	public void setDebFileName(String debFileName) {
-		this.debFileName = debFileName;
-	}
-
-	public byte[] getDebFileContent() {
-		return debFileContent;
-	}
-
-	public void setDebFileContent(byte[] debFileContent) {
-		this.debFileContent = debFileContent;
-	}
-
 	public AccessMethod getDatabaseAccessMethod() {
 		return databaseAccessMethod;
 	}
@@ -431,6 +431,46 @@ public class LiderSetupConfig {
 
 	public void setLdapAccessPassphrase(String ldapAccessPassphrase) {
 		this.ldapAccessPassphrase = ldapAccessPassphrase;
+	}
+
+	public String getDatabaseDebFileName() {
+		return databaseDebFileName;
+	}
+
+	public void setDatabaseDebFileName(String databaseDebFileName) {
+		this.databaseDebFileName = databaseDebFileName;
+	}
+
+	public byte[] getDatabaseDebFileContent() {
+		return databaseDebFileContent;
+	}
+
+	public void setDatabaseDebFileContent(byte[] databaseDebFileContent) {
+		this.databaseDebFileContent = databaseDebFileContent;
+	}
+
+	public String getLdapDebFileName() {
+		return ldapDebFileName;
+	}
+
+	public void setLdapDebFileName(String ldapDebFileName) {
+		this.ldapDebFileName = ldapDebFileName;
+	}
+
+	public byte[] getLdapDebFileContent() {
+		return ldapDebFileContent;
+	}
+
+	public void setLdapDebFileContent(byte[] ldapDebFileContent) {
+		this.ldapDebFileContent = ldapDebFileContent;
+	}
+
+	public InstallMethod getLdapInstallMethod() {
+		return ldapInstallMethod;
+	}
+
+	public void setLdapInstallMethod(InstallMethod ldapInstallMethod) {
+		this.ldapInstallMethod = ldapInstallMethod;
 	}
 
 }
