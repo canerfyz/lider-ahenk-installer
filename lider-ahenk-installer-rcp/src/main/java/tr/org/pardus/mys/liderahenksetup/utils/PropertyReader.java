@@ -53,4 +53,9 @@ public class PropertyReader {
 		return propertyMap.get(key);
 	}
 
+	public static Integer propertyInt(String key) {
+		String val = property(key);
+		return val != null ? new Integer(val.trim()) : null;
+	}
+
 }
