@@ -51,7 +51,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 		// progressGd.widthHint = 780;
 		progressBar.setLayoutData(progressGd);
 	}
-	
+
 	@Override
 	public IWizardPage getNextPage() {
 		// Start Lider installation here.
@@ -59,7 +59,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
 		if (super.isCurrentPage() && !isInstallationFinished) {
-			
+
 			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
 				@Override
@@ -68,33 +68,47 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 					printMessage("Initializing installation...");
 					setProgressBar(10);
 
+					printMessage("Installing package...");
+
 					if (config.getLdapInstallMethod() == InstallMethod.APT_GET) {
 						try {
 							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 									config.getLdapPackageName(), null);
+							setProgressBar(90);
+							isInstallationFinished = true;
 						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
 					} else if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getLdapDebFileName());
 						try {
 							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(), deb);
+									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+									deb);
+							setProgressBar(90);
+							isInstallationFinished = true;
 						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
 					} else {
+						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-					// TODO handle failed installation attempts!
 
 					setProgressBar(100);
-					isInstallationFinished = true;
 					setPageComplete(isInstallationFinished);
 				}
 
@@ -136,10 +150,10 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 			Thread thread = new Thread(runnable);
 			thread.start();
 		}
-		
+
 		return super.getNextPage();
 	}
-	
+
 	@Override
 	public IWizardPage getPreviousPage() {
 		// Do not allow to go back from this page.

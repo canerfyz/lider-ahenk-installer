@@ -1,7 +1,6 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,7 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,6 +21,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
  * installing/un-installing a package, checking version of a package etc.)
  * locally or remotely
  *
+ * @author Emre Akkaya <emre.akkaya@agem.com.tr>
+ *
  */
 public class SetupUtils {
 
@@ -31,43 +31,37 @@ public class SetupUtils {
 	/**
 	 * Command used to check a package with the certain version number exists.
 	 */
-//	private static final String CHECK_PACKAGE_EXIST_CMD = "sudo -S -p '' apt-cache policy {0}";
 	private static final String CHECK_PACKAGE_EXIST_CMD = "apt-cache policy {0}";
 
 	/**
 	 * Command used to check a package with the certain version number
 	 * installed.
 	 */
-//	private static final String CHECK_PACKAGE_INSTALLED_CMD = "sudo -S -p '' dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
 	private static final String CHECK_PACKAGE_INSTALLED_CMD = "dpkg -l  | grep \"{0}\" | awk '{ print $3; }'";
 
 	/**
 	 * Install package via apt-get
 	 */
-//	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "sudo -S -p '' apt-get install -y --force-yes {0}={1}";
 	private static final String INSTALL_PACKAGE_FROM_REPO_CMD = "apt-get install -y --force-yes {0}={1}";
+
 	/**
 	 * Install package via apt-get (without version)
 	 */
-//	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "sudo -S -p '' apt-get install -y --force-yes {0}";
 	private static final String INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION = "apt-get install -y --force-yes {0}";
 
 	/**
 	 * Install given package via dpkg
 	 */
-//	private static final String INSTALL_PACKAGE = "sudo -S -p '' dpkg -i {0}";
 	private static final String INSTALL_PACKAGE = "dpkg -i {0}";
 
 	/**
 	 * Uninstall package via apt-get
 	 */
-//	private static final String UNINSTALL_PACKAGE_CMD = "sudo -S -p '' apt-get remove --purge -y {0}";
 	private static final String UNINSTALL_PACKAGE_CMD = "apt-get remove --purge -y {0}";
 
 	/**
 	 * Add new repository
 	 */
-//	private static final String ADD_APP_REPO_CMD = "sudo -S -p '' add-apt-repository -y {0} && sudo apt-get update";
 	private static final String ADD_APP_REPO_CMD = "add-apt-repository -y {0} && sudo apt-get update";
 
 	/**
@@ -78,8 +72,6 @@ public class SetupUtils {
 	/**
 	 * Sets default values which used during the noninteractive installation
 	 */
-	// FIXME won't work for sudo user!
-//	private static final String DEBCONF_SET_SELECTIONS = "sudo -S -p '' debconf-set-selections <<< '{0}'";
 	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
@@ -166,15 +158,6 @@ public class SetupUtils {
 				String command = CHECK_PACKAGE_EXIST_CMD.replace("{0}", packageName);
 				Process process = Runtime.getRuntime().exec(command);
 
-				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-										// press.
-					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -217,13 +200,7 @@ public class SetupUtils {
 
 			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
 			manager.connect();
-			String versions = manager.execCommand(CHECK_PACKAGE_EXIST_CMD, new Object[] { packageName },
-					new IOutputStreamProvider() {
-						@Override
-						public byte[] getStreamAsByteArray() {
-							return (password + "\n").getBytes();
-						}
-					});
+			String versions = manager.execCommand(CHECK_PACKAGE_EXIST_CMD, new Object[] { packageName });
 			manager.disconnect();
 
 			/**
@@ -274,15 +251,6 @@ public class SetupUtils {
 				String command = CHECK_PACKAGE_INSTALLED_CMD.replace("{0}", packageName);
 				Process process = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", command });
 
-				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-					// press.
-					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -317,13 +285,7 @@ public class SetupUtils {
 
 				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
 				manager.connect();
-				String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD, new Object[] { packageName },
-						new IOutputStreamProvider() {
-							@Override
-							public byte[] getStreamAsByteArray() {
-								return (password + "\n").getBytes();
-							}
-						});
+				String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD, new Object[] { packageName });
 				manager.disconnect();
 
 				boolean installed = versions.contains(version);
@@ -381,16 +343,6 @@ public class SetupUtils {
 
 				Process process = Runtime.getRuntime().exec(command);
 
-				if (password != null) {
-					// TODO
-//					OutputStream stdIn = process.getOutputStream();
-//					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-//					writer.write(password);
-//					writer.write("\n"); // write newline char to mimic 'enter'
-//										// press.
-//					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -419,26 +371,10 @@ public class SetupUtils {
 
 				// If version is not given
 				if (version == null || "".equals(version)) {
-					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, new Object[] { packageName },
-							new IOutputStreamProvider() {
-								@Override
-								public byte[] getStreamAsByteArray() {
-//									return (password + "\n").getBytes();
-									return null; // TODO
-								}
-							});
-
+					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, new Object[] { packageName });
 					logger.log(Level.INFO, "Package {0} installed successfully", new Object[] { packageName });
 				} else {
-					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD, new Object[] { packageName, version },
-							new IOutputStreamProvider() {
-								@Override
-								public byte[] getStreamAsByteArray() {
-//									return (password + "\n").getBytes();
-									return null; // TODO
-								}
-							});
-
+					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD, new Object[] { packageName, version });
 					logger.log(Level.INFO, "Package {0}:{1} installed successfully",
 							new Object[] { packageName, version });
 				}
@@ -467,124 +403,73 @@ public class SetupUtils {
 	 * @param packageName
 	 * @param version
 	 * @param debconfValues
+	 * @throws CommandExecutionException
+	 * @throws SSHConnectionException
 	 */
 	public static void installPackageNoninteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String packageName, final String version,
-			final String[] debconfValues) {
+			final String[] debconfValues) throws CommandExecutionException, SSHConnectionException {
 
-		try {
+		if (NetworkUtils.isLocal(ip)) {
 
-			// Try to uninstall the package first.
-			// This will give us a clean installation as well as clearing
-			// debconf selections
-			uninstallPackage(ip, username, password, port, privateKey, packageName + "*");
+			try {
 
-			if (NetworkUtils.isLocal(ip)) {
+				// Set frontend as noninteractive
+				String command = SET_DEBIAN_FRONTEND;
+				Process process = Runtime.getRuntime().exec(command);
 
-				try {
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
 
-					// Set frontend as noninteractive
-					String command = SET_DEBIAN_FRONTEND;
-					Process process = Runtime.getRuntime().exec(command);
+				// Set debconf values
+				for (String value : debconfValues) {
 
-					if (password != null) {
-						// TODO
-//						OutputStream stdIn = process.getOutputStream();
-//						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-//						writer.write(password);
-//						writer.write("\n"); // write newline char to mimic
-//											// 'enter'
-//											// press.
-//						writer.flush();
-					}
+					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+					process = Runtime.getRuntime().exec(command);
 
-					int exitValue = process.waitFor();
+					exitValue = process.waitFor();
 					if (exitValue != 0) {
 						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
 								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
 						throw new CommandExecutionException("Failed to execute command: " + command);
 					}
 
-					// Set debconf values
-					for (String value : debconfValues) {
-
-						command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
-						process = Runtime.getRuntime().exec(command);
-
-						if (password != null) {
-							// TODO
-//							OutputStream stdIn = process.getOutputStream();
-//							BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-//							writer.write(password);
-//							writer.write("\n"); // write newline char to mimic
-//												// 'enter'
-//												// press.
-//							writer.flush();
-						}
-
-						exitValue = process.waitFor();
-						if (exitValue != 0) {
-							logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
-									process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-							throw new CommandExecutionException("Failed to execute command: " + command);
-						}
-
-					}
-
-					// Finally, install the package
-					SetupUtils.installPackage(ip, username, password, port, privateKey, packageName, version);
-
-					logger.log(Level.INFO, "Package {0} installed successfully", packageName);
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}
-
-			} else {
-
-				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
-				manager.connect();
-
-				// Set frontend as noninteractive
-				manager.execCommand(SET_DEBIAN_FRONTEND, new IOutputStreamProvider() {
-					@Override
-					public byte[] getStreamAsByteArray() {
-						// TODO
-//						return (password + "\n").getBytes();
-						return null;
-					}
-				});
-				
-				manager.disconnect();
-				manager = new SSHManager(ip, username, password, port, privateKey);
-				manager.connect();
-
-				// Set debconf values
-				for (String value : debconfValues) {
-					manager.execCommand(DEBCONF_SET_SELECTIONS, new Object[] { value }, new IOutputStreamProvider() {
-						@Override
-						public byte[] getStreamAsByteArray() {
-							// TODO
-//							return (password + "\n").getBytes();
-							return null;
-						}
-					});
-				}
-				
-				manager.disconnect();
 
 				// Finally, install the package
 				SetupUtils.installPackage(ip, username, password, port, privateKey, packageName, version);
 
-				logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 
-		} catch (CommandExecutionException e) {
-			e.printStackTrace();
-		} catch (SSHConnectionException e) {
-			e.printStackTrace();
+		} else {
+
+			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			manager.connect();
+
+			// Set frontend as noninteractive
+			manager.execCommand(SET_DEBIAN_FRONTEND, new Object[] {});
+
+			manager.disconnect();
+			manager = new SSHManager(ip, username, password, port, privateKey);
+			manager.connect();
+
+			// Set debconf values
+			for (String value : debconfValues) {
+				manager.execCommand(DEBCONF_SET_SELECTIONS, new Object[] { value });
+			}
+
+			manager.disconnect();
+
+			// Finally, install the package
+			SetupUtils.installPackage(ip, username, password, port, privateKey, packageName, version);
 		}
 
 	}
@@ -615,15 +500,6 @@ public class SetupUtils {
 				String command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + debPackage.getName());
 				Process process = Runtime.getRuntime().exec(command);
 
-				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-										// press.
-					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -648,23 +524,13 @@ public class SetupUtils {
 
 			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
 			manager.connect();
-			manager.execCommand(INSTALL_PACKAGE, new Object[] { "/tmp/" + debPackage.getName() },
-					new IOutputStreamProvider() {
-						@Override
-						public byte[] getStreamAsByteArray() {
-							return (password + "\n").getBytes();
-						}
-					});
+			manager.execCommand(INSTALL_PACKAGE, new Object[] { "/tmp/" + debPackage.getName() });
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
 		}
 	}
 
-	// TODO
-	// TODO
-	// TODO
-	// TODO
 	/**
 	 * Installs a deb package file. This can be used when a specified deb
 	 * package is already provided. Before installing the package it uses
@@ -680,7 +546,69 @@ public class SetupUtils {
 	 * @param debconfValues
 	 */
 	public static void installPackageNonInteractively(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final File debPackage, final String[] debconfValues) {
+			final Integer port, final String privateKey, final File debPackage, final String[] debconfValues)
+					throws CommandExecutionException, SSHConnectionException {
+		if (NetworkUtils.isLocal(ip)) {
+
+			try {
+
+				// Set frontend as noninteractive
+				String command = SET_DEBIAN_FRONTEND;
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+
+				// Set debconf values
+				for (String value : debconfValues) {
+
+					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+					process = Runtime.getRuntime().exec(command);
+
+					exitValue = process.waitFor();
+					if (exitValue != 0) {
+						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
+								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+						throw new CommandExecutionException("Failed to execute command: " + command);
+					}
+
+				}
+
+				// Finally, install the package
+				SetupUtils.installPackage(ip, username, password, port, privateKey, debPackage);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+
+			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			manager.connect();
+
+			// Set frontend as noninteractive
+			manager.execCommand(SET_DEBIAN_FRONTEND, new Object[] {});
+
+			manager.disconnect();
+			manager = new SSHManager(ip, username, password, port, privateKey);
+			manager.connect();
+
+			// Set debconf values
+			for (String value : debconfValues) {
+				manager.execCommand(DEBCONF_SET_SELECTIONS, new Object[] { value });
+			}
+
+			manager.disconnect();
+
+			// Finally, install the package
+			SetupUtils.installPackage(ip, username, password, port, privateKey, debPackage);
+		}
 
 	}
 
@@ -707,16 +635,6 @@ public class SetupUtils {
 				String command = UNINSTALL_PACKAGE_CMD.replace("{0}", packageName);
 				Process process = Runtime.getRuntime().exec(command);
 
-				if (password != null) {
-					// TODO
-//					OutputStream stdIn = process.getOutputStream();
-//					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-//					writer.write(password);
-//					writer.write("\n"); // write newline char to mimic 'enter'
-//										// press.
-//					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -739,13 +657,7 @@ public class SetupUtils {
 
 			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
 			manager.connect();
-			manager.execCommand(UNINSTALL_PACKAGE_CMD, new Object[] { packageName }, new IOutputStreamProvider() {
-				@Override
-				public byte[] getStreamAsByteArray() {
-//					return (password + "\n").getBytes();
-					return null; // TODO
-				}
-			});
+			manager.execCommand(UNINSTALL_PACKAGE_CMD, new Object[] { packageName });
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
@@ -774,15 +686,6 @@ public class SetupUtils {
 				String command = ADD_APP_REPO_CMD.replace("{0}", repository);
 				Process process = Runtime.getRuntime().exec(command);
 
-				if (password != null) {
-					OutputStream stdIn = process.getOutputStream();
-					BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdIn));
-					writer.write(password);
-					writer.write("\n"); // write newline char to mimic 'enter'
-										// press.
-					writer.flush();
-				}
-
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
 					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
@@ -805,12 +708,7 @@ public class SetupUtils {
 
 			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
 			manager.connect();
-			manager.execCommand(ADD_APP_REPO_CMD, new Object[] { repository }, new IOutputStreamProvider() {
-				@Override
-				public byte[] getStreamAsByteArray() {
-					return (password + "\n").getBytes();
-				}
-			});
+			manager.execCommand(ADD_APP_REPO_CMD, new Object[] { repository });
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Repository {0} added successfully", repository);

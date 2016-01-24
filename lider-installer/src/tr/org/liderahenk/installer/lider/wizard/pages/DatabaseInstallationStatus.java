@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
+import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
@@ -27,7 +29,7 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
-	
+
 	boolean isInstallationFinished = false;
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
@@ -56,7 +58,7 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	@Override
 	public IWizardPage getNextPage() {
-		// Start MariaDB installation here.
+		// Start database installation here.
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
@@ -77,23 +79,48 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 					printMessage("Installing package...");
 
 					if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
-						SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
-								config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-								config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-								config.getDatabasePackageName(), null, debconfValues);
+						try {
+							SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
+									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
+									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
+									config.getDatabasePackageName(), null, debconfValues);
+							setProgressBar(90);
+							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + config.getDatabasePackageName());
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
 					} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getDatabaseDebFileName());
-						SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
-								config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-								config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
+						try {
+							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
+									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
+									config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
+							setProgressBar(90);
+							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + deb.getName());
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
 					} else {
+						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-					// TODO handle failed installation attempts!
 
 					setProgressBar(100);
-					isInstallationFinished = true;
-					setPageComplete(isInstallationFinished);
+					setPageCompleteAsync(isInstallationFinished);
 				}
 
 				/**
@@ -126,6 +153,20 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 						@Override
 						public void run() {
 							progressBar.setSelection(selection);
+						}
+					});
+				}
+
+				/**
+				 * Sets page complete status asynchronously.
+				 * 
+				 * @param isComplete
+				 */
+				private void setPageCompleteAsync(final boolean isComplete) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							setPageComplete(isComplete);
 						}
 					});
 				}

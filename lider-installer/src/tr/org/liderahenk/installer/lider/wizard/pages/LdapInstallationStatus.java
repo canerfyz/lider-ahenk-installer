@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
+import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
@@ -71,22 +73,47 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 					final String[] debconfValues = generateDebconfValues();
 					setProgressBar(20);
 
+					printMessage("Installing package...");
+
 					if (config.getLdapInstallMethod() == InstallMethod.APT_GET) {
-						SetupUtils.installPackageNoninteractively(config.getLdapIp(), config.getLdapAccessUsername(),
-								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
-								config.getLdapPackageName(), null, debconfValues);
+						try {
+							SetupUtils.installPackageNoninteractively(config.getLdapIp(),
+									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
+									config.getLdapAccessKeyPath(), config.getLdapPackageName(), null, debconfValues);
+							setProgressBar(90);
+							isInstallationFinished = true;
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
 					} else if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getLdapDebFileName());
-						SetupUtils.installPackageNonInteractively(config.getLdapIp(), config.getLdapAccessUsername(),
-								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(), deb,
-								debconfValues);
+						try {
+							SetupUtils.installPackageNonInteractively(config.getLdapIp(),
+									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
+									config.getLdapAccessKeyPath(), deb, debconfValues);
+							setProgressBar(90);
+							isInstallationFinished = true;
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
 					} else {
+						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-					// TODO handle failed installation attempts!
 
 					setProgressBar(100);
-					isInstallationFinished = true;
 					setPageComplete(isInstallationFinished);
 				}
 
