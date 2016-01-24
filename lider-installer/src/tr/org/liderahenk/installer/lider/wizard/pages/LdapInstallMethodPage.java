@@ -156,13 +156,13 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 	protected void updateConfig() {
 		if (btnDebPackage.getSelection()) {
-			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
-			config.setDatabasePackageName(null);
+			config.setLdapInstallMethod(InstallMethod.PROVIDED_DEB);
+			config.setLdapPackageName(null);
 		} else {
-			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
-			config.setDatabasePackageName(PropertyReader.property("ldap.package.name"));
+			config.setLdapInstallMethod(InstallMethod.APT_GET);
+			config.setLdapPackageName(PropertyReader.property("ldap.package.name"));
 		}
-		config.setDatabaseRootPassword(txtLdapRootPassword.getText());
+		config.setLdapRootPassword(txtLdapRootPassword.getText());
 	}
 
 	private void updatePageCompleteStatus() {

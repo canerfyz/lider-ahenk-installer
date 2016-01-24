@@ -52,11 +52,9 @@ public class LdapConfirmPage extends WizardPage implements ILdapPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-		/**
-		 * Set the IP info in the opening of page
-		 */
+		// Set the IP info in the opening of page
 		lblIp.setText("- IP: " + config.getLdapIp());
-
 		return super.getNextPage();
 	}
+
 }

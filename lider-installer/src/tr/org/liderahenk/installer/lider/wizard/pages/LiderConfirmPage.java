@@ -8,6 +8,8 @@ import org.eclipse.swt.widgets.Label;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -16,14 +18,11 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 public class LiderConfirmPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
-	
-	// Widgets
-	private Label ip;
-	
+
+	private Label lblIp;
+
 	public LiderConfirmPage(LiderSetupConfig config) {
-		super(LiderConfirmPage.class.getName(), 
-				Messages.getString("LIDER_INSTALLATION"), null);
-		
+		super(LiderConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("5.3 " + Messages.getString("KARAF_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
@@ -33,33 +32,29 @@ public class LiderConfirmPage extends WizardPage implements ILiderPage {
 
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
-		
+
 		GridData gd = new GridData();
 		gd.widthHint = 200;
 		gd.minimumWidth = 200;
-		ip = GUIHelper.createLabel(container, "localhost");
-		ip.setLayoutData(gd);
-		
-//		connectionMethod = GUIHelper.createLabel(container, "- " + 
-//				Messages.getString(config.isKarafUseSSH() ? 
-//						"ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
-//		
-//		setupMethod = GUIHelper.createLabel(container, "- " +
-//				Messages.getString(config.isKarafUseRepository() ?
-//						"USE_REPOSITORY" : "USE_GIVEN_DEB"));
-//		
-//		question = GUIHelper.createLabel(container, 
-//				Messages.getString("KARAF_WILL_BE_INSTALLED") + " " +
-//				Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
+		lblIp = GUIHelper.createLabel(container, "localhost");
+		lblIp.setLayoutData(gd);
+
+		GUIHelper.createLabel(container,
+				"- " + Messages.getString(config.getLiderAccessMethod() == AccessMethod.PRIVATE_KEY
+						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
+
+		GUIHelper.createLabel(container, "- " + Messages.getString(
+				config.getLiderInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+
+		GUIHelper.createLabel(container, Messages.getString("LIDER_WILL_BE_INSTALLED") + " "
+				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
-	
+
 	@Override
 	public IWizardPage getNextPage() {
-		/**
-		 * Set the IP info in the opening of page
-		 */
-		ip.setText("- IP: " + config.getLiderIp());
-		
+		// Set the IP info in the opening of page
+		lblIp.setText("- IP: " + config.getLiderIp());
 		return super.getNextPage();
 	}
+
 }

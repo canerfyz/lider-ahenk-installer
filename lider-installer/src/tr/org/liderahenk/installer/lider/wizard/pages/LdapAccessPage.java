@@ -173,7 +173,7 @@ public class LdapAccessPage extends WizardPage implements ILdapPage {
 	}
 
 	/**
-	 * This method organises button, fields etc. according to selections etc.
+	 * This method organizes button, fields etc. according to selections etc.
 	 */
 	private void organizeFields() {
 		if (usernamePassword.getSelection()) {

@@ -101,12 +101,12 @@ public class LiderSetupConfig {
 	private boolean installLdap;
 
 	/**
-	 * Package name to be installed as ldap server
+	 * Package name to be installed as LDAP server
 	 */
 	private String ldapPackageName;
 
 	/**
-	 * Root password for the ldap server
+	 * Root password for the LDAP server
 	 */
 	private String ldapRootPassword;
 
@@ -177,6 +177,16 @@ public class LiderSetupConfig {
 	private boolean installXmpp;
 
 	/**
+	 * Package name to be installed as XMPP server
+	 */
+	private String xmppPackageName;
+
+	/**
+	 * Root password for the XMPP server
+	 */
+	private String xmppRootPassword;
+
+	/**
 	 * XMPP server IP
 	 */
 	private String xmppIp;
@@ -185,6 +195,49 @@ public class LiderSetupConfig {
 	 * SSH port which is used to connect to server
 	 */
 	private Integer xmppPort;
+
+	/**
+	 * Indicates access method which is either via username-password pair or
+	 * private key.
+	 */
+	private AccessMethod xmppAccessMethod;
+
+	/**
+	 * User name which is used for accessing target machine via SSH
+	 */
+	private String xmppAccessUsername;
+
+	/**
+	 * Password which is used for accessing target machine via SSH
+	 */
+	private String xmppAccessPasswd;
+
+	/**
+	 * Absolute path of the private key that is used for accessing target
+	 * machine via SSH
+	 */
+	private String xmppAccessKeyPath;
+
+	/**
+	 * Passphrase which is used for accessing target machine via SSH (Optional)
+	 */
+	private String xmppAccessPassphrase;
+
+	/**
+	 * Indicates installation method which is either via apt-get or provided DEB
+	 * package
+	 */
+	private InstallMethod xmppInstallMethod;
+
+	/**
+	 * File name of the provided DEB package
+	 */
+	private String xmppDebFileName;
+
+	/**
+	 * File content of the provided DEB package
+	 */
+	private byte[] xmppDebFileContent;
 
 	/**
 	 * ###################################
@@ -200,6 +253,11 @@ public class LiderSetupConfig {
 	private boolean installLider;
 
 	/**
+	 * Package name to be installed as Lider server
+	 */
+	private String liderPackageName;
+
+	/**
 	 * Lider server IP
 	 */
 	private String liderIp;
@@ -208,6 +266,49 @@ public class LiderSetupConfig {
 	 * SSH port which is used to connect to server
 	 */
 	private Integer liderPort;
+
+	/**
+	 * Indicates access method which is either via username-password pair or
+	 * private key.
+	 */
+	private AccessMethod liderAccessMethod;
+
+	/**
+	 * User name which is used for accessing target machine via SSH
+	 */
+	private String liderAccessUsername;
+
+	/**
+	 * Password which is used for accessing target machine via SSH
+	 */
+	private String liderAccessPasswd;
+
+	/**
+	 * Absolute path of the private key that is used for accessing target
+	 * machine via SSH
+	 */
+	private String liderAccessKeyPath;
+
+	/**
+	 * Passphrase which is used for accessing target machine via SSH (Optional)
+	 */
+	private String liderAccessPassphrase;
+
+	/**
+	 * Indicates installation method which is either via apt-get or provided DEB
+	 * package
+	 */
+	private InstallMethod liderInstallMethod;
+
+	/**
+	 * File name of the provided DEB package
+	 */
+	private String liderDebFileName;
+
+	/**
+	 * File content of the provided DEB package
+	 */
+	private byte[] liderDebFileContent;
 
 	/**
 	 * ###################################
@@ -471,6 +572,158 @@ public class LiderSetupConfig {
 
 	public void setLdapInstallMethod(InstallMethod ldapInstallMethod) {
 		this.ldapInstallMethod = ldapInstallMethod;
+	}
+
+	public AccessMethod getXmppAccessMethod() {
+		return xmppAccessMethod;
+	}
+
+	public void setXmppAccessMethod(AccessMethod xmppAccessMethod) {
+		this.xmppAccessMethod = xmppAccessMethod;
+	}
+
+	public String getXmppAccessUsername() {
+		return xmppAccessUsername;
+	}
+
+	public void setXmppAccessUsername(String xmppAccessUsername) {
+		this.xmppAccessUsername = xmppAccessUsername;
+	}
+
+	public String getXmppAccessPasswd() {
+		return xmppAccessPasswd;
+	}
+
+	public void setXmppAccessPasswd(String xmppAccessPasswd) {
+		this.xmppAccessPasswd = xmppAccessPasswd;
+	}
+
+	public String getXmppAccessKeyPath() {
+		return xmppAccessKeyPath;
+	}
+
+	public void setXmppAccessKeyPath(String xmppAccessKeyPath) {
+		this.xmppAccessKeyPath = xmppAccessKeyPath;
+	}
+
+	public String getXmppAccessPassphrase() {
+		return xmppAccessPassphrase;
+	}
+
+	public void setXmppAccessPassphrase(String xmppAccessPassphrase) {
+		this.xmppAccessPassphrase = xmppAccessPassphrase;
+	}
+
+	public String getXmppDebFileName() {
+		return xmppDebFileName;
+	}
+
+	public void setXmppDebFileName(String xmppDebFileName) {
+		this.xmppDebFileName = xmppDebFileName;
+	}
+
+	public byte[] getXmppDebFileContent() {
+		return xmppDebFileContent;
+	}
+
+	public void setXmppDebFileContent(byte[] xmppDebFileContent) {
+		this.xmppDebFileContent = xmppDebFileContent;
+	}
+
+	public InstallMethod getXmppInstallMethod() {
+		return xmppInstallMethod;
+	}
+
+	public void setXmppInstallMethod(InstallMethod xmppInstallMethod) {
+		this.xmppInstallMethod = xmppInstallMethod;
+	}
+
+	public AccessMethod getLiderAccessMethod() {
+		return liderAccessMethod;
+	}
+
+	public void setLiderAccessMethod(AccessMethod liderAccessMethod) {
+		this.liderAccessMethod = liderAccessMethod;
+	}
+
+	public String getLiderAccessUsername() {
+		return liderAccessUsername;
+	}
+
+	public void setLiderAccessUsername(String liderAccessUsername) {
+		this.liderAccessUsername = liderAccessUsername;
+	}
+
+	public String getLiderAccessPasswd() {
+		return liderAccessPasswd;
+	}
+
+	public void setLiderAccessPasswd(String liderAccessPasswd) {
+		this.liderAccessPasswd = liderAccessPasswd;
+	}
+
+	public String getLiderAccessKeyPath() {
+		return liderAccessKeyPath;
+	}
+
+	public void setLiderAccessKeyPath(String liderAccessKeyPath) {
+		this.liderAccessKeyPath = liderAccessKeyPath;
+	}
+
+	public String getLiderAccessPassphrase() {
+		return liderAccessPassphrase;
+	}
+
+	public void setLiderAccessPassphrase(String liderAccessPassphrase) {
+		this.liderAccessPassphrase = liderAccessPassphrase;
+	}
+
+	public InstallMethod getLiderInstallMethod() {
+		return liderInstallMethod;
+	}
+
+	public void setLiderInstallMethod(InstallMethod liderInstallMethod) {
+		this.liderInstallMethod = liderInstallMethod;
+	}
+
+	public String getLiderDebFileName() {
+		return liderDebFileName;
+	}
+
+	public void setLiderDebFileName(String liderDebFileName) {
+		this.liderDebFileName = liderDebFileName;
+	}
+
+	public byte[] getLiderDebFileContent() {
+		return liderDebFileContent;
+	}
+
+	public void setLiderDebFileContent(byte[] liderDebFileContent) {
+		this.liderDebFileContent = liderDebFileContent;
+	}
+
+	public String getLiderPackageName() {
+		return liderPackageName;
+	}
+
+	public void setLiderPackageName(String liderPackageName) {
+		this.liderPackageName = liderPackageName;
+	}
+
+	public String getXmppPackageName() {
+		return xmppPackageName;
+	}
+
+	public void setXmppPackageName(String xmppPackageName) {
+		this.xmppPackageName = xmppPackageName;
+	}
+
+	public String getXmppRootPassword() {
+		return xmppRootPassword;
+	}
+
+	public void setXmppRootPassword(String xmppRootPassword) {
+		this.xmppRootPassword = xmppRootPassword;
 	}
 
 }

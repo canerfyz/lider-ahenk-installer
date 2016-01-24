@@ -14,6 +14,7 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
@@ -56,11 +57,12 @@ public class LiderSetupWizard extends Wizard {
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
 	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
+	// TODO IXmppPage
+
 	LiderAccessPage liderAccess = new LiderAccessPage(config);
 	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
 	LiderConfirmPage liderConfirm = new LiderConfirmPage(config);
-	
-	// TODO IXmppPage 
+	LiderInstallationStatus liderStatus = new LiderInstallationStatus(config);
 
 	@Override
 	public void addPages() {
@@ -76,10 +78,12 @@ public class LiderSetupWizard extends Wizard {
 		addPage(ldapAccess);
 		addPage(ldapInstallMethod);
 		addPage(ldapConfirm);
+		addPage(ldapStatus);
 		// Lider configuration
 		addPage(liderAccess);
 		addPage(liderInstallMethod);
 		addPage(liderConfirm);
+		addPage(liderStatus);
 		// Set this as true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
 	}

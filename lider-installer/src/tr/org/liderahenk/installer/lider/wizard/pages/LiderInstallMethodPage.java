@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -29,7 +31,6 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 
-	// Widgets
 	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Text txtFileName;
@@ -57,9 +58,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnAptGet.getSelection()) {
-//					config.setInstallViaAptGet(true);
-				}
+				updateConfig();
 				updatePageCompleteStatus();
 			}
 
@@ -74,9 +73,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (btnDebPackage.getSelection()) {
-//					config.setInstallViaAptGet(false);
-				}
+				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
 				updatePageCompleteStatus();
@@ -124,8 +121,8 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 					}
 
 					// Set deb file
-//					config.setDebFileName(debFileName);
-//					config.setDebContent(debContent);
+					config.setLiderDebFileName(debFileName);
+					config.setLiderDebFileContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -136,6 +133,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 			}
 		});
 
+		updateConfig();
 		updatePageCompleteStatus();
 	}
 
@@ -144,27 +142,21 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 	}
 
 	private boolean checkFile() {
-//		return config.getDebFileName() != null && config.getDebContent() != null;
-		return false;
+		return config.getLiderDebFileName() != null && config.getLiderDebFileContent() != null;
 	}
 
-	// This method sets info which taken from user
-	// to appropriate variables in LiderSetupConfig.
-	private void setConfigVariables() {
-//
-//		if (btnAptGet.getSelection()) {
-//			config.setKarafUseRepository(true);
-//		} else {
-//			config.setKarafUseRepository(false);
-//			config.setKarafDebAbsPath(txtFileName.getText());
-//		}
+	private void updateConfig() {
+		if (btnDebPackage.getSelection()) {
+			config.setLiderInstallMethod(InstallMethod.PROVIDED_DEB);
+			config.setLiderPackageName(null);
+		} else {
+			config.setLiderInstallMethod(InstallMethod.APT_GET);
+			config.setLiderPackageName(PropertyReader.property("lider.package.name"));
+		}
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		// Set variables before going to next page.
-		setConfigVariables();
-
 		return super.getNextPage();
 	}
 
