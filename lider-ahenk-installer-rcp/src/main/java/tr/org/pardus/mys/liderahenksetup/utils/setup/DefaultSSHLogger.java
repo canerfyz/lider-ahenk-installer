@@ -2,9 +2,12 @@ package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
 import java.util.Hashtable;
 
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
+
 public class SSHLogger implements com.jcraft.jsch.Logger {
 
 	public static Hashtable<Integer, String> name = null;
+
 	static {
 		name = new Hashtable<Integer, String>();
 		name.put(new Integer(DEBUG), "DEBUG: ");
@@ -16,12 +19,13 @@ public class SSHLogger implements com.jcraft.jsch.Logger {
 
 	@Override
 	public boolean isEnabled(int level) {
-		return true;
+		Integer val = PropertyReader.propertyInt("ssh.logger.level");
+		return val == null ? true : (val.intValue() == level);
 	}
 
 	@Override
 	public void log(int level, String message) {
-		// TODO 
+		// TODO
 		System.err.print(name.get(new Integer(level)));
 		System.err.println(message);
 	}

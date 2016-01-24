@@ -19,6 +19,13 @@ import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
+/**
+ * SSHManager is responsible for managing SSH connections and executing
+ * commands.
+ * 
+ * @author Emre Akkaya <emre.akkaya@agem.com.tr>
+ *
+ */
 public class SSHManager {
 
 	private static final Logger logger = Logger.getLogger(SSHManager.class.getName());
@@ -27,7 +34,6 @@ public class SSHManager {
 	private Session session;
 	private Properties config;
 
-	// Connection parameters
 	private String username;
 	private String password;
 	private String ip;
@@ -51,10 +57,13 @@ public class SSHManager {
 		this.privateKey = privateKey;
 	}
 
+	/**
+	 * Initializes SSH manager by configuring encryption algorithms and setting
+	 * SSH logger.
+	 */
 	private void init() {
 		JSch.setLogger(new SSHLogger());
 		SSHChannel = new JSch();
-
 		config = new Properties();
 		config.put("kex",
 				"diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1,diffie-hellman-group-exchange-sha256");
@@ -88,10 +97,15 @@ public class SSHManager {
 	 * Executes command string via SSH
 	 * 
 	 * @param command
+	 *            Command String
+	 * @param outputStreamProvider
+	 *            Provides an array of bytes which is used to pass arguments to
+	 *            the command executed.
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
+	 * 
 	 */
-	public String execCommand(String command, IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 
 		StringBuilder outputBuffer = new StringBuilder();
@@ -102,6 +116,7 @@ public class SSHManager {
 			Channel channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand(command);
 
+			// Open channel and handle output stream
 			InputStream inputStream = channel.getInputStream();
 			((ChannelExec) channel).setPty(true);
 			OutputStream outputStream = null;
@@ -110,22 +125,24 @@ public class SSHManager {
 			}
 			channel.connect();
 
+			// Pass provided byte array as command argument
 			byte[] byteArray = outputStreamProvider.getStreamAsByteArray();
 			if (outputStream != null && byteArray != null) {
 				outputStream.write(byteArray);
 				outputStream.flush();
 			}
 
+			// Read output from the stream and handle the channel accordingly
 			byte[] tmp = new byte[1024];
 			while (true) {
 				while (inputStream.available() > 0) {
 					int i = inputStream.read(tmp, 0, 1024);
 					if (i < 0)
 						break;
-					System.out.print(new String(tmp, 0, i));
+					logger.log(Level.INFO, new String(tmp, 0, i));
 				}
 				if (channel.isClosed()) {
-					System.out.println("exit status: " + channel.getExitStatus());
+					logger.log(Level.INFO, "exit status: " + channel.getExitStatus());
 					break;
 				}
 				try {
@@ -146,20 +163,20 @@ public class SSHManager {
 
 	/**
 	 * Executes command string via SSH. Replaces parameter indicators with
-	 * values from the params array before execution.
+	 * values from the provided array before execution.
 	 * 
 	 * @param command
 	 * @param params
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(String command, Object[] params) throws CommandExecutionException {
+	public String execCommand(final String command, final Object[] params) throws CommandExecutionException {
 		return execCommand(command, params, null);
 	}
 
 	/**
 	 * Executes command string via SSH. Replaces parameter indicators with
-	 * values from the params array before execution. While executing the
+	 * values from the provided array before execution. While executing the
 	 * command feeds its output stream via IOutputStreamProvider instance
 	 * 
 	 * @param command
@@ -168,7 +185,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(String command, Object[] params, IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 		String tmpCommand = command;
 		if (params != null) {
@@ -181,14 +198,14 @@ public class SSHManager {
 	}
 
 	/**
-	 * Tries to safe-copy local file to remote server.
+	 * Tries to safe-copy provided local file to remote server.
 	 * 
 	 * @param fileToTransfer
 	 * @param destDirectory
 	 * @param preserveTimestamp
 	 * @throws CommandExecutionException
 	 */
-	public void copyFileToRemote(File fileToTransfer, String destDirectory, boolean preserveTimestamp)
+	public void copyFileToRemote(final File fileToTransfer, final String destDirectory, final boolean preserveTimestamp)
 			throws CommandExecutionException {
 
 		FileInputStream fis = null;
@@ -263,7 +280,7 @@ public class SSHManager {
 
 	}
 
-	static String checkAck(InputStream in) throws IOException {
+	private static String checkAck(final InputStream in) throws IOException {
 		int b = in.read();
 		// b may be 0 for success,
 		// 1 for error,
