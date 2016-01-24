@@ -77,6 +77,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 									config.getLdapPackageName(), null);
 							setProgressBar(90);
 							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + config.getLiderPackageName());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -94,6 +95,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 									deb);
 							setProgressBar(90);
 							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + deb.getName());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -109,7 +111,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 					}
 
 					setProgressBar(100);
-					setPageComplete(isInstallationFinished);
+					setPageCompleteAsync(isInstallationFinished);
 				}
 
 				/**
@@ -145,6 +147,21 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						}
 					});
 				}
+
+				/**
+				 * Sets page complete status asynchronously.
+				 * 
+				 * @param isComplete
+				 */
+				private void setPageCompleteAsync(final boolean isComplete) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							setPageComplete(isComplete);
+						}
+					});
+				}
+
 			};
 
 			Thread thread = new Thread(runnable);

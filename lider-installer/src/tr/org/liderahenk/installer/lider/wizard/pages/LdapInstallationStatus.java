@@ -82,6 +82,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 									config.getLdapAccessKeyPath(), config.getLdapPackageName(), null, debconfValues);
 							setProgressBar(90);
 							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + config.getLdapPackageName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -99,6 +100,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 									config.getLdapAccessKeyPath(), deb, debconfValues);
 							setProgressBar(90);
 							isInstallationFinished = true;
+							printMessage("Successfully installed package: " + deb.getName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -114,7 +116,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 					}
 
 					setProgressBar(100);
-					setPageComplete(isInstallationFinished);
+					setPageCompleteAsync(isInstallationFinished);
 				}
 
 				/**
@@ -150,6 +152,21 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 						}
 					});
 				}
+
+				/**
+				 * Sets page complete status asynchronously.
+				 * 
+				 * @param isComplete
+				 */
+				private void setPageCompleteAsync(final boolean isComplete) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							setPageComplete(isComplete);
+						}
+					});
+				}
+
 			};
 
 			Thread thread = new Thread(runnable);
