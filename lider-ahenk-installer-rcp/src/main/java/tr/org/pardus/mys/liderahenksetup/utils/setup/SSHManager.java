@@ -62,7 +62,7 @@ public class SSHManager {
 	 * SSH logger.
 	 */
 	private void init() {
-		JSch.setLogger(new SSHLogger());
+		JSch.setLogger(new DefaultSSHLogger());
 		SSHChannel = new JSch();
 		config = new Properties();
 		config.put("kex",
@@ -86,7 +86,7 @@ public class SSHManager {
 				session.setPassword(password);
 			}
 			session.setConfig(config);
-			session.connect(Integer.parseInt(PropertyReader.property("network.timeout")));
+			session.connect(PropertyReader.propertyInt("session.timeout").intValue());
 		} catch (JSchException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 			throw new SSHConnectionException(e.getMessage());
@@ -119,14 +119,17 @@ public class SSHManager {
 			// Open channel and handle output stream
 			InputStream inputStream = channel.getInputStream();
 			((ChannelExec) channel).setPty(true);
+
 			OutputStream outputStream = null;
+			byte[] byteArray = null;
 			if (outputStreamProvider != null) {
 				outputStream = channel.getOutputStream();
+				byteArray = outputStreamProvider.getStreamAsByteArray();
 			}
-			channel.connect();
+
+			channel.connect(PropertyReader.propertyInt("channel.timeout").intValue());
 
 			// Pass provided byte array as command argument
-			byte[] byteArray = outputStreamProvider.getStreamAsByteArray();
 			if (outputStream != null && byteArray != null) {
 				outputStream.write(byteArray);
 				outputStream.flush();
@@ -224,7 +227,7 @@ public class SSHManager {
 			OutputStream out = channel.getOutputStream();
 			InputStream in = channel.getInputStream();
 
-			channel.connect();
+			channel.connect(PropertyReader.propertyInt("channel.timeout").intValue());
 
 			if ((error = checkAck(in)) != null) {
 				throw new CommandExecutionException(error);

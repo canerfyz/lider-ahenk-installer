@@ -4,7 +4,7 @@ import java.util.Hashtable;
 
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
-public class SSHLogger implements com.jcraft.jsch.Logger {
+public class DefaultSSHLogger implements com.jcraft.jsch.Logger {
 
 	public static Hashtable<Integer, String> name = null;
 
