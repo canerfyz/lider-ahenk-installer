@@ -13,8 +13,9 @@ public class AhenkInstallationHandler {
 
 	@Execute
 	public void execute(Shell shell) {
-		WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(Display.getCurrent().getActiveShell(),
-				new AhenkSetupWizard(), new Point(800, 600));
+		WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(Display
+				.getCurrent().getActiveShell(), new AhenkSetupWizard(),
+				new Point(800, 600));
 		wizardDialog.open();
 	}
 
