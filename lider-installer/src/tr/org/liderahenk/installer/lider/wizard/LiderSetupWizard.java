@@ -21,6 +21,10 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
@@ -57,8 +61,11 @@ public class LiderSetupWizard extends Wizard {
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
 	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
-	// TODO IXmppPage
-
+	XmppAccessPage xmppAccess = new XmppAccessPage(config);
+	XmppInstallMethodPage xmppInstallMethod = new XmppInstallMethodPage(config);
+	XmppConfirmPage xmppConfirm = new XmppConfirmPage(config);
+	XmppInstallationStatus xmppStatus = new XmppInstallationStatus(config);
+	
 	LiderAccessPage liderAccess = new LiderAccessPage(config);
 	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
 	LiderConfirmPage liderConfirm = new LiderConfirmPage(config);
@@ -69,6 +76,13 @@ public class LiderSetupWizard extends Wizard {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(compSelect);
 		addPage(locatOfComps);
+		
+		// TODO yeri değişecek
+		addPage(xmppAccess);
+		addPage(xmppInstallMethod);
+		addPage(xmppConfirm);
+		addPage(xmppStatus);
+		
 		// Database configuration
 		addPage(dbAccess);
 		addPage(dbInstallMethod);
