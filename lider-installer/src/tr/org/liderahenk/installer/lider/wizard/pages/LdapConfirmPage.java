@@ -46,7 +46,7 @@ public class LdapConfirmPage extends WizardPage implements ILdapPage {
 		GUIHelper.createLabel(container, "- " + Messages.getString(
 				config.getLdapInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
 
-		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " "
+		GUIHelper.createLabel(container, Messages.getString("LDAP_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 

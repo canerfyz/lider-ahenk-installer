@@ -40,7 +40,7 @@ public class LiderAccessPage extends WizardPage implements ILiderPage {
 
 	public LiderAccessPage(LiderSetupConfig config) {
 		super(LiderAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.1 " + Messages.getString("KARAF_ACCESS_FOR_INSTALLATION"));
+		setDescription("5.1 " + Messages.getString("LIDER_ACCESS_FOR_INSTALLATION"));
 		this.config = config;
 	}
 

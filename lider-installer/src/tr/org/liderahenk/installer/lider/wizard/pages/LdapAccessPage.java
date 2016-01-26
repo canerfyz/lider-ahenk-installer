@@ -99,7 +99,7 @@ public class LdapAccessPage extends WizardPage implements ILdapPage {
 		// Creating another child container.
 		Composite thirdChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
-		GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE"));
+		GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE(OPTIONAL)"));
 
 		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField,
 				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);

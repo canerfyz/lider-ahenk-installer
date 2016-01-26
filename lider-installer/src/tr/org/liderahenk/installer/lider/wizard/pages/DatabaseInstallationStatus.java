@@ -34,8 +34,7 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
 		super(DatabaseInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("2.4 " + Messages.getString("MARIA_DB_INSTALLATION_METHOD") + " - "
-				+ Messages.getString("DB_SETUP_METHOD_DESC"));
+		setDescription("2.4 " + Messages.getString("DATABASE_INSTALLATION"));
 		this.config = config;
 	}
 

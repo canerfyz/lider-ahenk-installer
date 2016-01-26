@@ -30,8 +30,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 
 	public LiderInstallationStatus(LiderSetupConfig config) {
 		super(LiderInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.4 " + Messages.getString("LDAP_DB_INSTALLATION_METHOD") + " - "
-				+ Messages.getString("LDAP_SETUP_METHOD_DESC"));
+		setDescription("5.4 " + Messages.getString("LIDER_INSTALLATION"));
 		this.config = config;
 	}
 
@@ -70,11 +69,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 
 					printMessage("Installing package...");
 
-					if (config.getLdapInstallMethod() == InstallMethod.APT_GET) {
+					if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
 						try {
-							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
-									config.getLdapPackageName(), null);
+							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									config.getXmppPackageName(), null);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLiderPackageName());
@@ -87,11 +86,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
-					} else if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getLdapDebFileName());
+					} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
+						File deb = new File(config.getXmppDebFileName());
 						try {
-							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									deb);
 							setProgressBar(90);
 							isInstallationFinished = true;

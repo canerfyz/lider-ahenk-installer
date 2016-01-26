@@ -41,7 +41,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	public LiderInstallMethodPage(LiderSetupConfig config) {
 		super(LiderInstallMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.2 " + Messages.getString("KARAF_INSTALLATION_METHOD") + " - "
+		setDescription("5.2 " + Messages.getString("LIDER_INSTALLATION_METHOD") + " - "
 				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
@@ -54,7 +54,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 		// Ask user if Karaf will be installed from a .deb package or via
 		// apt-get
-		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("KARAF_SETUP_METHOD_APT_GET"));
+		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_APT_GET"));
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -68,7 +68,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		});
 		btnAptGet.setSelection(true);
 
-		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("KARAF_SETUP_METHOD_DEB"));
+		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
 			@Override

@@ -23,7 +23,7 @@ public class XmppConfirmPage extends WizardPage implements IXmppPage {
 
 	public XmppConfirmPage(LiderSetupConfig config) {
 		super(XmppConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.3 " + Messages.getString("KARAF_INSTALLATION_CONFIRM"));
+		setDescription("4.3 " + Messages.getString("XMPP_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
 
@@ -40,20 +40,20 @@ public class XmppConfirmPage extends WizardPage implements IXmppPage {
 		lblIp.setLayoutData(gd);
 
 		GUIHelper.createLabel(container,
-				"- " + Messages.getString(config.getLiderAccessMethod() == AccessMethod.PRIVATE_KEY
+				"- " + Messages.getString(config.getXmppAccessMethod() == AccessMethod.PRIVATE_KEY
 						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 
 		GUIHelper.createLabel(container, "- " + Messages.getString(
-				config.getLiderInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+				config.getXmppInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
 
-		GUIHelper.createLabel(container, Messages.getString("LIDER_WILL_BE_INSTALLED") + " "
+		GUIHelper.createLabel(container, Messages.getString("XMPP_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 		// Set the IP info in the opening of page
-		lblIp.setText("- IP: " + config.getLiderIp());
+		lblIp.setText("- IP: " + config.getXmppIp());
 		return super.getNextPage();
 	}
 

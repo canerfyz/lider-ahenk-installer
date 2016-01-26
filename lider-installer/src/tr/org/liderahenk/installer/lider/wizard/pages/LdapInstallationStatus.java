@@ -31,8 +31,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 
 	public LdapInstallationStatus(LiderSetupConfig config) {
 		super(LdapInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("3.4 " + Messages.getString("LDAP_DB_INSTALLATION_METHOD") + " - "
-				+ Messages.getString("LDAP_SETUP_METHOD_DESC"));
+		setDescription("3.4 " + Messages.getString("LDAP_INSTALLATION"));
 		this.config = config;
 	}
 

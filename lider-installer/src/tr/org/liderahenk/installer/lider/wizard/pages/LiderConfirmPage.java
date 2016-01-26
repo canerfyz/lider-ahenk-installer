@@ -23,7 +23,7 @@ public class LiderConfirmPage extends WizardPage implements ILiderPage {
 
 	public LiderConfirmPage(LiderSetupConfig config) {
 		super(LiderConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.3 " + Messages.getString("KARAF_INSTALLATION_CONFIRM"));
+		setDescription("5.3 " + Messages.getString("LIDER_INSTALLATION_CONFIRM"));
 		this.config = config;
 	}
 

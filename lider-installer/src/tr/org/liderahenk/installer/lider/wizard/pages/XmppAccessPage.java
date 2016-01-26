@@ -40,7 +40,7 @@ public class XmppAccessPage extends WizardPage implements IXmppPage {
 
 	public XmppAccessPage(LiderSetupConfig config) {
 		super(XmppAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("4.1 " + Messages.getString("KARAF_ACCESS_FOR_INSTALLATION"));
+		setDescription("4.1 " + Messages.getString("XMPP_ACCESS_FOR_INSTALLATION"));
 		this.config = config;
 	}
 
@@ -214,13 +214,13 @@ public class XmppAccessPage extends WizardPage implements IXmppPage {
 	 */
 	private void setConfigVariables() {
 		if (usernamePassword.getSelection()) {
-			config.setLiderAccessMethod(AccessMethod.USERNAME_PASSWORD);
-			config.setLiderAccessUsername(usernameTxt.getText());
-			config.setLiderAccessPasswd(passwordTxt.getText());
+			config.setXmppAccessMethod(AccessMethod.USERNAME_PASSWORD);
+			config.setXmppAccessUsername(usernameTxt.getText());
+			config.setXmppAccessPasswd(passwordTxt.getText());
 		} else {
-			config.setLiderAccessMethod(AccessMethod.PRIVATE_KEY);
-			config.setLiderAccessKeyPath(privateKeyTxt.getText());
-			config.setLiderAccessPassphrase(passphraseTxt.getText());
+			config.setXmppAccessMethod(AccessMethod.PRIVATE_KEY);
+			config.setXmppAccessKeyPath(privateKeyTxt.getText());
+			config.setXmppAccessPassphrase(passphraseTxt.getText());
 		}
 	}
 

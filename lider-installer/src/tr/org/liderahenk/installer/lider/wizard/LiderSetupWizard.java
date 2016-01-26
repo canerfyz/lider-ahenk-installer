@@ -16,6 +16,7 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallationStatus;
@@ -58,6 +59,7 @@ public class LiderSetupWizard extends Wizard {
 
 	LdapAccessPage ldapAccess = new LdapAccessPage(config);
 	LdapInstallMethodPage ldapInstallMethod = new LdapInstallMethodPage(config);
+	LdapConfPage ldapConf = new LdapConfPage(config);
 	LdapConfirmPage ldapConfirm = new LdapConfirmPage(config);
 	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
@@ -91,6 +93,7 @@ public class LiderSetupWizard extends Wizard {
 		// LDAP configuration
 		addPage(ldapAccess);
 		addPage(ldapInstallMethod);
+		addPage(ldapConf);
 		addPage(ldapConfirm);
 		addPage(ldapStatus);
 		// Lider configuration

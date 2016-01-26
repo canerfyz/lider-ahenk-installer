@@ -41,7 +41,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	public XmppInstallMethodPage(LiderSetupConfig config) {
 		super(XmppInstallMethodPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.2 " + Messages.getString("KARAF_INSTALLATION_METHOD") + " - "
+		setDescription("4.2 " + Messages.getString("XMPP_INSTALLATION_METHOD") + " - "
 				+ Messages.getString("DB_SETUP_METHOD_DESC"));
 		this.config = config;
 	}
@@ -52,9 +52,9 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		// Ask user if Karaf will be installed from a .deb package or via
+		// Ask user if Xmpp will be installed from a .deb package or via
 		// apt-get
-		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("KARAF_SETUP_METHOD_APT_GET"));
+		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_APT_GET"));
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -68,7 +68,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		});
 		btnAptGet.setSelection(true);
 
-		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("KARAF_SETUP_METHOD_DEB"));
+		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -121,8 +121,8 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 					}
 
 					// Set deb file
-					config.setLiderDebFileName(debFileName);
-					config.setLiderDebFileContent(debContent);
+					config.setXmppDebFileName(debFileName);
+					config.setXmppDebFileContent(debContent);
 				}
 
 				updatePageCompleteStatus();
@@ -142,16 +142,16 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 	}
 
 	private boolean checkFile() {
-		return config.getLiderDebFileName() != null && config.getLiderDebFileContent() != null;
+		return config.getXmppDebFileName() != null && config.getXmppDebFileContent() != null;
 	}
 
 	private void updateConfig() {
 		if (btnDebPackage.getSelection()) {
-			config.setLiderInstallMethod(InstallMethod.PROVIDED_DEB);
-			config.setLiderPackageName(null);
+			config.setXmppInstallMethod(InstallMethod.PROVIDED_DEB);
+			config.setXmppPackageName(null);
 		} else {
-			config.setLiderInstallMethod(InstallMethod.APT_GET);
-			config.setLiderPackageName(PropertyReader.property("lider.package.name"));
+			config.setXmppInstallMethod(InstallMethod.APT_GET);
+			config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
 		}
 	}
 

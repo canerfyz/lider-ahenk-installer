@@ -30,8 +30,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 
 	public XmppInstallationStatus(LiderSetupConfig config) {
 		super(XmppInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.4 " + Messages.getString("LDAP_DB_INSTALLATION_METHOD") + " - "
-				+ Messages.getString("LDAP_SETUP_METHOD_DESC"));
+		setDescription("4.4 " + Messages.getString("XMPP_INSTALLATION"));
 		this.config = config;
 	}
 
@@ -54,7 +53,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-		// Start Lider installation here.
+		// Start XMPP installation here.
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
@@ -70,14 +69,14 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 
 					printMessage("Installing package...");
 
-					if (config.getLdapInstallMethod() == InstallMethod.APT_GET) {
+					if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
 						try {
-							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
-									config.getLdapPackageName(), null);
+							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									config.getXmppPackageName(), null);
 							setProgressBar(90);
 							isInstallationFinished = true;
-							printMessage("Successfully installed package: " + config.getLiderPackageName());
+							printMessage("Successfully installed package: " + config.getXmppPackageName());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -87,11 +86,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
-					} else if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getLdapDebFileName());
+					} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
+						File deb = new File(config.getXmppDebFileName());
 						try {
-							SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									deb);
 							setProgressBar(90);
 							isInstallationFinished = true;
