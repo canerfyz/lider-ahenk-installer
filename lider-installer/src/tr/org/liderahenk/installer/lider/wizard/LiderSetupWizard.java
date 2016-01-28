@@ -21,8 +21,10 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallationStatus;
@@ -65,11 +67,13 @@ public class LiderSetupWizard extends Wizard {
 
 	XmppAccessPage xmppAccess = new XmppAccessPage(config);
 	XmppInstallMethodPage xmppInstallMethod = new XmppInstallMethodPage(config);
+	XmppConfPage xmppConfPage = new XmppConfPage(config);
 	XmppConfirmPage xmppConfirm = new XmppConfirmPage(config);
 	XmppInstallationStatus xmppStatus = new XmppInstallationStatus(config);
 	
 	LiderAccessPage liderAccess = new LiderAccessPage(config);
 	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
+	LiderConfPage liderConfPage = new LiderConfPage(config);
 	LiderConfirmPage liderConfirm = new LiderConfirmPage(config);
 	LiderInstallationStatus liderStatus = new LiderInstallationStatus(config);
 
@@ -78,12 +82,6 @@ public class LiderSetupWizard extends Wizard {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(compSelect);
 		addPage(locatOfComps);
-		
-		// TODO yeri değişecek
-		addPage(xmppAccess);
-		addPage(xmppInstallMethod);
-		addPage(xmppConfirm);
-		addPage(xmppStatus);
 		
 		// Database configuration
 		addPage(dbAccess);
@@ -96,11 +94,19 @@ public class LiderSetupWizard extends Wizard {
 		addPage(ldapConf);
 		addPage(ldapConfirm);
 		addPage(ldapStatus);
+		// XMPP configuration
+		addPage(xmppAccess);
+		addPage(xmppInstallMethod);
+		addPage(xmppConfPage);
+		addPage(xmppConfirm);
+		addPage(xmppStatus);
 		// Lider configuration
 		addPage(liderAccess);
 		addPage(liderInstallMethod);
+		addPage(liderConfPage);
 		addPage(liderConfirm);
 		addPage(liderStatus);
+		
 		// Set this as true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
 	}

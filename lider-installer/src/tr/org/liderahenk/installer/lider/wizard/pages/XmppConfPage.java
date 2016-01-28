@@ -22,15 +22,15 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LdapConfPage extends WizardPage implements ILdapPage {
+public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
 
 	private StyledText st;
 
-	public LdapConfPage(LiderSetupConfig config) {
-		super(LdapConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("3.4 " + Messages.getString("LDAP_CONF"));
+	public XmppConfPage(LiderSetupConfig config) {
+		super(XmppConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
+		setDescription("3.4 " + Messages.getString("XMPP_CONF"));
 		this.config = config;
 	}
 
@@ -40,7 +40,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		GUIHelper.createLabel(container, Messages.getString("LDAP__ENTER_CONF_CONTENT"));
+		GUIHelper.createLabel(container, Messages.getString("XMPP_ENTER_CONF_CONTENT"));
 
 		// Add a text area for configuration.
 		st = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
@@ -129,7 +129,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	public IWizardPage getNextPage() {
 
 		// Set config variables before going to next page
-		config.setLdapConfContent(st.getText());
+		config.setXmppConfContent(st.getText());
 
 		return super.getNextPage();
 	}

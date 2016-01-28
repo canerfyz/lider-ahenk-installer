@@ -164,6 +164,11 @@ public class LiderSetupConfig {
 	private byte[] ldapDebFileContent;
 
 	/**
+	 * LDAP configuration file content
+	 */
+	private String ldapConfContent;
+	
+	/**
 	 * ###################################
 	 * 
 	 * XMPP Configuration
@@ -240,6 +245,11 @@ public class LiderSetupConfig {
 	private byte[] xmppDebFileContent;
 
 	/**
+	 * XMPP configuration file content
+	 */
+	private String xmppConfContent;
+	
+	/**
 	 * ###################################
 	 * 
 	 * Lider Configuration
@@ -310,6 +320,11 @@ public class LiderSetupConfig {
 	 */
 	private byte[] liderDebFileContent;
 
+	/**
+	 * Lider configuration file content
+	 */
+	private String liderConfContent;
+	
 	/**
 	 * ###################################
 	 * 
@@ -724,6 +739,30 @@ public class LiderSetupConfig {
 
 	public void setXmppRootPassword(String xmppRootPassword) {
 		this.xmppRootPassword = xmppRootPassword;
+	}
+
+	public String getLdapConfContent() {
+		return ldapConfContent;
+	}
+
+	public void setLdapConfContent(String ldapConfContent) {
+		this.ldapConfContent = ldapConfContent;
+	}
+
+	public String getXmppConfContent() {
+		return xmppConfContent;
+	}
+
+	public void setXmppConfContent(String xmppConfContent) {
+		this.xmppConfContent = xmppConfContent;
+	}
+
+	public String getLiderConfContent() {
+		return liderConfContent;
+	}
+
+	public void setLiderConfContent(String liderConfContent) {
+		this.liderConfContent = liderConfContent;
 	}
 
 }
