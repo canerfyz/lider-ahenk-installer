@@ -75,6 +75,11 @@ public class SetupUtils {
 	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
+	 * Extracts a tarball to given location {1}
+	 */
+	private static final String EXTRACT_PACKAGE = "tar zxvf {0} -C {1}";
+	
+	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
 	 * 
 	 * @param ip
@@ -790,5 +795,4 @@ public class SetupUtils {
 			logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
 		}
 	}
-
 }

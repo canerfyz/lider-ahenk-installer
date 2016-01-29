@@ -69,11 +69,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 
 					printMessage("Installing package...");
 
-					if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
+					if (config.getLiderInstallMethod() == InstallMethod.APT_GET) {
 						try {
-							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppPackageName(), null);
+							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+									config.getLiderPackageName(), null);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLiderPackageName());
@@ -86,11 +86,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
-					} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getXmppDebFileName());
+					} else if (config.getLiderInstallMethod() == InstallMethod.PROVIDED_DEB) {
+						File deb = new File(config.getLiderDebFileName());
 						try {
-							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
 									deb);
 							setProgressBar(90);
 							isInstallationFinished = true;
