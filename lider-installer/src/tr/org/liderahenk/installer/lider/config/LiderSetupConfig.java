@@ -1,5 +1,7 @@
 package tr.org.liderahenk.installer.lider.config;
 
+import java.io.File;
+
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
@@ -245,9 +247,34 @@ public class LiderSetupConfig {
 	private byte[] xmppDebFileContent;
 
 	/**
+	 * XMPP hostname
+	 */
+	private String xmppHostname;
+	
+	/**
+	 * Password for user: admin in XMPP
+	 */
+	private String xmppAdminPwd;
+	
+	/**
+	 * Username for Lider Server user in XMPP.
+	 */
+	private String xmppLiderUsername;
+
+	/**
+	 * Password for Lider Server user in XMPP.
+	 */
+	private String xmppLiderPassword;
+	
+	/**
 	 * XMPP configuration file content
 	 */
 	private String xmppConfContent;
+	
+	/**
+	 * Absolute path of XMPP configuration file.
+	 */
+	private String xmppAbsPathConfFile;
 	
 	/**
 	 * ###################################
@@ -763,6 +790,46 @@ public class LiderSetupConfig {
 
 	public void setLiderConfContent(String liderConfContent) {
 		this.liderConfContent = liderConfContent;
+	}
+
+	public String getXmppHostname() {
+		return xmppHostname;
+	}
+
+	public void setXmppHostname(String xmppHostname) {
+		this.xmppHostname = xmppHostname;
+	}
+
+	public String getXmppAdminPwd() {
+		return xmppAdminPwd;
+	}
+
+	public void setXmppAdminPwd(String xmppAdminPwd) {
+		this.xmppAdminPwd = xmppAdminPwd;
+	}
+
+	public String getXmppLiderUsername() {
+		return xmppLiderUsername;
+	}
+
+	public void setXmppLiderUsername(String xmppLiderUsername) {
+		this.xmppLiderUsername = xmppLiderUsername;
+	}
+
+	public String getXmppLiderPassword() {
+		return xmppLiderPassword;
+	}
+
+	public void setXmppLiderPassword(String xmppLiderPassword) {
+		this.xmppLiderPassword = xmppLiderPassword;
+	}
+
+	public String getXmppAbsPathConfFile() {
+		return xmppAbsPathConfFile;
+	}
+
+	public void setXmppAbsPathConfFile(String xmppAbsPathConfFile) {
+		this.xmppAbsPathConfFile = xmppAbsPathConfFile;
 	}
 
 }

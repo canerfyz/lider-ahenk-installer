@@ -168,7 +168,7 @@ public class GUIHelper {
 	 * @return
 	 */
 	public static Label createLabel(Composite parent) {
-		return createLabel(parent, null);
+		return createLabel(parent, "");
 	}
 
 	/**

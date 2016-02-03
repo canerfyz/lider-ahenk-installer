@@ -77,6 +77,15 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getXmppPackageName());
+							
+							File file = new File(config.getXmppAbsPathConfFile());
+							
+							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), file, "/etc/ejabberd/");
+							printMessage("Configuration file successfully sent.");
+							
+							deleteFile("ejabberd.yml");
+							
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -95,6 +104,15 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
+							
+							File file = new File(config.getXmppAbsPathConfFile());
+							
+							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), file, "/etc/ejabberd/");
+							printMessage("Configuration file successfully sent.");
+							
+							deleteFile("ejabberd.yml");
+							
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -174,6 +192,27 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 	public IWizardPage getPreviousPage() {
 		// Do not allow to go back from this page.
 		return null;
+	}
+	
+	/**
+	 * Deletes a file from temporary file directory.
+	 * 
+	 * @param content
+	 * @param namePrefix
+	 * @param nameSuffix
+	 * @return absolute path of created temp file
+	 */
+	private void deleteFile(String fileName) {
+		try {
+			if (!fileName.isEmpty()) {
+				File file = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+
+				file.delete();
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

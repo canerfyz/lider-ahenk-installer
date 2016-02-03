@@ -1,5 +1,14 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -9,11 +18,14 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -25,6 +37,11 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
+
+	private Text hostnameTxt;
+	private Text adminPwdTxt;
+	private Text liderUserTxt;
+	private Text liderPwdTxt;
 
 	private StyledText st;
 
@@ -38,12 +55,56 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	public void createControl(Composite parent) {
 
 		Composite container = GUIHelper.createComposite(parent, 1);
+
 		setControl(container);
 
+		GridData gdForTxt = new GridData();
+		gdForTxt.widthHint = 125;
+
+		// --------- Hostname and Ejabberd Admin Password Inputs ----//
+		GUIHelper.createLabel(container, Messages.getString("XMPP_SERVER_HOSTNAME_AND_EJABBERD_ADMIN_PWD"));
+
+		Composite inputsContainer = GUIHelper.createComposite(container, new GridLayout(2, false),
+				new GridData(SWT.NO, SWT.NO, true, false));
+
+		GUIHelper.createLabel(inputsContainer, Messages.getString("HOSTNAME"));
+
+		hostnameTxt = GUIHelper.createText(inputsContainer);
+		hostnameTxt.setLayoutData(gdForTxt);
+
+		GUIHelper.createLabel(inputsContainer, Messages.getString("ADMIN_PASSWORD"));
+
+		adminPwdTxt = GUIHelper.createText(inputsContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		adminPwdTxt.setLayoutData(gdForTxt);
+		// ----------------------------------------------------------//
+
+		// Info message
+		Composite infoContainer = GUIHelper.createComposite(container, new GridLayout(1, false),
+				new GridData(SWT.FILL, SWT.NO, true, false));
+		GUIHelper.createLabel(infoContainer, Messages.getString("LIDER_SERVER_USER_INFO"));
+
+		// ------------- Lider Server Username and Password -----------//
+		Composite liderContainer = GUIHelper.createComposite(container, new GridLayout(2, false),
+				new GridData(SWT.NO, SWT.NO, true, false));
+
+		GUIHelper.createLabel(liderContainer, Messages.getString("USERNAME"));
+
+		liderUserTxt = GUIHelper.createText(liderContainer);
+		liderUserTxt.setLayoutData(gdForTxt);
+
+		GUIHelper.createLabel(liderContainer, Messages.getString("PASSWORD"));
+
+		liderPwdTxt = GUIHelper.createText(liderContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		liderPwdTxt.setLayoutData(gdForTxt);
+		// ------------------------------------------------------------//
+
+		// ----------- Text Editor --------------------//
 		GUIHelper.createLabel(container, Messages.getString("XMPP_ENTER_CONF_CONTENT"));
 
+		Composite textAreaContainer = GUIHelper.createComposite(container, 1);
+
 		// Add a text area for configuration.
-		st = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		st = new StyledText(textAreaContainer, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		st.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		// Add a menu which pops up when right clicked.
@@ -114,15 +175,18 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				// If config content is entered user can click next.
-				if (!"".equals(st.getText()) && st.getText() != null) {
+//				if (!"".equals(st.getText()) && st.getText() != null) {
 					setPageComplete(true);
-				} else {
-					setPageComplete(false);
-				}
+//				} else {
+//					setPageComplete(false);
+//				}
 			}
 		});
+		// -----------------------------------//
 
-		setPageComplete(false);
+//		setPageComplete(false);
+
+		readFile("ejabberd.yml", st);
 	}
 
 	@Override
@@ -130,8 +194,89 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		// Set config variables before going to next page
 		config.setXmppConfContent(st.getText());
+		config.setXmppHostname(hostnameTxt.getText());
+		config.setXmppAdminPwd(adminPwdTxt.getText());
+		config.setXmppLiderUsername(liderUserTxt.getText());
+		config.setXmppLiderPassword(liderPwdTxt.getText());
+
+		// Write configuration to file
+		config.setXmppAbsPathConfFile(writeToFile(st.getText(), "ejabberd.yml"));
 
 		return super.getNextPage();
 	}
 
+	/**
+	 * Reads file from classpath location for current project and sets it to a
+	 * text in a GUI.
+	 * 
+	 * @param fileName
+	 */
+	private void readFile(String fileName, final StyledText guiText) {
+
+		BufferedReader br = null;
+		InputStream inputStream = null;
+
+		try {
+			String currentLine;
+
+			inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
+
+			br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+			String readingText = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				// Platforn independent line separator.
+				readingText += currentLine + System.getProperty("line.separator");
+			}
+
+			final String tmpText = readingText;
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					guiText.setText(tmpText);
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param namePrefix
+	 * @param nameSuffix
+	 * @return absolute path of created temp file
+	 */
+	private String writeToFile(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return absPath;
+	}
 }

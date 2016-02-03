@@ -229,13 +229,4 @@ public class XmppAccessPage extends WizardPage implements IXmppPage {
 		setConfigVariables();
 		return super.getNextPage();
 	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-		/**
-		 * Do not allow to go back from this page.
-		 */
-		return null;
-	}
-
 }

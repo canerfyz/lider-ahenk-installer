@@ -40,7 +40,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		GUIHelper.createLabel(container, Messages.getString("LDAP__ENTER_CONF_CONTENT"));
+		GUIHelper.createLabel(container, Messages.getString("LDAP_ENTER_CONF_CONTENT"));
 
 		// Add a text area for configuration.
 		st = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
