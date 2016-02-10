@@ -16,6 +16,7 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -27,6 +28,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 	private Text txtLogConsole;
 
 	boolean isInstallationFinished = false;
+
+	private static final String EJABBERD_REGISTER = "ejabberdctl register {0} {1} {2}";
 
 	public XmppInstallationStatus(LiderSetupConfig config) {
 		super(XmppInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -74,18 +77,73 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									config.getXmppPackageName(), null);
-							setProgressBar(90);
-							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getXmppPackageName());
+							setProgressBar(50);
 							
+							printMessage("Now, installer starts configuring Ejabberd, please wait..");
+							
+							//------------ Set ejabberd.yml configuration file -----------//
 							File file = new File(config.getXmppAbsPathConfFile());
-							
+
 							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), file, "/etc/ejabberd/");
-							printMessage("Configuration file successfully sent.");
-							
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									file, "/etc/ejabberd/");
+							printMessage("Configuration file successfully set.");
+							setProgressBar(60);
+
+							// Delete the configuration file created in /tmp
 							deleteFile("ejabberd.yml");
+							//------------------------------------------------------------//
+
+							//------------ Configure /etc/hosts file ---------------//
+							printMessage("Configuring hosts file for Ejabberd..");
+
+							String script = PropertyReader.property("hosts.file.configuration");
+							script = script.replaceAll("##", config.getXmppHostname());
 							
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), script);
+							setProgressBar(70);
+							//------------------------------------------------------//
+							
+							//------------ Restart Ejabberd service ----------------//
+							printMessage("Restarting Ejabberd service to apply changes.");
+
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), 
+									"service ejabberd restart");
+							setProgressBar(80);
+							//------------------------------------------------------//
+
+							//---------- Create Ejabberd users -----------//
+							printMessage("Creating Ejabberd users..");
+
+							// Prepare register command for admin user
+							String command = prepareCommand(EJABBERD_REGISTER,
+									new Object[] { "admin", config.getXmppHostname(), config.getXmppAdminPwd() });
+
+							// Register admin user in Ejabberd
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									command);
+							printMessage("Ejabberd user: admin has been successfully created");
+							setProgressBar(90);
+
+							// Prepare register command for Lider user
+							command = prepareCommand(EJABBERD_REGISTER, new Object[] { config.getXmppLiderUsername(),
+									config.getXmppHostname(), config.getXmppLiderPassword() });
+							
+							// Register Lider server user in Ejabberd
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									command);
+							printMessage("Ejabberd user: " + config.getXmppLiderUsername()
+							+ " has been successfully created");
+							setProgressBar(100);
+							//--------------------------------------------//
+							
+							isInstallationFinished = true;
+
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -102,17 +160,20 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									deb);
 							setProgressBar(90);
-							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
-							
+
 							File file = new File(config.getXmppAbsPathConfFile());
-							
+
 							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), file, "/etc/ejabberd/");
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									file, "/etc/ejabberd/");
 							printMessage("Configuration file successfully sent.");
-							
+
+							// Delete the configuration file created in /tmp
 							deleteFile("ejabberd.yml");
-							
+
+							isInstallationFinished = true;
+
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							printMessage("Error occurred: " + e.getMessage());
@@ -193,7 +254,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 		// Do not allow to go back from this page.
 		return null;
 	}
-	
+
 	/**
 	 * Deletes a file from temporary file directory.
 	 * 
@@ -209,10 +270,23 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 
 				file.delete();
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String prepareCommand(String command, Object[] params) {
+		String tmpCmd = command;
+
+		if (params != null) {
+			for (int i = 0; i < params.length; i++) {
+				if (params[i] != null) {
+					tmpCmd = tmpCmd.replaceAll("\\{" + i + "\\}", params[i].toString());
+				}
+			}
+		}
+		return tmpCmd;
 	}
 
 }

@@ -300,7 +300,7 @@ public class SetupUtils {
 
 				return installed;
 
-			} catch (CommandExecutionException | SSHConnectionException e) {
+			} catch (SSHConnectionException e) {
 				e.printStackTrace();
 			}
 		}
@@ -385,7 +385,7 @@ public class SetupUtils {
 				}
 				manager.disconnect();
 
-			} catch (CommandExecutionException | SSHConnectionException e) {
+			} catch (SSHConnectionException e) {
 				e.printStackTrace();
 			}
 		}
@@ -794,5 +794,64 @@ public class SetupUtils {
 
 			logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
 		}
+	}
+	
+	/**
+	 * 
+	 * Executes a command on the given machine.
+	 * 
+	 * @param ip
+	 * @param username
+	 * @param password
+	 * @param port
+	 * @param privateKey
+	 * @param command
+	 * @throws SSHConnectionException
+	 * @throws CommandExecutionException
+	 */
+	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
+			final String privateKey, final String command)
+					throws SSHConnectionException, CommandExecutionException {
+		if (NetworkUtils.isLocal(ip)) {
+
+			logger.log(Level.INFO, "Executing command locally.");
+
+			try {
+
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+				
+				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			try {
+				logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
+						new Object[] { ip, username });
+
+				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+				manager.connect();
+
+				manager.execCommand(command, new Object[] {});
+				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+
+				manager.disconnect();
+
+			} catch (SSHConnectionException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 }

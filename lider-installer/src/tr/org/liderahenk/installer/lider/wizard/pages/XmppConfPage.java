@@ -15,8 +15,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -170,22 +168,10 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 				}
 			}
 		});
-
-		st.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent event) {
-				// If config content is entered user can click next.
-//				if (!"".equals(st.getText()) && st.getText() != null) {
-					setPageComplete(true);
-//				} else {
-//					setPageComplete(false);
-//				}
-			}
-		});
 		// -----------------------------------//
-
-//		setPageComplete(false);
-
+		
+		// Read from file and bring default configuration
+		// in the opening of page
 		readFile("ejabberd.yml", st);
 	}
 

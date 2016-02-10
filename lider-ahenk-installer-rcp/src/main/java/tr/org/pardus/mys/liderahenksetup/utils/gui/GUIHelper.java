@@ -143,7 +143,7 @@ public class GUIHelper {
 	 * @return
 	 */
 	public static Button createButton(Composite parent, int buttonType) {
-		return createButton(parent, buttonType, null);
+		return createButton(parent, buttonType, "");
 	}
 
 	/**

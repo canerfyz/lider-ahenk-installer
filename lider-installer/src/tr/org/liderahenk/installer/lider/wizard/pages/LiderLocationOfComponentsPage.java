@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.wizard.LiderSetupWizard;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
@@ -428,6 +429,9 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	@Override
 	public IWizardPage getNextPage() {
 		setConfigVariables();
+
+		((AccessPage) selectNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
 		return selectNextPage();
 	}
 
