@@ -185,6 +185,21 @@ public class GUIHelper {
 		return l;
 	}
 
+	/**
+	 * 
+	 * @param parent
+	 * @param text
+	 * @param style
+	 * @return
+	 */
+	public static Label createLabel(Composite parent, String text, int style) {
+		Label l = new Label(parent, style | SWT.NONE);
+		l.setText(text);
+		l.setBackground(getApplicationBackground());
+		l.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
+		return l;
+	}
+
 	public static Color getApplicationBackground() {
 		return Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
 	}

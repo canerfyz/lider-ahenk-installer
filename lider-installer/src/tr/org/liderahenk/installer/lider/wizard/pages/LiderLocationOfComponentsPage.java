@@ -398,7 +398,8 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	}
 
 	/**
-	 * Tries to find the first instance of the provided class in the linked list.
+	 * Tries to find the first instance of the provided class in the linked
+	 * list.
 	 * 
 	 * @param pagesList
 	 * @param cls
@@ -430,8 +431,9 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	public IWizardPage getNextPage() {
 		setConfigVariables();
 
-		((AccessPage) selectNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
-		
+		((ControlNextEvent) selectNextPage()).setNextPageEventType(
+				NextPageEventType.CLICK_FROM_PREV_PAGE);
+
 		return selectNextPage();
 	}
 

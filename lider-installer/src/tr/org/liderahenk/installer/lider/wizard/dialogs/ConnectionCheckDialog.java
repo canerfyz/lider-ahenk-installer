@@ -1,7 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -21,6 +20,9 @@ import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ */
 public class ConnectionCheckDialog extends Dialog{
 	
 	private LiderSetupConfig config;
@@ -47,22 +49,26 @@ public class ConnectionCheckDialog extends Dialog{
 	protected Control createContents(Composite parent) {
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 		
-		// Wait image
 		Composite container = GUIHelper.createComposite(mainContainer, 2);
+		
+		// Wait-Success-Fail image
 		image = GUIHelper.createLabel(container);
 		image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/wait.png")));
 		
 		// Message to user
-		message = GUIHelper.createLabel(container, "Checking authentication parameters please wait..");
+		message = GUIHelper.createLabel(container, "Checking authentication parameters please wait..", SWT.WRAP);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		gridData.widthHint = 350;
 		message.setLayoutData(gridData);
 		
 		// Progress bar while process going on
 		Composite secondCon = GUIHelper.createComposite(mainContainer, 1);
-		progBar = new ProgressBar(secondCon, SWT.INDETERMINATE);
 		
-		//TODO ok button, invis, closes when clicked.
+		progBar = new ProgressBar(secondCon, SWT.INDETERMINATE);
+		GridData barGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		progBar.setLayoutData(barGridData);
+		
+		// Ok button to close dialog
 		okBtn = GUIHelper.createButton(secondCon, SWT.PUSH, "Ok");
 		okBtn.addSelectionListener(new SelectionListener() {
 			@Override
@@ -74,6 +80,9 @@ public class ConnectionCheckDialog extends Dialog{
 			}
 		});
 		okBtn.setVisible(false);
+		GridData gdButton = new GridData(SWT.CENTER, SWT.TOP, true, false);
+		gdButton.widthHint = 100;
+		okBtn.setLayoutData(gdButton);
 		
 		startAuthorizationCheck();
 		
@@ -81,59 +90,73 @@ public class ConnectionCheckDialog extends Dialog{
 	}
 
 	private void startAuthorizationCheck() {
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				if (config.getXmppAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
-					Runnable runnable = new Runnable() {
-						
+		if (config.getXmppAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
+			
+			final Display display = Display.getCurrent(); 
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					canAuthorize = SetupUtils.canConnectViaSsh(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessPasswd());
+					display.asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							canAuthorize = SetupUtils.canConnectViaSsh(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessPasswd());
+							if (canAuthorize) {
+								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
+								message.setText("Authentication successfull.");
+								progBar.setVisible(false);
+								okBtn.setVisible(true);
+							}
+							else {
+								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
+								message.setText("Authentication failed. Please check connection information..");
+								progBar.setVisible(false);
+								okBtn.setVisible(true);
+							}
 						}
-					};
-					
-					Thread thread = new Thread(runnable);
-					thread.start();
-					
-					if (canAuthorize) {
-						image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
-						message.setText("Authentication successfull.");
-						progBar.setVisible(false);
-						okBtn.setVisible(true);
-					}
-					else {
-						image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
-						message.setText("Authentication failed. Please check connection information..");
-						progBar.setVisible(false);
-						okBtn.setVisible(true);
-					}
+					});
 				}
-				else {
-					SetupUtils.canConnectViaSshWithoutPassword(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessKeyPath());
+			};
+			
+			Thread thread = new Thread(runnable);
+			thread.start();
+			
+		}
+		else {
+			final Display display = Display.getCurrent(); 
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					canAuthorize = SetupUtils.canConnectViaSshWithoutPassword(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessKeyPath());
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (canAuthorize) {
+								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
+								message.setText("Authentication successfull.");
+								progBar.setVisible(false);
+								okBtn.setVisible(true);
+							}
+							else {
+								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
+								message.setText("Authentication failed. Please check connection information..");
+								progBar.setVisible(false);
+								okBtn.setVisible(true);
+							}
+						}
+					});
 				}
-			}
-		};
-
-		Thread thread = new Thread(runnable);
-		thread.start();		
-	}
-
-	@Override
-	protected void createButtonsForButtonBar(Composite parent) {
-		// TODO Auto-generated method stub
-		// TODO ok butonu ekle disabled olsun başlangıçta
-		createButton(parent, IDialogConstants.OK_ID, "Ok", true);
+			};
+			
+			Thread thread = new Thread(runnable);
+			thread.start();
+			
+		}
 	}
 
 	@Override
 	protected Point getInitialSize() {
 		// TODO Auto-generated method stub
-		return new Point(500, 200);
-	}
-
-	protected void okPressed() {
-		close();
+		return new Point(450, 155);
 	}
 
 	public boolean getCanAuthorize() {

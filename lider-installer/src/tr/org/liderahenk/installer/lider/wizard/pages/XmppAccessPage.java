@@ -26,7 +26,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class XmppAccessPage extends WizardPage implements IXmppPage, AccessPage {
+public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -254,7 +254,7 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, AccessPage 
 			return super.getNextPage();
 		}
 		else {
-			return null;
+			return this;
 		}
 	}
 
@@ -283,8 +283,8 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, AccessPage 
 	}
 
 	@Override
-	public NextPageEventType setNextPageEventType(NextPageEventType nextPageEventType) {
-		return this.nextPageEventType = nextPageEventType;
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 	
 	
