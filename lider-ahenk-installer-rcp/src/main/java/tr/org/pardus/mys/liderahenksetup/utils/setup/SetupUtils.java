@@ -75,11 +75,6 @@ public class SetupUtils {
 	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
-	 * Extracts a tarball to given location {1}
-	 */
-	private static final String EXTRACT_PACKAGE = "tar zxvf {0} -C {1}";
-	
-	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
 	 * 
 	 * @param ip
@@ -120,7 +115,7 @@ public class SetupUtils {
 			final Integer port, final String privateKey) {
 		SSHManager manager = null;
 		try {
-			manager = new SSHManager(ip, username, password, port, privateKey);
+			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			logger.log(Level.INFO, "Connection established to: {0} with username: {1}", new Object[] { ip, username });
 			return true;
@@ -203,7 +198,7 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Checking package remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			String versions = manager.execCommand(CHECK_PACKAGE_EXIST_CMD, new Object[] { packageName });
 			manager.disconnect();
@@ -288,7 +283,7 @@ public class SetupUtils {
 				logger.log(Level.INFO, "Checking package remotely on: {0} with username: {1}",
 						new Object[] { ip, username });
 
-				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 				manager.connect();
 				String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD, new Object[] { packageName });
 				manager.disconnect();
@@ -371,7 +366,7 @@ public class SetupUtils {
 				logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}",
 						new Object[] { ip, username });
 
-				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 				manager.connect();
 
 				// If version is not given
@@ -456,14 +451,14 @@ public class SetupUtils {
 
 		} else {
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 
 			// Set frontend as noninteractive
 			manager.execCommand(SET_DEBIAN_FRONTEND, new Object[] {});
 
 			manager.disconnect();
-			manager = new SSHManager(ip, username, password, port, privateKey);
+			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 
 			// Set debconf values
@@ -527,7 +522,7 @@ public class SetupUtils {
 
 			copyFile(ip, username, password, port, privateKey, debPackage, "/tmp/");
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			manager.execCommand(INSTALL_PACKAGE, new Object[] { "/tmp/" + debPackage.getName() });
 			manager.disconnect();
@@ -594,14 +589,14 @@ public class SetupUtils {
 
 		} else {
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 
 			// Set frontend as noninteractive
 			manager.execCommand(SET_DEBIAN_FRONTEND, new Object[] {});
 
 			manager.disconnect();
-			manager = new SSHManager(ip, username, password, port, privateKey);
+			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 
 			// Set debconf values
@@ -660,7 +655,7 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Uninstalling package remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			manager.execCommand(UNINSTALL_PACKAGE_CMD, new Object[] { packageName });
 			manager.disconnect();
@@ -711,7 +706,7 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Adding repository remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			manager.execCommand(ADD_APP_REPO_CMD, new Object[] { repository });
 			manager.disconnect();
@@ -787,7 +782,7 @@ public class SetupUtils {
 
 			logger.log(Level.INFO, "Copying file to: {0} with username: {1}", new Object[] { ip, username });
 
-			SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 			manager.connect();
 			manager.copyFileToRemote(fileToTranster, destDirectory, false);
 			manager.disconnect();
@@ -840,7 +835,7 @@ public class SetupUtils {
 				logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
 						new Object[] { ip, username });
 
-				SSHManager manager = new SSHManager(ip, username, password, port, privateKey);
+				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey);
 				manager.connect();
 
 				manager.execCommand(command, new Object[] {});

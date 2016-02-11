@@ -15,32 +15,39 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
-import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
+ * Creates a dialog which executes an authorization check with provided when it pops up.
+ *  
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 public class ConnectionCheckDialog extends Dialog{
-	
-	private LiderSetupConfig config;
 	
 	private Label image;
 	private Label message;
 	private ProgressBar progBar;
 	private Button okBtn;
 	
+	private String ip;
+	private String username;
+	private String password;
+	private String keyAbsPath;
+	private AccessMethod method;
+	
 	private boolean canAuthorize;
 	
 
-	public ConnectionCheckDialog(Shell parentShell, LiderSetupConfig config) {
+	public ConnectionCheckDialog(Shell parentShell, String ip, String username, String password, String keyAbsPath, AccessMethod method) {
 		super(parentShell);
+		this.ip = ip;
+		this.username = username;
+		this.password = password;
+		this.keyAbsPath = keyAbsPath;
+		this.method = method;
 
-		// Set LiderSetupConfig
-		this.config = config;
-		
 		// Do not show close on the title bar and lock parent window.
 		super.setShellStyle(SWT.TITLE | SWT.APPLICATION_MODAL);
 	}
@@ -90,72 +97,41 @@ public class ConnectionCheckDialog extends Dialog{
 	}
 
 	private void startAuthorizationCheck() {
-		if (config.getXmppAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
-			
-			final Display display = Display.getCurrent(); 
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					canAuthorize = SetupUtils.canConnectViaSsh(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessPasswd());
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (canAuthorize) {
-								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
-								message.setText("Authentication successfull.");
-								progBar.setVisible(false);
-								okBtn.setVisible(true);
-							}
-							else {
-								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
-								message.setText("Authentication failed. Please check connection information..");
-								progBar.setVisible(false);
-								okBtn.setVisible(true);
-							}
-						}
-					});
+		final Display display = Display.getCurrent(); 
+		Runnable runnable = new Runnable() {
+			@Override
+			public void run() {
+				if (method == AccessMethod.USERNAME_PASSWORD) {
+					canAuthorize = SetupUtils.canConnectViaSsh(ip, username, password);
 				}
-			};
-			
-			Thread thread = new Thread(runnable);
-			thread.start();
-			
-		}
-		else {
-			final Display display = Display.getCurrent(); 
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					canAuthorize = SetupUtils.canConnectViaSshWithoutPassword(config.getXmppIp(), config.getXmppAccessUsername(), config.getXmppAccessKeyPath());
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							if (canAuthorize) {
-								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
-								message.setText("Authentication successfull.");
-								progBar.setVisible(false);
-								okBtn.setVisible(true);
-							}
-							else {
-								image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
-								message.setText("Authentication failed. Please check connection information..");
-								progBar.setVisible(false);
-								okBtn.setVisible(true);
-							}
+				else {
+					canAuthorize = SetupUtils.canConnectViaSshWithoutPassword(ip, username, keyAbsPath);
+				}					
+				display.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						if (canAuthorize) {
+							image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
+							message.setText("Authentication successfull.");
+							progBar.setVisible(false);
+							okBtn.setVisible(true);
 						}
-					});
-				}
-			};
-			
-			Thread thread = new Thread(runnable);
-			thread.start();
-			
-		}
+						else {
+							image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
+							message.setText("Authentication failed. Please check connection information..");
+							progBar.setVisible(false);
+							okBtn.setVisible(true);
+						}
+					}
+				});
+			}
+		};
+		Thread thread = new Thread(runnable);
+		thread.start();
 	}
 
 	@Override
 	protected Point getInitialSize() {
-		// TODO Auto-generated method stub
 		return new Point(450, 155);
 	}
 

@@ -157,7 +157,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 	}
 
 	@Override
-	public IWizardPage getNextPage() {
+	public IWizardPage getPreviousPage() {
 		
 		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
 				NextPageEventType.CLICK_FROM_PREV_PAGE);

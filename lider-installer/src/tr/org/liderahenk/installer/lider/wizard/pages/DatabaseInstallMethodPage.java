@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
@@ -176,8 +177,11 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 	}
 
 	@Override
-	public IWizardPage getNextPage() {
-		return super.getNextPage();
+	public IWizardPage getPreviousPage() {
+		
+		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
+				NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
+		return super.getPreviousPage();
 	}
-
 }

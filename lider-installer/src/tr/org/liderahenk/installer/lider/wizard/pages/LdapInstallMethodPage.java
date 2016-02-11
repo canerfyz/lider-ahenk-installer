@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
@@ -176,6 +177,10 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 	@Override
 	public IWizardPage getNextPage() {
+
+		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
+				NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
 		return super.getNextPage();
 	}
 

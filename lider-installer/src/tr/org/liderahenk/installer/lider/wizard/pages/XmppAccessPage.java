@@ -40,10 +40,10 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 	private FileDialog dialog;
 	private String selectedFile;
 	private Text passphraseTxt;
-	
+
 	private NextPageEventType nextPageEventType;
-	
-	// Set to true as default otherwise 
+
+	// Set to true as default otherwise
 	// wizard button activations does not work properly.
 	private boolean goNextPage = true;
 
@@ -229,6 +229,7 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 			config.setXmppAccessMethod(AccessMethod.PRIVATE_KEY);
 			config.setXmppAccessKeyPath(privateKeyTxt.getText());
 			config.setXmppAccessPassphrase(passphraseTxt.getText());
+			config.setXmppAccessUsername(usernameTxt.getText());
 		}
 	}
 
@@ -236,34 +237,37 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 	public IWizardPage getNextPage() {
 		// Set config variables before going next page.
 		setConfigVariables();
-		
+
 		// If next button clicked, open a dialog and start
 		// authorization check.
 		if (nextPageEventType == NextPageEventType.NEXT_BUTTON_CLICK) {
 			openConnectionCheckDialog(getShell());
 		}
-		
-		// Everytime this method runs, event type should be set to NEXT_BUTTON_CLICK
+
+		// Everytime this method runs, event type should be set to
+		// NEXT_BUTTON_CLICK
 		// otherwise we can never catch the real click to next button.
 		nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
-		
+
 		// goNextPage is the result of authorization check,
-		// if we can authorize then go to next page 
+		// if we can authorize then go to next page
 		// else do not allow.
 		if (goNextPage == true) {
 			return super.getNextPage();
-		}
-		else {
+		} else {
 			return this;
 		}
 	}
 
 	private void openConnectionCheckDialog(Shell shell) {
 		// Create a dialog
-		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config);
+		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getXmppIp(),
+				config.getXmppAccessUsername(), config.getXmppAccessPasswd(), config.getXmppAccessKeyPath(),
+				config.getXmppAccessMethod());
+
 		// Open it
 		ccDialog.open();
-		
+
 		// After closing it get the result of authorization check.
 		goNextPage = ccDialog.getCanAuthorize();
 	}
@@ -273,7 +277,7 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 		// Set event type here. If event type is not set,
 		// authorization check will be executed.
 		nextPageEventType = NextPageEventType.SET_PAGE_COMPLETE;
-		
+
 		super.setPageComplete(complete);
 	}
 
@@ -286,6 +290,5 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
-	
-	
+
 }
