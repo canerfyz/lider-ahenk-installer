@@ -8,9 +8,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
+import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
@@ -267,9 +269,12 @@ public class LiderSetupWizard extends Wizard {
 	public boolean canFinish() {
 		// If current page is the last page of this wizard
 		// then enable finish button.
-		if (getContainer().getCurrentPage().getName().equals(this.getPagesList().getLast().getName())) {
+		if (PageFlowHelper.selectNextPage(config, (WizardPage) getContainer().getCurrentPage()) == null) {
 			return true;
 		}
+//		if (getContainer().getCurrentPage().getName().equals(this.getPagesList().getLast().getName())) {
+//			return true;
+//		}
 		return false;
 	}
 

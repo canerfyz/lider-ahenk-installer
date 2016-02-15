@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
@@ -61,12 +62,14 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
 		if (super.isCurrentPage() && !isInstallationFinished) {
-
+			
 			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 
+					setPageCompleteAsync(false);
+					
 					printMessage("Initializing installation...");
 					setProgressBar(10);
 
@@ -245,8 +248,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 			Thread thread = new Thread(runnable);
 			thread.start();
 		}
-
-		return super.getNextPage();
+		
+		getContainer().updateButtons();
+		
+		// Select next page.
+		return PageFlowHelper.selectNextPage(config, this);
 	}
 
 	@Override
@@ -288,5 +294,4 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 		}
 		return tmpCmd;
 	}
-
 }

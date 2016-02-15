@@ -15,6 +15,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -69,11 +71,23 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		hostnameTxt = GUIHelper.createText(inputsContainer);
 		hostnameTxt.setLayoutData(gdForTxt);
+		hostnameTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(inputsContainer, Messages.getString("ADMIN_PASSWORD"));
 
 		adminPwdTxt = GUIHelper.createText(inputsContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		adminPwdTxt.setLayoutData(gdForTxt);
+		adminPwdTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
 		// ----------------------------------------------------------//
 
 		// Info message
@@ -89,11 +103,23 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		liderUserTxt = GUIHelper.createText(liderContainer);
 		liderUserTxt.setLayoutData(gdForTxt);
-
+		liderUserTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
+		
 		GUIHelper.createLabel(liderContainer, Messages.getString("PASSWORD"));
 
 		liderPwdTxt = GUIHelper.createText(liderContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
 		liderPwdTxt.setLayoutData(gdForTxt);
+		liderPwdTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
 		// ------------------------------------------------------------//
 
 		// ----------- Text Editor --------------------//
@@ -169,10 +195,22 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 			}
 		});
 		// -----------------------------------//
+
+		updatePageCompleteStatus();
 		
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("ejabberd.yml", st);
+	}
+
+	private void updatePageCompleteStatus() {
+		if (!"".equals(hostnameTxt.getText()) && !"".equals(adminPwdTxt.getText()) 
+				&& !"".equals(liderUserTxt.getText()) && !"".equals(liderPwdTxt.getText())) {
+			setPageComplete(true);
+		}
+		else {
+			setPageComplete(false);
+		}
 	}
 
 	@Override
