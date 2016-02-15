@@ -392,9 +392,10 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			return findFirstInstance(pagesList, ILdapPage.class);
 		} else if (config.isInstallXmpp()) {
 			return findFirstInstance(pagesList, IXmppPage.class);
-		} else { // Lider
+		} else if (config.isInstallLider()) { // Lider
 			return findFirstInstance(pagesList, ILiderPage.class);
 		}
+		return null;
 	}
 
 	/**

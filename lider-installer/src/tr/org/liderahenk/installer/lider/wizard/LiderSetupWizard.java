@@ -257,7 +257,7 @@ public class LiderSetupWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		// TODO
-		return false;
+		return true;
 	}
 
 	@Override
@@ -269,12 +269,10 @@ public class LiderSetupWizard extends Wizard {
 	public boolean canFinish() {
 		// If current page is the last page of this wizard
 		// then enable finish button.
-		if (PageFlowHelper.selectNextPage(config, (WizardPage) getContainer().getCurrentPage()) == null) {
+		if (PageFlowHelper.isLastPage(config, (WizardPage) getContainer().getCurrentPage())) {
 			return true;
 		}
-//		if (getContainer().getCurrentPage().getName().equals(this.getPagesList().getLast().getName())) {
-//			return true;
-//		}
+
 		return false;
 	}
 

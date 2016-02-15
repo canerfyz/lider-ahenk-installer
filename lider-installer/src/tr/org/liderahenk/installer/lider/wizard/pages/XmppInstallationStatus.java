@@ -15,22 +15,29 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
-public class XmppInstallationStatus extends WizardPage implements IXmppPage {
+public class XmppInstallationStatus extends WizardPage implements IXmppPage, ControlNextEvent, InstallationStatusPage {
 
 	private LiderSetupConfig config;
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
 
+	private NextPageEventType nextPageEventType;
+
 	boolean isInstallationFinished = false;
 
+	boolean canGoBack = false;
+
 	private static final String EJABBERD_REGISTER = "ejabberdctl register {0} {1} {2}";
+
+	private static final String EJABBERD_SRG_CREATE = "ejabberdctl srg-create {0} {1} {2} {3} {4}";
 
 	public XmppInstallationStatus(LiderSetupConfig config) {
 		super(XmppInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -61,31 +68,50 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
-		if (super.isCurrentPage() && !isInstallationFinished) {
-			
+		if (super.isCurrentPage() && !isInstallationFinished
+				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+
 			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 
 					setPageCompleteAsync(false);
-					
+
 					printMessage("Initializing installation...");
 					setProgressBar(10);
 
 					printMessage("Installing package...");
 
-					if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
+					// If installation method is not set, show an error message
+					// and do not try to install
+					if (config.getXmppInstallMethod() == InstallMethod.APT_GET
+							|| config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						try {
-							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppPackageName(), null);
-							printMessage("Successfully installed package: " + config.getXmppPackageName());
+
+							if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
+
+								SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppPackageName(), null);
+
+								printMessage("Successfully installed package: " + config.getXmppPackageName());
+							} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
+
+								File deb = new File(config.getXmppDebFileName());
+
+								SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), deb);
+
+								printMessage("Successfully installed package: " + deb.getName());
+							}
+
 							setProgressBar(50);
-							
+
 							printMessage("Now, installer starts configuring Ejabberd, please wait..");
-							
-							//------------ Set ejabberd.yml configuration file -----------//
+
+							// ----- Set ejabberd.yml configuration file ---//
 							File file = new File(config.getXmppAbsPathConfFile());
 
 							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
@@ -96,98 +122,106 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 
 							// Delete the configuration file created in /tmp
 							deleteFile("ejabberd.yml");
-							//------------------------------------------------------------//
+							// ------------------------------------------------------------//
 
-							//------------ Configure /etc/hosts file ---------------//
+							// ------ Configure /etc/hosts file ---//
 							printMessage("Configuring hosts file for Ejabberd..");
 
 							String script = PropertyReader.property("hosts.file.configuration");
 							script = script.replaceAll("##", config.getXmppHostname());
-							
+
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), script);
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									script);
 							setProgressBar(70);
-							//------------------------------------------------------//
-							
-							//------------ Restart Ejabberd service ----------------//
+							// -----------------------------------//
+
+							// ----- Restart Ejabberd service -----//
 							printMessage("Restarting Ejabberd service to apply changes.");
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(), 
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									"service ejabberd restart");
 							setProgressBar(80);
-							//------------------------------------------------------//
+							// ------------------------------------//
 
-							//---------- Create Ejabberd users -----------//
+							// --- Create Ejabberd Shared Roster Groups ---//
+							// Lider SRG
+							String createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "lider-srg",
+									config.getXmppHostname(), "Lider-SRG", "Lider-SRG", "lider-srg, ahenk-srg" });
+							
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									createSrg);
+
+							// Ahenk SRG
+							createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "ahenk-srg",
+									config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "lider-srg" });
+							
+							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
+									createSrg);
+							// ------------------------------------------------//
+
+							// ---------- Create Ejabberd users -----------//
 							printMessage("Creating Ejabberd users..");
 
 							// Prepare register command for admin user
-							String command = prepareCommand(EJABBERD_REGISTER,
+							String register = prepareCommand(EJABBERD_REGISTER,
 									new Object[] { "admin", config.getXmppHostname(), config.getXmppAdminPwd() });
 
 							// Register admin user in Ejabberd
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									command);
+									register);
 							printMessage("Ejabberd user: admin has been successfully created");
 							setProgressBar(90);
 
 							// Prepare register command for Lider user
-							command = prepareCommand(EJABBERD_REGISTER, new Object[] { config.getXmppLiderUsername(),
+							register = prepareCommand(EJABBERD_REGISTER, new Object[] { config.getXmppLiderUsername(),
 									config.getXmppHostname(), config.getXmppLiderPassword() });
-							
+
 							// Register Lider server user in Ejabberd
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									command);
+									register);
 							printMessage("Ejabberd user: " + config.getXmppLiderUsername()
-							+ " has been successfully created");
+									+ " has been successfully created");
 							setProgressBar(100);
-							//--------------------------------------------//
+
+							printMessage("Installation finished..");
+
+							updateFinishButton();
+							// --------------------------------------------//
+
+							// ----- Add Users to SRG ----- //
+							// TODO 
+							// TODO 
+							// TODO 
+							// --------------------------//
 							
 							isInstallationFinished = true;
 
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getXmppDebFileName());
-						try {
-							SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									deb);
-							setProgressBar(90);
-							printMessage("Successfully installed package: " + deb.getName());
-
-							File file = new File(config.getXmppAbsPathConfFile());
-
-							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									file, "/etc/ejabberd/");
-							printMessage("Configuration file successfully sent.");
-
-							// Delete the configuration file created in /tmp
-							deleteFile("ejabberd.yml");
-
-							isInstallationFinished = true;
-
-						} catch (SSHConnectionException e) {
-							isInstallationFinished = false;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
 					} else {
 						isInstallationFinished = false;
+						// If any error occured user should be able to go
+						// back and change selections etc.
+						canGoBack = true;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
 
@@ -243,14 +277,23 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 					});
 				}
 
+				/**
+				 * Updates finish button asynchronously.
+				 */
+				private void updateFinishButton() {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							getContainer().updateButtons();
+						}
+					});
+				}
 			};
 
 			Thread thread = new Thread(runnable);
 			thread.start();
 		}
-		
-		getContainer().updateButtons();
-		
+
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
 	}
@@ -294,4 +337,15 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage {
 		}
 		return tmpCmd;
 	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
+	}
+
 }

@@ -11,9 +11,16 @@ import tr.org.liderahenk.installer.lider.wizard.pages.IDatabasePage;
 import tr.org.liderahenk.installer.lider.wizard.pages.ILdapPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.ILiderPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.IXmppPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.InstallationStatusPage;
 
+/**
+ * This contains some helpful methods to control the page flow of wizard.
+ * 
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ * 
+ */
 public class PageFlowHelper {
-	
+
 	/**
 	 * Tries to find the first instance of the provided class in the linked
 	 * list.
@@ -32,7 +39,7 @@ public class PageFlowHelper {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * This method decides next page according to user's component choices
 	 * 
@@ -45,22 +52,65 @@ public class PageFlowHelper {
 				return findFirstInstance(pagesList, ILdapPage.class);
 			} else if (config.isInstallXmpp()) {
 				return findFirstInstance(pagesList, IXmppPage.class);
-			} else if (config.isInstallLider()){
-				return findFirstInstance(pagesList, ILiderPage.class);
-			}	
-		}
-		else if (page instanceof ILdapPage) {
-			if (config.isInstallXmpp()) {
-				return findFirstInstance(pagesList, ILdapPage.class);
-			} else if (config.isInstallLider()){
+			} else if (config.isInstallLider()) {
 				return findFirstInstance(pagesList, ILiderPage.class);
 			}
-		}
-		else if (page instanceof IXmppPage) {
+		} else if (page instanceof ILdapPage) {
+			if (config.isInstallXmpp()) {
+				return findFirstInstance(pagesList, ILdapPage.class);
+			} else if (config.isInstallLider()) {
+				return findFirstInstance(pagesList, ILiderPage.class);
+			}
+		} else if (page instanceof IXmppPage) {
 			if (config.isInstallLider()) {
 				return findFirstInstance(pagesList, ILiderPage.class);
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * This method returns true if given page parameter is the last page of
+	 * wizard.
+	 * 
+	 * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+	 * 
+	 * @param config
+	 * @param page
+	 * @return true if given page parameter is the last page of
+	 * wizard.
+	 */
+	public static boolean isLastPage(LiderSetupConfig config, WizardPage page) {
+		if (page instanceof InstallationStatusPage && isLastComponent(config, page)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * There are four components in this wizard (Database, Ldap, Xmpp and
+	 * Lider). And this method returns true if given page parameter belongs to
+	 * last component selected to be installed.
+	 * 
+	 * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+	 * 
+	 * @param config
+	 * @param page
+	 * @return true if given page parameter belongs to last component of wizard.
+	 */
+	public static boolean isLastComponent(LiderSetupConfig config, WizardPage page) {
+		if (page instanceof ILiderPage) {
+			return true;
+		} else if (page instanceof IXmppPage && !config.isInstallLider()) {
+			return true;
+		} else if (page instanceof ILdapPage && !config.isInstallLider() && !config.isInstallXmpp()) {
+			return true;
+		} else if (page instanceof IDatabasePage && !config.isInstallLider() && !config.isInstallXmpp()
+				&& config.isInstallLdap()) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

@@ -10,6 +10,7 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -54,6 +55,10 @@ public class XmppConfirmPage extends WizardPage implements IXmppPage {
 	public IWizardPage getNextPage() {
 		// Set the IP info in the opening of page
 		lblIp.setText("- IP: " + config.getXmppIp());
+		
+		((ControlNextEvent) super.getNextPage()).setNextPageEventType(
+				NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
 		return super.getNextPage();
 	}
 
