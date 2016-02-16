@@ -56,9 +56,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 		progressBar = new ProgressBar(container, SWT.SMOOTH | SWT.HORIZONTAL);
 		progressBar.setSelection(0);
 		progressBar.setMaximum(100);
+	
 		GridData progressGd = new GridData(GridData.FILL_HORIZONTAL);
 		progressGd.heightHint = 40;
-		// progressGd.widthHint = 780;
 		progressBar.setLayoutData(progressGd);
 	}
 
@@ -199,6 +199,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// TODO 
 							// TODO 
 							// --------------------------//
+							// TODO Add all users to ahenk srg by default (hint: @all@)
 							
 							isInstallationFinished = true;
 

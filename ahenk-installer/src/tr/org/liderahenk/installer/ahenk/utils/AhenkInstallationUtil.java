@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Table;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
@@ -23,8 +24,8 @@ public class AhenkInstallationUtil {
 	public static void installAhenk(final AhenkSetupConfig config, final ProgressBar progressBar, final Table table,
 			Label label) {
 
-		if (config.isUseUsernameAndPass()) {
-
+		if (config.getAhenkAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
+			
 			if (config.getPassphrase() != null && !"".equals(config.getPassphrase())) {
 
 			} else {

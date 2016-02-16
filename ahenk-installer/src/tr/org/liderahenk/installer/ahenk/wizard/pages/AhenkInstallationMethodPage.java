@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
 /**
  * @author caner Caner Feyzullahoğlu caner.feyzullahoglu@agem.com.tr
@@ -174,11 +175,9 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	public IWizardPage getNextPage() {
 
 		if (useAptGetBtn.getSelection()) {
-			config.setInstallByAptGet(true);
-			config.setInstallByDebFile(false);
+			config.setAhenkInstallMethod(InstallMethod.APT_GET);
 		} else {
-			config.setInstallByAptGet(false);
-			config.setInstallByDebFile(true);
+			config.setAhenkInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDebFileAbsPath(fileDialogText.getText());
 		}
 

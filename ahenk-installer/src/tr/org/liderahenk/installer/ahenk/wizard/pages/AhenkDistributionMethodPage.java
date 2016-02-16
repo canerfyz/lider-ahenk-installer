@@ -49,12 +49,12 @@ public class AhenkDistributionMethodPage extends WizardPage {
 
 		// Distribute by scp
 		useScpBtn = new Button(mainContainer, SWT.RADIO);
-		useScpBtn.setText(Messages.getString("DISTRUBUTE_WITH_SECURE_COPY(SCP)_METHOD"));
+		useScpBtn.setText(Messages.getString("DISTRIBUTE_WITH_SECURE_COPY(SCP)_METHOD"));
 		useScpBtn.setSelection(true);
 
 		// Distribute by torrent
 		useTorrentBtn = new Button(mainContainer, SWT.RADIO);
-		useTorrentBtn.setText(Messages.getString("DISTRUBUTE_VIA_TORRENT"));
+		useTorrentBtn.setText(Messages.getString("DISTRIBUTE_VIA_TORRENT"));
 	}
 
 	@Override

@@ -19,12 +19,11 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 
 
 /**
- * @author caner  
- * Caner Feyzullahoğlu
- * caner.feyzullahoglu@agem.com.tr
+ * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 public class AhenkConnectionMethodPage extends WizardPage {
 
@@ -56,7 +55,6 @@ public class AhenkConnectionMethodPage extends WizardPage {
 	private FileDialog fileDialog = null; 
 	
 	private String fileDialogResult = null;
-	
 	
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -292,14 +290,12 @@ public class AhenkConnectionMethodPage extends WizardPage {
 	public IWizardPage getNextPage() {
 		
 		if (userPassBtn.getSelection()) {
-			config.setUseUsernameAndPass(true);
-			config.setUsePrivateKey(false);
+			config.setAhenkAccessMethod(AccessMethod.USERNAME_PASSWORD);
 			config.setUsernameCm(userNameTxt.getText());
 			config.setPasswordCm(passwordTxt.getText());
 		}
 		else {
-			config.setUsePrivateKey(true);
-			config.setUseUsernameAndPass(false);
+			config.setAhenkAccessMethod(AccessMethod.PRIVATE_KEY);
 			config.setPrivateKeyAbsPath(fileDialogText.getText());
 			if (!"".equals(passphraseTxt.getText()) && passphraseTxt.getText() != null) {
 				config.setPassphrase(passphrase.getText());

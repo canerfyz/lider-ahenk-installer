@@ -2,6 +2,9 @@ package tr.org.liderahenk.installer.ahenk.config;
 
 import java.util.List;
 
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+
 /**
  * Contains configuration variables used throughout the whole setup process.
  *
@@ -12,19 +15,6 @@ public class AhenkSetupConfig {
 	 * IP list that Ahenk will be installed
 	 */
 	private List<String> ipList;
-
-	/**
-	 * MariaDBSetupLocationPage variables
-	 */
-	private boolean installDatabaseOnRemote;
-	private String databaseIp;
-
-	/**
-	 * MariaDBSetupMethodPage variables
-	 */
-	private boolean installViaAptGet;
-	private String debFileName;
-	private byte[] debContent;
 
 	/**
 	 * AhenkSetupLocationPage variables
@@ -44,8 +34,7 @@ public class AhenkSetupConfig {
 	/**
 	 * AhenkSetupConnectionMethodPage variables (Cm: Connection Method)
 	 */
-	private boolean usePrivateKey;
-	private boolean useUsernameAndPass;
+	private AccessMethod ahenkAccessMethod;
 	private String usernameCm;
 	private String passwordCm;
 	private String privateKeyAbsPath;
@@ -54,8 +43,7 @@ public class AhenkSetupConfig {
 	/**
 	 * AhenkSetupInstallationMethodPage variables
 	 */
-	private boolean installByAptGet;
-	private boolean installByDebFile;
+	private InstallMethod ahenkInstallMethod;
 	private String debFileAbsPath;
 
 	/**
@@ -64,46 +52,8 @@ public class AhenkSetupConfig {
 	private boolean useScp;
 	private boolean useTorrent;
 
-	public boolean isInstallDatabaseOnRemote() {
-		return installDatabaseOnRemote;
-	}
-
-	public void setInstallDatabaseOnRemote(boolean installDatabaseOnRemote) {
-		this.installDatabaseOnRemote = installDatabaseOnRemote;
-	}
-
-	public String getDatabaseIp() {
-		return databaseIp;
-	}
-
-	public void setDatabaseIp(String databaseIp) {
-		this.databaseIp = databaseIp;
-	}
-
-	public String getDebFileName() {
-		return debFileName;
-	}
-
-	public void setDebFileName(String debFileName) {
-		this.debFileName = debFileName;
-	}
-
-	public byte[] getDebContent() {
-		return debContent;
-	}
-
-	public void setDebContent(byte[] debContent) {
-		this.debContent = debContent;
-	}
-
-	public boolean isInstallViaAptGet() {
-		return installViaAptGet;
-	}
-
-	public void setInstallViaAptGet(boolean installViaAptGet) {
-		this.installViaAptGet = installViaAptGet;
-	}
-
+	
+	// ------ Getter Setter ----- //
 	public boolean isInstallAhenkLocally() {
 		return installAhenkLocally;
 	}
@@ -128,14 +78,6 @@ public class AhenkSetupConfig {
 		this.installOnGivenIps = installOnGivenIps;
 	}
 
-	// public String[] getRemoteIpList() {
-	// return remoteIpList;
-	// }
-	//
-	// public void setRemoteIpList(String[] remoteIpList) {
-	// this.remoteIpList = remoteIpList;
-	// }
-
 	public boolean isShowSystemInfo() {
 		return showSystemInfo;
 	}
@@ -158,14 +100,6 @@ public class AhenkSetupConfig {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public boolean isUsePrivateKey() {
-		return usePrivateKey;
-	}
-
-	public void setUsePrivateKey(boolean usePrivateKey) {
-		this.usePrivateKey = usePrivateKey;
 	}
 
 	public String getUsernameCm() {
@@ -208,22 +142,6 @@ public class AhenkSetupConfig {
 		this.ipList = ipList;
 	}
 
-	public boolean isInstallByAptGet() {
-		return installByAptGet;
-	}
-
-	public void setInstallByAptGet(boolean installByAptGet) {
-		this.installByAptGet = installByAptGet;
-	}
-
-	public boolean isInstallByDebFile() {
-		return installByDebFile;
-	}
-
-	public void setInstallByDebFile(boolean installByDebFile) {
-		this.installByDebFile = installByDebFile;
-	}
-
 	public String getDebFileAbsPath() {
 		return debFileAbsPath;
 	}
@@ -248,12 +166,20 @@ public class AhenkSetupConfig {
 		this.useTorrent = useTorrent;
 	}
 
-	public boolean isUseUsernameAndPass() {
-		return useUsernameAndPass;
+	public AccessMethod getAhenkAccessMethod() {
+		return ahenkAccessMethod;
 	}
 
-	public void setUseUsernameAndPass(boolean useUsernameAndPass) {
-		this.useUsernameAndPass = useUsernameAndPass;
+	public void setAhenkAccessMethod(AccessMethod ahenkAccessMethod) {
+		this.ahenkAccessMethod = ahenkAccessMethod;
+	}
+
+	public InstallMethod getAhenkInstallMethod() {
+		return ahenkInstallMethod;
+	}
+
+	public void setAhenkInstallMethod(InstallMethod ahenkInstallMethod) {
+		this.ahenkInstallMethod = ahenkInstallMethod;
 	}
 
 }

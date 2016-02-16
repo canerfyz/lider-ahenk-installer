@@ -12,6 +12,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.dialogs.AhenkStatusDialog;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConfirmPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConnectionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkDistributionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
@@ -36,20 +37,22 @@ public class AhenkSetupWizard extends Wizard {
 	 * 
 	 * Other pages will be added dynamically according to user action!
 	 */
-	AhenkSetupLocationPage aslPage = new AhenkSetupLocationPage(config);
-	AhenkConnectionMethodPage acmPage = new AhenkConnectionMethodPage(config);
-	AhenkInstallationMethodPage aimPage = new AhenkInstallationMethodPage(config);
-	AhenkDistributionMethodPage admPage = new AhenkDistributionMethodPage(config);
-	AhenkInstallationStatusPage aisPage = new AhenkInstallationStatusPage(config);
+	AhenkSetupLocationPage locationPage = new AhenkSetupLocationPage(config);
+	AhenkConnectionMethodPage accessPage = new AhenkConnectionMethodPage(config);
+	AhenkInstallationMethodPage installMethodPage = new AhenkInstallationMethodPage(config);
+	AhenkDistributionMethodPage distMethodPage = new AhenkDistributionMethodPage(config);
+	AhenkConfirmPage confirmPage = new AhenkConfirmPage(config);
+	AhenkInstallationStatusPage statusPage = new AhenkInstallationStatusPage(config);
 	
 	@Override
 	public void addPages() {
 		// Add first page as default, so the wizard can show it on startup
-		addPage(aslPage);
-		addPage(acmPage);
-		addPage(aimPage);
-		addPage(admPage);
-		addPage(aisPage);
+		addPage(locationPage);
+		addPage(accessPage);
+		addPage(installMethodPage);
+		addPage(distMethodPage);
+		addPage(confirmPage);
+		addPage(statusPage);
 		
 		// set this to true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
@@ -205,13 +208,7 @@ public class AhenkSetupWizard extends Wizard {
 	@Override
 	public boolean performFinish() {
 		
-		AhenkStatusDialog statusDialog = new AhenkStatusDialog(getShell());
-		//TODO set config (Burada ne demek istemişim hatırlamıyorum?)
-		
 		getContainer().getShell().setVisible(false);
-		
-		statusDialog.setConfig(config);
-		statusDialog.open();
 		
 		return false;
 	}

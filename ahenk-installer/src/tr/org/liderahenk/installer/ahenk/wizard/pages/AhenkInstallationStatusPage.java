@@ -1,43 +1,47 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
-import tr.org.liderahenk.installer.ahenk.utils.AhenkInstallationUtil;
+import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
+import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
 
-public class AhenkInstallationStatusPage extends WizardPage {
+public class AhenkInstallationStatusPage extends WizardPage implements ControlNextEvent, InstallationStatusPage {
 
 	private AhenkSetupConfig config = null;
 
 	// Widgets
 	private Composite mainContainer = null;
 
-	private ProgressBar progressBar = null;
+	private ProgressBar progressBar;
 
-	private Button startInstallation = null;
+	private Text txtLogConsole;
 
-	private Table table;
+	private NextPageEventType nextPageEventType;
 
-	private Label label;
+	boolean isInstallationFinished = false;
 
-	private Composite childContainer = null;
+	boolean canGoBack = false;
 
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -56,51 +60,163 @@ public class AhenkInstallationStatusPage extends WizardPage {
 	public void createControl(Composite parent) {
 
 		// create main container
-		mainContainer = new Composite(parent, SWT.NONE);
-		mainContainer.setLayout(new GridLayout(1, false));
+		mainContainer = GUIHelper.createComposite(parent, 1);
 		setControl(mainContainer);
 
-		childContainer = new Composite(mainContainer, SWT.NONE);
-		childContainer.setLayout(new GridLayout(2, false));
-
-		label = new Label(childContainer, SWT.NONE);
-		label.setText(Messages.getString("AHENK_WILL_BE_INSTALLED_TO_MACHINES_WITH_IPS_GIVEN_BELOW") + " "
-				+ Messages.getString("WOULD_YOU_LIKE_TO_CONTINUE"));
-
-		startInstallation = new Button(childContainer, SWT.PUSH);
-		startInstallation.setText(Messages.getString("START_INSTALLATION"));
-		startInstallation.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				try {
-					progressBar.setVisible(true);
-					startInstallation.setVisible(false);
-					AhenkInstallationUtil.installAhenk(config, progressBar, table, label);
-				} catch (Exception exception) {
-
-				}
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
+		txtLogConsole = GUIHelper.createText(mainContainer, new GridData(GridData.FILL_BOTH),
+				SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 
 		progressBar = new ProgressBar(mainContainer, SWT.SMOOTH | SWT.HORIZONTAL);
 		progressBar.setSelection(0);
-		progressBar.setVisible(false);
+		progressBar.setMaximum(100);
+
 		GridData progressGd = new GridData();
 		progressGd.heightHint = 40;
-		progressGd.widthHint = 500;
 		progressBar.setLayoutData(progressGd);
 
 	}
 
 	@Override
-	public boolean canFlipToNextPage() {
+	public IWizardPage getNextPage() {
+		// Start Ahenk installation here.
+		// To prevent triggering installation again
+		// // (i.e. when clicked "next" after installation finished),
+		// set isInstallationFinished to true when its done.
+		if (super.isCurrentPage() && !isInstallationFinished
+				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			final Display display = Display.getCurrent();
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					
+					setPageCompleteAsync(false);
+					
+					printMessage("Initializing installation...");
+					setProgressBar(10);
+					
+					printMessage("Installing package...");
+					
+					// If installation method is not set, show an error message
+					// and do not try to install
+					if (config.getAhenkInstallMethod() == InstallMethod.APT_GET
+							|| config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
+						
+						for (final String ip : config.getIpList()) {
+							
+							final Display display = Display.getCurrent();
+							
+							Runnable runnable = new Runnable() {
+								@Override
+								public void run() {
+									try {
+										if (config.getAhenkInstallMethod() == InstallMethod.APT_GET) {
+											printMessage("Ahenk is being installed to: " + ip + " from catalog.");
+											// port eklenecek
+											SetupUtils.installPackage(ip, config.getUsername(), config.getPassword(), 22, config.getPrivateKeyAbsPath(), "ahenk", null);
+										} else {
+											printMessage("Ahenk is being installed to: " + ip + " from given DEB package.");
+											
+											File debPackage = new File(config.getDebFileAbsPath());
+											// port eklenecek
+											SetupUtils.installPackage(ip, config.getUsername(), config.getPassword(), 22, config.getPrivateKeyAbsPath(), debPackage);
+										}
 
-		return super.canFlipToNextPage();
+										printMessage("Ahenk has been successfully installed to: " + ip);
+										
+										// TODO message: konfigürasyon yapılacak lütfen bekleyin.
+										// TODO konfigürasyonu yap.
+										
+									} catch (SSHConnectionException e) {
+										isInstallationFinished = false;
+										// If any error occured user should be
+										// able to go
+										// back and change selections etc.
+										canGoBack = true;
+										printMessage("Error occurred: " + e.getMessage());
+										e.printStackTrace();
+									} catch (CommandExecutionException e) {
+										isInstallationFinished = false;
+										// If any error occured user should be
+										// able to go
+										// back and change selections etc.
+										canGoBack = true;
+										printMessage("Error occurred: " + e.getMessage());
+										e.printStackTrace();
+									}
+									
+									
+								}
+
+							};
+							
+							Thread thread = new Thread(runnable);
+							thread.start();
+						}
+					}
+				}
+				/**
+				 * Prints log message to the log console widget
+				 * 
+				 * @param message
+				 */
+				private void printMessage(final String message) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+									? txtLogConsole.getText() + "\n" : "") + message);
+						}
+					});
+				}
+				
+				/**
+				 * Sets progress bar selection
+				 * 
+				 * @param selection
+				 */
+				private void setProgressBar(final int selection) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							progressBar.setSelection(selection);
+						}
+					});
+				}
+
+				/**
+				 * Sets page complete status asynchronously.
+				 * 
+				 * @param isComplete
+				 */
+				private void setPageCompleteAsync(final boolean isComplete) {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							setPageComplete(isComplete);
+						}
+					});
+				}
+			};
+			
+			Thread thread = new Thread(runnable);
+			thread.start();
+		}
+		
+		return super.getNextPage();
 	}
 
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
+	}
 }
