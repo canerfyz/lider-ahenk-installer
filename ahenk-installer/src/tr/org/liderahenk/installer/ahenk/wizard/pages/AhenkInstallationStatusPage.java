@@ -79,135 +79,291 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	@Override
 	public IWizardPage getNextPage() {
 		// Start Ahenk installation here.
-		// To prevent triggering installation again
-		// // (i.e. when clicked "next" after installation finished),
-		// set isInstallationFinished to true when its done.
+		// To prevent triggering installation again (i.e. when clicked "next"
+		// after installation finished), set isInstallationFinished to true when
+		// its done.
 		if (super.isCurrentPage() && !isInstallationFinished
 				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
-			final Display display = Display.getCurrent();
-			Runnable runnable = new Runnable() {
-				@Override
-				public void run() {
-					
-					setPageCompleteAsync(false);
-					
-					printMessage("Initializing installation...");
-					setProgressBar(10);
-					
-					printMessage("Installing package...");
-					
-					// If installation method is not set, show an error message
-					// and do not try to install
-					if (config.getAhenkInstallMethod() == InstallMethod.APT_GET
-							|| config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						
-						for (final String ip : config.getIpList()) {
-							
-							final Display display = Display.getCurrent();
-							
-							Runnable runnable = new Runnable() {
-								@Override
-								public void run() {
-									try {
-										if (config.getAhenkInstallMethod() == InstallMethod.APT_GET) {
-											printMessage("Ahenk is being installed to: " + ip + " from catalog.");
-											// port eklenecek
-											SetupUtils.installPackage(ip, config.getUsername(), config.getPassword(), 22, config.getPrivateKeyAbsPath(), "ahenk", null);
-										} else {
-											printMessage("Ahenk is being installed to: " + ip + " from given DEB package.");
-											
-											File debPackage = new File(config.getDebFileAbsPath());
-											// port eklenecek
-											SetupUtils.installPackage(ip, config.getUsername(), config.getPassword(), 22, config.getPrivateKeyAbsPath(), debPackage);
-										}
 
-										printMessage("Ahenk has been successfully installed to: " + ip);
-										
-										// TODO message: konfigürasyon yapılacak lütfen bekleyin.
-										// TODO konfigürasyonu yap.
-										
-									} catch (SSHConnectionException e) {
-										isInstallationFinished = false;
-										// If any error occured user should be
-										// able to go
-										// back and change selections etc.
-										canGoBack = true;
-										printMessage("Error occurred: " + e.getMessage());
-										e.printStackTrace();
-									} catch (CommandExecutionException e) {
-										isInstallationFinished = false;
-										// If any error occured user should be
-										// able to go
-										// back and change selections etc.
-										canGoBack = true;
-										printMessage("Error occurred: " + e.getMessage());
-										e.printStackTrace();
-									}
-									
-									
-								}
+			setPageCompleteAsync(false, Display.getCurrent());
 
-							};
-							
-							Thread thread = new Thread(runnable);
-							thread.start();
-						}
-					}
-				}
-				/**
-				 * Prints log message to the log console widget
-				 * 
-				 * @param message
-				 */
-				private void printMessage(final String message) {
-					display.asyncExec(new Runnable() {
+			setProgressBar(10, Display.getCurrent());
+
+			printMessage("Initializing installation...", Display.getCurrent());
+			
+			// Check installation method
+			if (config.getAhenkInstallMethod() == InstallMethod.APT_GET) {
+
+				// Calculate progress bar increment size
+				final Integer increment = (Integer) (70 / config.getIpList().size());
+
+				for (int i = 0; i < config.getIpList().size(); i++) {
+
+					final int index = i;
+					
+					final String ip = config.getIpList().get(i);
+					
+					final Display display = Display.getCurrent();
+
+					final int selection = progressBar.getSelection();
+
+					// Execute each installation in a new thread.
+					Runnable runnable = new Runnable() {
 						@Override
 						public void run() {
 							try {
-								Thread.sleep(500);
-							} catch (InterruptedException e) {
+								printMessage("Trying to connect to: " + ip, display);
+
+								// Check authorization before starting
+								// installation
+								// TODO port eklenecek
+								final boolean canConnect = SetupUtils.canConnectViaSsh(ip, config.getUsernameCm(),
+										config.getPasswordCm(), 22, config.getPrivateKeyAbsPath());
+
+								// If we can connect to machine
+								if (canConnect) {
+									printMessage("Successfully connected to: " + ip, display);
+
+									printMessage("Ahenk is being installed to: " + ip + " from catalog.", display);
+
+									// TODO port eklenecek
+									SetupUtils.installPackage(ip, config.getUsernameCm(), config.getPasswordCm(), 22,
+											config.getPrivateKeyAbsPath(), "ahenk", null);
+
+									setProgressBar(selection + increment, display);
+
+									printMessage("Ahenk has been successfully installed to: " + ip, display);
+									
+									if (index == config.getIpList().size() - 1) {
+										printMessage("Installation finished.", display);
+										
+										setProgressBar(100, display);
+										
+										updateFinishButton(display);
+									}
+								}
+
+							} catch (SSHConnectionException e) {
+								// Also update progress bar when installation
+								// fails
+								setProgressBar(selection + increment, display);
+
+								isInstallationFinished = false;
+
+								// If any error occured user should be able to
+								// go back and change selections etc.
+								canGoBack = true;
+
+								printMessage("Error occurred: " + e.getMessage(), display);
+
+								e.printStackTrace();
+							} catch (CommandExecutionException e) {
+								// Also update progress bar when installation
+								// fails
+								setProgressBar(selection + increment, display);
+
+								isInstallationFinished = false;
+
+								// If any error occured user should be able to
+								// go back and change selections etc.
+								canGoBack = true;
+
+								printMessage("Error occurred: " + e.getMessage(), display);
+
 								e.printStackTrace();
 							}
-							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
-									? txtLogConsole.getText() + "\n" : "") + message);
 						}
-					});
-				}
-				
-				/**
-				 * Sets progress bar selection
-				 * 
-				 * @param selection
-				 */
-				private void setProgressBar(final int selection) {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							progressBar.setSelection(selection);
-						}
-					});
+					};
+
+					Thread thread = new Thread(runnable);
+					thread.start();
 				}
 
-				/**
-				 * Sets page complete status asynchronously.
-				 * 
-				 * @param isComplete
-				 */
-				private void setPageCompleteAsync(final boolean isComplete) {
-					display.asyncExec(new Runnable() {
+				printMessage("Ahenk installation finished.", Display.getCurrent());
+			} else if (config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
+
+				// Calculate progress bar increment size
+				final Integer increment = (Integer) (70 / config.getIpList().size());
+
+				final int selection = progressBar.getSelection();
+				
+				// Execute each installation in a new thread.
+				for (int i = 0; i < config.getIpList().size(); i++) {
+
+					final int index = i;
+					
+					final String ip = config.getIpList().get(i);
+					
+					final Display display = Display.getCurrent();
+
+					Runnable runnable = new Runnable() {
 						@Override
 						public void run() {
-							setPageComplete(isComplete);
+							try {
+
+								printMessage("Trying to connect to: " + ip, display);
+
+								// TODO port eklenecek
+								final boolean canConnect = SetupUtils.canConnectViaSsh(ip, config.getUsernameCm(),
+										config.getPasswordCm(), 22, config.getPrivateKeyAbsPath());
+
+								if (canConnect) {
+									printMessage("Successfully connected to: " + ip, display);
+
+									printMessage("Ahenk is being installed to: " + ip + " from given DEB package.",
+											display);
+
+									File debPackage = new File(config.getDebFileAbsPath());
+
+									// TODO port eklenecek
+									SetupUtils.installPackage(ip, config.getUsernameCm(), config.getPasswordCm(), 22,
+											config.getPrivateKeyAbsPath(), debPackage);
+
+									setProgressBar(selection + increment, display);
+
+									printMessage("Ahenk has been successfully installed to: " + ip, display);
+									
+									if (index == config.getIpList().size() - 1) {
+										printMessage("Installation finished.", display);
+										
+										setProgressBar(100, display);
+										
+										isInstallationFinished = true;
+										
+										updateFinishButton(display);
+									}
+								}
+
+							} catch (SSHConnectionException e) {
+								// Also update progress bar when installation
+								// fails
+								setProgressBar(selection + increment, display);
+
+								isInstallationFinished = false;
+
+								// If any error occured user should be able to
+								// go back and change selections etc.
+								canGoBack = true;
+
+								printMessage("Error occurred: " + e.getMessage(), display);
+
+								e.printStackTrace();
+							} catch (CommandExecutionException e) {
+								// Also update progress bar when installation
+								// fails
+								setProgressBar(selection + increment, display);
+
+								isInstallationFinished = false;
+
+								// If any error occured user should be able to
+								// go back and change selections etc.
+								canGoBack = true;
+
+								printMessage("Error occurred: " + e.getMessage(), display);
+
+								e.printStackTrace();
+							}
 						}
-					});
+					};
+
+					Thread thread = new Thread(runnable);
+					thread.start();
 				}
-			};
+
+			} else {
+				// If installation method is not set, show an error message and
+				// do not try to install
+				isInstallationFinished = false;
+
+				// If any error occured user should be able to go back and
+				// change selections etc.
+				canGoBack = true;
+
+				// Set progress bar to complete
+				setProgressBar(100, Display.getCurrent());
+
+				printMessage("Invalid installation method. Installation cancelled.", Display.getCurrent());
+			}
 			
-			Thread thread = new Thread(runnable);
-			thread.start();
+			setPageCompleteAsync(isInstallationFinished, Display.getCurrent());
 		}
-		
 		return super.getNextPage();
+	}
+
+	/**
+	 * Prints log message to the log console widget
+	 * 
+	 * @param message
+	 */
+	private void printMessage(final String message, Display display) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+						? txtLogConsole.getText() + "\n" : "") + message);
+			}
+		});
+	}
+
+	/**
+	 * Sets progress bar selection
+	 * 
+	 * @param selection
+	 */
+	private void setProgressBar(final int selection, Display display) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				progressBar.setSelection(selection);
+			}
+		});
+	}
+
+	/**
+	 * Sets page complete status asynchronously.
+	 * 
+	 * @param isComplete
+	 */
+	private void setPageCompleteAsync(final boolean isComplete, Display display) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				setPageComplete(isComplete);
+			}
+		});
+	}
+	
+	/**
+	 * Updates finish button asynchronously.
+	 */
+	private void updateFinishButton(Display display) {
+		display.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				getContainer().updateButtons();
+			}
+		});
+	}
+	
+	@Override
+	public IWizardPage getPreviousPage() {
+		// Do not allow to go back from this page if installation completed successfully.
+		if (canGoBack) {
+			return super.getPreviousPage();
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

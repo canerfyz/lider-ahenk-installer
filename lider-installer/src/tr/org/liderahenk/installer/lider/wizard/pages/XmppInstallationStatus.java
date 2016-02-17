@@ -301,8 +301,13 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		// Do not allow to go back from this page.
-		return null;
+		// Do not allow to go back from this page if installation completed successfully.
+		if (canGoBack) {
+			return super.getPreviousPage();
+		}
+		else {
+			return null;
+		}
 	}
 
 	/**

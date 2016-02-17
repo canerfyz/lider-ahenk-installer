@@ -8,16 +8,17 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
-import tr.org.liderahenk.installer.ahenk.dialogs.AhenkStatusDialog;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConfirmPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConnectionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkDistributionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationStatusPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkSetupLocationPage;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.InstallationStatusPage;
 
 public class AhenkSetupWizard extends Wizard {
 
@@ -215,15 +216,12 @@ public class AhenkSetupWizard extends Wizard {
 
 	@Override
 	public boolean canFinish() {
-		//If the current page is last page of installation,
-		//then enable finish button. 
-		// Burası "eğer bu current sayfa InstallationStatus sayfasıysa" diye check edilecek.
-		// Ve kurulum bittiğinde config'e installationCompleted variable'ı koyup set edip 
-		// getWizard().getContainer().updateButtons() çalıştırıp
-		// bu canFinish methodunu tetikliycem.
-		if (getContainer().getCurrentPage().getName().equals(this.getPagesList().getLast().getName())) {
+		// If current page is the last page of this wizard
+		// then enable finish button.
+		if ((WizardPage) getContainer().getCurrentPage() instanceof InstallationStatusPage) {
 			return true;
 		}
+
 		return false;
 	}
 	
