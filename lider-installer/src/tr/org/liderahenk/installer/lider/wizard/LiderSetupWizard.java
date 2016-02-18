@@ -72,7 +72,7 @@ public class LiderSetupWizard extends Wizard {
 	XmppConfPage xmppConfPage = new XmppConfPage(config);
 	XmppConfirmPage xmppConfirm = new XmppConfirmPage(config);
 	XmppInstallationStatus xmppStatus = new XmppInstallationStatus(config);
-	
+
 	LiderAccessPage liderAccess = new LiderAccessPage(config);
 	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
 	LiderConfPage liderConfPage = new LiderConfPage(config);
@@ -84,7 +84,7 @@ public class LiderSetupWizard extends Wizard {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(compSelect);
 		addPage(locatOfComps);
-		
+
 		// Database configuration
 		addPage(dbAccess);
 		addPage(dbInstallMethod);
@@ -108,7 +108,7 @@ public class LiderSetupWizard extends Wizard {
 		addPage(liderConfPage);
 		addPage(liderConfirm);
 		addPage(liderStatus);
-		
+
 		// Set this as true to override needsPreviousAndNextButtons() method
 		setForcePreviousAndNextButtons(true);
 	}
@@ -268,8 +268,9 @@ public class LiderSetupWizard extends Wizard {
 	@Override
 	public boolean canFinish() {
 		// If current page is the last page of this wizard
-		// then enable finish button.
-		if (PageFlowHelper.isLastPage(config, (WizardPage) getContainer().getCurrentPage())) {
+		// and installation is finished then enable finish button.
+		if (PageFlowHelper.isLastPage(config, (WizardPage) getContainer().getCurrentPage())
+				&& config.isInstallationFinished()) {
 			return true;
 		}
 

@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.util.Policy;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
@@ -18,7 +17,6 @@ import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkDistributionMethodPag
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationStatusPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkSetupLocationPage;
-import tr.org.liderahenk.installer.ahenk.wizard.pages.InstallationStatusPage;
 
 public class AhenkSetupWizard extends Wizard {
 
@@ -216,9 +214,8 @@ public class AhenkSetupWizard extends Wizard {
 
 	@Override
 	public boolean canFinish() {
-		// If current page is the last page of this wizard
-		// then enable finish button.
-		if ((WizardPage) getContainer().getCurrentPage() instanceof InstallationStatusPage) {
+		// If installation is finished then enable finish button.
+		if (config.isInstallationFinished()) {
 			return true;
 		}
 

@@ -52,6 +52,10 @@ public class AhenkSetupConfig {
 	private boolean useScp;
 	private boolean useTorrent;
 
+	/**
+	 * This variable is used to enable/disable finish button 
+	 */
+	private boolean isInstallationFinished = false;
 	
 	// ------ Getter Setter ----- //
 	public boolean isInstallAhenkLocally() {
@@ -180,6 +184,14 @@ public class AhenkSetupConfig {
 
 	public void setAhenkInstallMethod(InstallMethod ahenkInstallMethod) {
 		this.ahenkInstallMethod = ahenkInstallMethod;
+	}
+
+	public boolean isInstallationFinished() {
+		return isInstallationFinished;
+	}
+
+	public void setInstallationFinished(boolean isInstallationFinished) {
+		this.isInstallationFinished = isInstallationFinished;
 	}
 
 }

@@ -191,7 +191,6 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 							printMessage("Installation finished..");
 
-							updateFinishButton();
 							// --------------------------------------------//
 
 							// ----- Add Users to SRG ----- //
@@ -202,6 +201,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// TODO Add all users to ahenk srg by default (hint: @all@)
 							
 							isInstallationFinished = true;
+							
+							config.setInstallationFinished(isInstallationFinished);
 
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
@@ -278,17 +279,6 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 					});
 				}
 
-				/**
-				 * Updates finish button asynchronously.
-				 */
-				private void updateFinishButton() {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							getContainer().updateButtons();
-						}
-					});
-				}
 			};
 
 			Thread thread = new Thread(runnable);

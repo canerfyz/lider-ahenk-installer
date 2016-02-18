@@ -1,7 +1,5 @@
 package tr.org.liderahenk.installer.lider.config;
 
-import java.io.File;
-
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
@@ -351,6 +349,11 @@ public class LiderSetupConfig {
 	 * Lider configuration file content
 	 */
 	private String liderConfContent;
+	
+	/**
+	 * This variable is used to enable/disable finish button 
+	 */
+	private boolean isInstallationFinished = false;
 	
 	/**
 	 * ###################################
@@ -830,6 +833,14 @@ public class LiderSetupConfig {
 
 	public void setXmppAbsPathConfFile(String xmppAbsPathConfFile) {
 		this.xmppAbsPathConfFile = xmppAbsPathConfFile;
+	}
+
+	public boolean isInstallationFinished() {
+		return isInstallationFinished;
+	}
+
+	public void setInstallationFinished(boolean isInstallationFinished) {
+		this.isInstallationFinished = isInstallationFinished;
 	}
 
 }
