@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
@@ -31,6 +32,8 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 	private Text txtLogConsole;
 
 	boolean isInstallationFinished = false;
+	
+	boolean canGoBack = false;
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
 		super(DatabaseInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -176,7 +179,8 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 			thread.start();
 		}
 
-		return super.getNextPage();
+		// Select next page.
+		return PageFlowHelper.selectNextPage(config, this);
 	}
 
 	/**
@@ -194,10 +198,13 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		/**
-		 * Do not allow to go back from this page.
-		 */
-		return null;
+		// Do not allow to go back from this page if installation completed successfully.
+		if (canGoBack) {
+			return super.getPreviousPage();
+		}
+		else {
+			return null;
+		}
 	}
 
 }

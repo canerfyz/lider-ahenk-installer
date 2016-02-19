@@ -135,8 +135,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													display);
 
 											// TODO port eklenecek
+											// TODO gedit değiştirilecek
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), 22, config.getPrivateKeyAbsPath(), "ahenk",
+													config.getPasswordCm(), 22, config.getPrivateKeyAbsPath(), "gedit",
 													null);
 
 											setProgressBar(increment, display);
@@ -210,7 +211,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										if (canConnect) {
 											printMessage("Successfully connected to: " + ip, display);
 
-											printMessage("Ahenk is being installed to: " + ip + " from catalog.",
+											printMessage("Ahenk is being installed to: " + ip + " from provided DEB file.",
 													display);
 
 											File debPackage = new File(config.getDebFileAbsPath());
