@@ -56,7 +56,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 		progressBar = new ProgressBar(container, SWT.SMOOTH | SWT.HORIZONTAL);
 		progressBar.setSelection(0);
 		progressBar.setMaximum(100);
-	
+
 		GridData progressGd = new GridData(GridData.FILL_HORIZONTAL);
 		progressGd.heightHint = 40;
 		progressBar.setLayoutData(progressGd);
@@ -64,6 +64,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	@Override
 	public IWizardPage getNextPage() {
+
 		// Start XMPP installation here.
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
@@ -76,7 +77,12 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 				@Override
 				public void run() {
 
-					setPageCompleteAsync(false);
+					// Clear text log console and progress bar before starting
+					// installation.
+					clearLogConsole();
+					setProgressBar(0);
+
+					setPageCompleteAsync(isInstallationFinished);
 
 					printMessage("Initializing installation...");
 					setProgressBar(10);
@@ -120,10 +126,6 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							printMessage("Configuration file successfully set.");
 							setProgressBar(60);
 
-							// Delete the configuration file created in /tmp
-							deleteFile("ejabberd.yml");
-							// ------------------------------------------------------------//
-
 							// ------ Configure /etc/hosts file ---//
 							printMessage("Configuring hosts file for Ejabberd..");
 
@@ -149,7 +151,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// Lider SRG
 							String createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "lider-srg",
 									config.getXmppHostname(), "Lider-SRG", "Lider-SRG", "lider-srg, ahenk-srg" });
-							
+
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									createSrg);
@@ -157,11 +159,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// Ahenk SRG
 							createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "ahenk-srg",
 									config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "lider-srg" });
-							
+
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									createSrg);
-							// ------------------------------------------------//
+									// ------------------------------------------------//
 
 							// ---------- Create Ejabberd users -----------//
 							printMessage("Creating Ejabberd users..");
@@ -187,22 +189,29 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 									register);
 							printMessage("Ejabberd user: " + config.getXmppLiderUsername()
 									+ " has been successfully created");
-							setProgressBar(100);
+							setProgressBar(95);
+							// --------------------------------------------//
+
+							isInstallationFinished = true;
+
+							// If installation finished delete the configuration
+							// file created in /tmp
+							if (isInstallationFinished) {
+								deleteFile("ejabberd.yml");
+							}
+							// ------------------------------------------------------------//
+
+							config.setInstallationFinished(isInstallationFinished);
 
 							printMessage("Installation finished..");
 
-							// --------------------------------------------//
-
 							// ----- Add Users to SRG ----- //
-							// TODO 
-							// TODO 
-							// TODO 
+							// TODO
+							// TODO
+							// TODO
 							// --------------------------//
-							// TODO Add all users to ahenk srg by default (hint: @all@)
-							
-							isInstallationFinished = true;
-							
-							config.setInstallationFinished(isInstallationFinished);
+							// TODO Add all users to ahenk srg by default (hint:
+							// @all@)
 
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
@@ -252,6 +261,23 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 				}
 
 				/**
+				 * Clears log console by set its content to empty string.
+				 */
+				private void clearLogConsole() {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							txtLogConsole.setText("");
+						}
+					});
+				}
+
+				/**
 				 * Sets progress bar selection
 				 * 
 				 * @param selection
@@ -291,10 +317,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		// Do not allow to go back from this page if installation completed successfully.
+		// Do not allow to go back from this page if installation completed
+		// successfully.
 		if (canGoBack) {
 			return super.getPreviousPage();
-		}
+		} 
 		else {
 			return null;
 		}
@@ -343,5 +370,4 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
-
 }

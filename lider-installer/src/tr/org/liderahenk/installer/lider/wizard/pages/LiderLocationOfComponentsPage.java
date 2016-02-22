@@ -275,8 +275,10 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private void organizeInnerFields() {
 		// If it is the first selection
 		// then select local installation as default
-		// (that means both of them not selected)
-		btnLocal.setSelection(!(btnLocal.getSelection() && btnRemote.getSelection()));
+		if (btnInstallCentral.getSelection() && !btnRemote.getSelection()) {
+			btnLocal.setSelection(true);
+		}
+		
 		// If 'install to remote' is selected
 		// then enable IP text field
 		txtRemoteIp.setEnabled(btnRemote.getSelection());

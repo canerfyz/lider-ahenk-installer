@@ -250,7 +250,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 			String readingText = "";
 
 			while ((currentLine = br.readLine()) != null) {
-				// Platforn independent line separator.
+				// Platform independent line separator.
 				readingText += currentLine + System.getProperty("line.separator");
 			}
 

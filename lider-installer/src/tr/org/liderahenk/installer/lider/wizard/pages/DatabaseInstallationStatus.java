@@ -15,6 +15,7 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -24,15 +25,18 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class DatabaseInstallationStatus extends WizardPage implements IDatabasePage {
+public class DatabaseInstallationStatus extends WizardPage
+		implements IDatabasePage, ControlNextEvent, InstallationStatusPage {
 
 	private LiderSetupConfig config;
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
 
+	private NextPageEventType nextPageEventType;
+
 	boolean isInstallationFinished = false;
-	
+
 	boolean canGoBack = false;
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
@@ -60,16 +64,25 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	@Override
 	public IWizardPage getNextPage() {
+
 		// Start database installation here.
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
-		if (super.isCurrentPage() && !isInstallationFinished) {
+		if (super.isCurrentPage() && !isInstallationFinished
+				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
 			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
+
+					// Clear text log console and progress bar before starting
+					// installation.
+					clearLogConsole();
+					setProgressBar(0);
+
+					setPageCompleteAsync(isInstallationFinished);
 
 					printMessage("Initializing installation...");
 					setProgressBar(10);
@@ -86,15 +99,24 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
 									config.getDatabasePackageName(), null, debconfValues);
+
 							setProgressBar(90);
+
 							isInstallationFinished = true;
+
 							printMessage("Successfully installed package: " + config.getDatabasePackageName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -104,24 +126,40 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
+
 							setProgressBar(90);
+
 							isInstallationFinished = true;
+
 							printMessage("Successfully installed package: " + deb.getName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
 					} else {
 						isInstallationFinished = false;
+						// If any error occured user should be able to go
+						// back and change selections etc.
+						canGoBack = true;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-
 					setProgressBar(100);
+
+					config.setInstallationFinished(isInstallationFinished);
+
+					printMessage("Installation finished..");
+
 					setPageCompleteAsync(isInstallationFinished);
 				}
 
@@ -141,6 +179,23 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 							}
 							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 									? txtLogConsole.getText() + "\n" : "") + message);
+						}
+					});
+				}
+
+				/**
+				 * Clears log console by set its content to empty string.
+				 */
+				private void clearLogConsole() {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Thread.sleep(500);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							txtLogConsole.setText("");
 						}
 					});
 				}
@@ -172,7 +227,6 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 						}
 					});
 				}
-
 			};
 
 			Thread thread = new Thread(runnable);
@@ -198,13 +252,23 @@ public class DatabaseInstallationStatus extends WizardPage implements IDatabaseP
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		// Do not allow to go back from this page if installation completed successfully.
+		// Do not allow to go back from this page if installation completed
+		// successfully.
 		if (canGoBack) {
 			return super.getPreviousPage();
-		}
-		else {
+		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }

@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 
 /**
@@ -55,6 +56,8 @@ public class AhenkConnectionMethodPage extends WizardPage {
 	private FileDialog fileDialog = null; 
 	
 	private String fileDialogResult = null;
+
+	private Text portTxt;
 	
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -224,6 +227,22 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		passphraseTxt.setLayoutData(gdPassphrase);
 		passphraseTxt.setEnabled(false);
 		
+		Composite portComp = new Composite(mainContainer, SWT.NONE);
+		
+		GridLayout glPort = new GridLayout(2, false);
+		portComp.setLayout(glPort);
+		
+		Label port = new Label(portComp, SWT.SINGLE);
+		port.setText(Messages.getString("PLEASE_ENTER_PORT"));
+		
+		portTxt = GUIHelper.createText(portComp);
+		portTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
+		
 		setPageComplete(false);
 	}
 	
@@ -231,6 +250,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		
 		boolean userInfoEntered;
 		boolean privateKeyEntered;
+		boolean portEntered;
 		
 		//If "Use username and password" is selected, username and password fields must be entered.
 		if (userPassBtn.getSelection()) {
@@ -259,9 +279,16 @@ public class AhenkConnectionMethodPage extends WizardPage {
 			privateKeyEntered = true;
 		}
 		
-		setPageComplete(userInfoEntered && privateKeyEntered);
+		if (!"".equals(portTxt.getText()) && portTxt.getText() != null) {
+			portEntered = true;
+		}
+		else {
+			portEntered = false;
+		}
 		
-		return userInfoEntered && privateKeyEntered;
+		setPageComplete(userInfoEntered && privateKeyEntered && portEntered);
+		
+		return userInfoEntered && privateKeyEntered && portEntered;
 	}
 	
 	private void organizeFields() {
@@ -301,6 +328,10 @@ public class AhenkConnectionMethodPage extends WizardPage {
 				config.setPassphrase(passphrase.getText());
 			}
 		}
+		
+		config.setPort(portTxt.getText() != null && !portTxt.getText().isEmpty()
+				? new Integer(portTxt.getText()) : null);
+		
 		return super.getNextPage();
 	}
 

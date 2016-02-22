@@ -10,6 +10,7 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -53,10 +54,20 @@ public class DatabaseConfirmPage extends WizardPage implements IDatabasePage {
 
 	@Override
 	public IWizardPage getNextPage() {
-		/**
-		 * Set the IP info in the opening of page
-		 */
+		// Set the IP info in the opening of page
 		lblIp.setText("- IP: " + config.getDatabaseIp());
+
+		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+
+		// Set page complete to true, otherwise it does not go into getNextPage
+		// method of DatabaseInstallationStatus page.
+		((WizardPage) super.getNextPage()).setPageComplete(true);
+
+		// Set global variable to false before every installation status page,
+		// if it is not set and there are more than one component to be
+		// installed, finish button will be enabled directly in the last
+		// installation page.
+		config.setInstallationFinished(false);
 
 		return super.getNextPage();
 	}

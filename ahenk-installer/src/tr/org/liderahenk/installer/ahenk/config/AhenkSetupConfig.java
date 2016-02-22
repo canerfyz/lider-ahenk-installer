@@ -57,6 +57,11 @@ public class AhenkSetupConfig {
 	 */
 	private boolean isInstallationFinished = false;
 	
+	/**
+	 * Port for SSH connection.
+	 */
+	private Integer port;
+	
 	// ------ Getter Setter ----- //
 	public boolean isInstallAhenkLocally() {
 		return installAhenkLocally;
@@ -192,6 +197,14 @@ public class AhenkSetupConfig {
 
 	public void setInstallationFinished(boolean isInstallationFinished) {
 		this.isInstallationFinished = isInstallationFinished;
+	}
+
+	public Integer getPort() {
+		return port;
+	}
+
+	public void setPort(Integer port) {
+		this.port = port;
 	}
 
 }

@@ -122,9 +122,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										printMessage("Trying to connect to: " + ip, display);
 
 										// Check authorization before starting installation
-										// TODO port eklenecek
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
-												config.getUsernameCm(), config.getPasswordCm(), 22,
+												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
 												config.getPrivateKeyAbsPath());
 
 										// If we can connect to machine install Ahenk
@@ -134,10 +133,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											printMessage("Ahenk is being installed to: " + ip + " from catalog.",
 													display);
 
-											// TODO port eklenecek
 											// TODO gedit değiştirilecek
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), 22, config.getPrivateKeyAbsPath(), "gedit",
+													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), "gedit",
 													null);
 
 											setProgressBar(increment, display);
@@ -202,9 +200,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										printMessage("Trying to connect to: " + ip, display);
 
 										// Check authorization before starting installation
-										// TODO port eklenecek
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
-												config.getUsernameCm(), config.getPasswordCm(), 22,
+												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
 												config.getPrivateKeyAbsPath());
 
 										// If we can connect to machine install Ahenk
@@ -216,9 +213,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											File debPackage = new File(config.getDebFileAbsPath());
 
-											// TODO port eklenecek
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), 22, config.getPrivateKeyAbsPath(),
+													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(),
 													debPackage);
 											
 											setProgressBar(increment, display);
