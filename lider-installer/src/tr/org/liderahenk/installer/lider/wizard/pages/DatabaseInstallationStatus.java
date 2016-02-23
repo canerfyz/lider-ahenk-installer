@@ -9,11 +9,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
+import tr.org.liderahenk.installer.lider.wizard.dialogs.DatabaseWarningDialog;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
@@ -73,16 +75,18 @@ public class DatabaseInstallationStatus extends WizardPage
 				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
 			final Display display = Display.getCurrent();
+			final Shell shell = display.getActiveShell();
+
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
+
+					setPageCompleteAsync(isInstallationFinished);
 
 					// Clear text log console and progress bar before starting
 					// installation.
 					clearLogConsole();
 					setProgressBar(0);
-
-					setPageCompleteAsync(isInstallationFinished);
 
 					printMessage("Initializing installation...");
 					setProgressBar(10);
@@ -98,7 +102,8 @@ public class DatabaseInstallationStatus extends WizardPage
 							SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabasePackageName(), null, debconfValues);
+									config.getDatabaseAccessPassphrase(), config.getDatabasePackageName(), null,
+									debconfValues);
 
 							setProgressBar(90);
 
@@ -125,7 +130,8 @@ public class DatabaseInstallationStatus extends WizardPage
 						try {
 							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-									config.getDatabasePort(), config.getDatabaseAccessKeyPath(), deb, debconfValues);
+									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
+									config.getDatabaseAccessPassphrase(), deb, debconfValues);
 
 							setProgressBar(90);
 
@@ -161,6 +167,24 @@ public class DatabaseInstallationStatus extends WizardPage
 					printMessage("Installation finished..");
 
 					setPageCompleteAsync(isInstallationFinished);
+
+					if (!config.getDatabaseIp().equals(config.getLiderIp())) {
+						openWarningDialog();
+					}
+
+				}
+
+				private void openWarningDialog() {
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							// Create a dialog
+							DatabaseWarningDialog warningDialog = new DatabaseWarningDialog(shell);
+
+							// Open it
+							warningDialog.open();
+						}
+					});
 				}
 
 				/**

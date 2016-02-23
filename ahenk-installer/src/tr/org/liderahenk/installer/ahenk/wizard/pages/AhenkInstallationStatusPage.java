@@ -124,7 +124,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// Check authorization before starting installation
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
 												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-												config.getPrivateKeyAbsPath());
+												config.getPrivateKeyAbsPath(), config.getPassphrase());
 
 										// If we can connect to machine install Ahenk
 										if (canConnect) {
@@ -202,7 +202,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// Check authorization before starting installation
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
 												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-												config.getPrivateKeyAbsPath());
+												config.getPrivateKeyAbsPath(), config.getPassphrase());
 
 										// If we can connect to machine install Ahenk
 										if (canConnect) {
@@ -215,7 +215,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(),
-													debPackage);
+													config.getPassphrase(), debPackage);
 											
 											setProgressBar(increment, display);
 

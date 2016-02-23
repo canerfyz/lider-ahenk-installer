@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -20,6 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
@@ -152,6 +154,18 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 			config.setXmppInstallMethod(InstallMethod.APT_GET);
 			config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
 		}
+	}
+
+	@Override
+	public IWizardPage getPreviousPage() {
+
+		// If previous page is XmppAccessPage, set NextPageEventType. Otherwise
+		// authorization check will start.
+		if (super.getPreviousPage().getName().equals(XmppAccessPage.class.getName())) {
+			((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+		}
+
+		return super.getPreviousPage();
 	}
 
 }

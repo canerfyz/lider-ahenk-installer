@@ -263,7 +263,7 @@ public class XmppAccessPage extends WizardPage implements IXmppPage, ControlNext
 		// Create a dialog
 		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getXmppIp(),
 				config.getXmppAccessUsername(), config.getXmppAccessPasswd(), config.getXmppAccessKeyPath(),
-				config.getXmppAccessMethod());
+				config.getXmppAccessPassphrase(), config.getXmppAccessMethod());
 
 		// Open it
 		ccDialog.open();

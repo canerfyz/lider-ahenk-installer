@@ -264,7 +264,7 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 		// Create a dialog
 		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getDatabaseIp(),
 				config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(), config.getDatabaseAccessKeyPath(),
-				config.getDatabaseAccessMethod());
+				config.getDatabaseAccessPassphrase(), config.getDatabaseAccessMethod());
 		
 		// Open it
 		ccDialog.open();

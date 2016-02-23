@@ -107,7 +107,7 @@ public class PageFlowHelper {
 		} else if (page instanceof ILdapPage && !config.isInstallLider() && !config.isInstallXmpp()) {
 			return true;
 		} else if (page instanceof IDatabasePage && !config.isInstallLider() && !config.isInstallXmpp()
-				&& config.isInstallLdap()) {
+				&& !config.isInstallLdap()) {
 			return true;
 		} else {
 			return false;

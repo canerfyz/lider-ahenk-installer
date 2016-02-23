@@ -11,7 +11,9 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
@@ -20,61 +22,84 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * Creates a dialog which executes an authorization check with provided when it pops up.
- *  
+ * Creates a dialog which executes an authorization check with provided when it
+ * pops up.
+ * 
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class ConnectionCheckDialog extends Dialog{
-	
+public class ConnectionCheckDialog extends Dialog {
+
 	private Label image;
 	private Label message;
 	private ProgressBar progBar;
 	private Button okBtn;
-	
+
 	private String ip;
 	private String username;
 	private String password;
 	private String keyAbsPath;
+	private String passphrase;
 	private AccessMethod method;
-	
-	private boolean canAuthorize;
-	
 
-	public ConnectionCheckDialog(Shell parentShell, String ip, String username, String password, String keyAbsPath, AccessMethod method) {
+	private boolean canAuthorize;
+
+	public ConnectionCheckDialog(Shell parentShell, String ip, String username, String password, String keyAbsPath,
+			String passphrase, AccessMethod method) {
 		super(parentShell);
 		this.ip = ip;
 		this.username = username;
 		this.password = password;
 		this.keyAbsPath = keyAbsPath;
+		this.passphrase = passphrase;
 		this.method = method;
 
 		// Do not show close on the title bar and lock parent window.
 		super.setShellStyle(SWT.TITLE | SWT.APPLICATION_MODAL);
+
+		// getShell().addListener(SWT.Traverse, new Listener() {
+		// @Override
+		// public void handleEvent(Event e) {
+		// if (e.detail == SWT.TRAVERSE_ESCAPE) {
+		// e.doit = false;
+		// }
+		// }
+		// });
 	}
 
 	@Override
 	protected Control createContents(Composite parent) {
+
+		// Disable ESC key in this dialog
+		getShell().addListener(SWT.Traverse, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				if (e.detail == SWT.TRAVERSE_ESCAPE) {
+					e.doit = false;
+				}
+			}
+		});
+
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
-		
+
 		Composite container = GUIHelper.createComposite(mainContainer, 2);
-		
+
 		// Wait-Success-Fail image
 		image = GUIHelper.createLabel(container);
 		image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/wait.png")));
-		
+
 		// Message to user
 		message = GUIHelper.createLabel(container, "Checking authentication parameters please wait..", SWT.WRAP);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		gridData.widthHint = 350;
 		message.setLayoutData(gridData);
-		
+
 		// Progress bar while process going on
 		Composite secondCon = GUIHelper.createComposite(mainContainer, 1);
-		
+
 		progBar = new ProgressBar(secondCon, SWT.INDETERMINATE);
 		GridData barGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
 		progBar.setLayoutData(barGridData);
-		
+
 		// Ok button to close dialog
 		okBtn = GUIHelper.createButton(secondCon, SWT.PUSH, "Ok");
 		okBtn.addSelectionListener(new SelectionListener() {
@@ -82,6 +107,7 @@ public class ConnectionCheckDialog extends Dialog{
 			public void widgetSelected(SelectionEvent e) {
 				close();
 			}
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
@@ -90,34 +116,34 @@ public class ConnectionCheckDialog extends Dialog{
 		GridData gdButton = new GridData(SWT.CENTER, SWT.TOP, true, false);
 		gdButton.widthHint = 100;
 		okBtn.setLayoutData(gdButton);
-		
+
 		startAuthorizationCheck();
-		
+
 		return mainContainer;
 	}
 
 	private void startAuthorizationCheck() {
-		final Display display = Display.getCurrent(); 
+		final Display display = Display.getCurrent();
 		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				if (method == AccessMethod.USERNAME_PASSWORD) {
-					canAuthorize = SetupUtils.canConnectViaSsh(ip, username, password);
+					canAuthorize = SetupUtils.canConnectViaSsh(ip, username, password, passphrase);
+				} else {
+					canAuthorize = SetupUtils.canConnectViaSshWithoutPassword(ip, username, keyAbsPath, passphrase);
 				}
-				else {
-					canAuthorize = SetupUtils.canConnectViaSshWithoutPassword(ip, username, keyAbsPath);
-				}					
 				display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
 						if (canAuthorize) {
-							image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/success.png")));
+							image.setImage(new Image(Display.getCurrent(),
+									this.getClass().getResourceAsStream("/icons/success.png")));
 							message.setText("Authentication successfull.");
 							progBar.setVisible(false);
 							okBtn.setVisible(true);
-						}
-						else {
-							image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/fail.png")));
+						} else {
+							image.setImage(new Image(Display.getCurrent(),
+									this.getClass().getResourceAsStream("/icons/fail.png")));
 							message.setText("Authentication failed. Please check connection information..");
 							progBar.setVisible(false);
 							okBtn.setVisible(true);

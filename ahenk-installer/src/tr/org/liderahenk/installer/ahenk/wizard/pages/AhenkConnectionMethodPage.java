@@ -227,6 +227,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		passphraseTxt.setLayoutData(gdPassphrase);
 		passphraseTxt.setEnabled(false);
 		
+		// Port section
 		Composite portComp = new Composite(mainContainer, SWT.NONE);
 		
 		GridLayout glPort = new GridLayout(2, false);
@@ -236,6 +237,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		port.setText(Messages.getString("PLEASE_ENTER_PORT"));
 		
 		portTxt = GUIHelper.createText(portComp);
+		portTxt.setText("22");
 		portTxt.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {

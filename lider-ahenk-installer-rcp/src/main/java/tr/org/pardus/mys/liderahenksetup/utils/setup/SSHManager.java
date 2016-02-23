@@ -39,6 +39,7 @@ public class SSHManager {
 	private String ip;
 	private int port;
 	private String privateKey;
+	private String passphrase;
 
 	/**
 	 * 
@@ -48,13 +49,14 @@ public class SSHManager {
 	 * @param port
 	 * @param privateKey
 	 */
-	public SSHManager(String ip, String username, String password, Integer port, String privateKey) {
+	public SSHManager(String ip, String username, String password, Integer port, String privateKey, String passphrase) {
 		init();
 		this.ip = ip;
 		this.username = username;
 		this.password = password;
 		this.port = (port == null ? Integer.parseInt(PropertyReader.property("connection.port")) : port);
 		this.privateKey = privateKey;
+		this.passphrase = passphrase;
 	}
 
 	/**
@@ -79,7 +81,12 @@ public class SSHManager {
 	public void connect() throws SSHConnectionException {
 		try {
 			if (privateKey != null && !privateKey.isEmpty()) {
-				SSHChannel.addIdentity(privateKey); // TODO passphrase
+				if (passphrase != null || !"".equals(passphrase)) {
+					SSHChannel.addIdentity(privateKey, passphrase.getBytes());
+				}
+				else {
+					SSHChannel.addIdentity(privateKey);
+				}
 			}
 			session = SSHChannel.getSession(username, ip, port);
 			if (password != null && !password.isEmpty()) {
@@ -333,6 +340,10 @@ public class SSHManager {
 
 	public String getPrivateKey() {
 		return privateKey;
+	}
+
+	public String getPassphrase() {
+		return passphrase;
 	}
 
 }

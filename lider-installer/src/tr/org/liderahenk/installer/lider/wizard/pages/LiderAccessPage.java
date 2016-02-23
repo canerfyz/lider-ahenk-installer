@@ -12,18 +12,21 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.wizard.dialogs.ConnectionCheckDialog;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LiderAccessPage extends WizardPage implements ILiderPage {
+public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -37,6 +40,12 @@ public class LiderAccessPage extends WizardPage implements ILiderPage {
 	private FileDialog dialog;
 	private String selectedFile;
 	private Text passphraseTxt;
+	
+	private NextPageEventType nextPageEventType;
+	
+	// Set to true as default otherwise
+	// wizard button activations does not work properly.
+	private boolean goNextPage = true;
 
 	public LiderAccessPage(LiderSetupConfig config) {
 		super(LiderAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -226,16 +235,60 @@ public class LiderAccessPage extends WizardPage implements ILiderPage {
 
 	@Override
 	public IWizardPage getNextPage() {
+		// Set config variables before going next page.
 		setConfigVariables();
-		return super.getNextPage();
+
+		// If next button clicked, open a dialog and start
+		// authorization check.
+		if (nextPageEventType == NextPageEventType.NEXT_BUTTON_CLICK) {
+			openConnectionCheckDialog(getShell());
+		}
+
+		// Everytime this method runs, event type should be set to
+		// NEXT_BUTTON_CLICK
+		// otherwise we can never catch the real click to next button.
+		nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+
+		// goNextPage is the result of authorization check,
+		// if we can authorize then go to next page
+		// else do not allow.
+		if (goNextPage == true) {
+			return super.getNextPage();
+		} else {
+			return this;
+		}
+	}
+	
+	private void openConnectionCheckDialog(Shell shell) {
+		// Create a dialog
+		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getLiderIp(),
+				config.getLiderAccessUsername(), config.getLiderAccessPasswd(), config.getLiderAccessKeyPath(),
+				config.getLiderAccessPassphrase(), config.getLiderAccessMethod());
+
+		// Open it
+		ccDialog.open();
+
+		// After closing it get the result of authorization check.
+		goNextPage = ccDialog.getCanAuthorize();
 	}
 
 	@Override
-	public IWizardPage getPreviousPage() {
-		/**
-		 * Do not allow to go back from this page.
-		 */
-		return null;
+	public void setPageComplete(boolean complete) {
+		// Set event type here. If event type is not set,
+		// authorization check will be executed.
+		nextPageEventType = NextPageEventType.SET_PAGE_COMPLETE;
+
+		super.setPageComplete(complete);
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }

@@ -72,8 +72,8 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 					if (config.getLiderInstallMethod() == InstallMethod.APT_GET) {
 						try {
 							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
-									config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-									config.getLiderPackageName(), null);
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "lider", null);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLiderPackageName());
@@ -90,8 +90,8 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						File deb = new File(config.getLiderDebFileName());
 						try {
 							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
-									config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-									deb);
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());

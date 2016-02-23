@@ -78,7 +78,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 						try {
 							SetupUtils.installPackageNoninteractively(config.getLdapIp(),
 									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapPackageName(), null, debconfValues);
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), config.getLdapPackageName(), null, debconfValues);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLdapPackageName());
@@ -96,7 +96,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 						try {
 							SetupUtils.installPackageNonInteractively(config.getLdapIp(),
 									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), deb, debconfValues);
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
