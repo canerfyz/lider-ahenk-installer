@@ -62,7 +62,6 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				updateConfig();
 				updatePageCompleteStatus();
 			}
 
@@ -77,7 +76,6 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
 				updatePageCompleteStatus();
@@ -146,7 +144,6 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		txtLdapRootPassword.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updateConfig();
 				updatePageCompleteStatus();
 			}
 		});
@@ -167,8 +164,12 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile())
-				&& txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty());
+		if (btnAptGet.getSelection()) {
+			setPageComplete(txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty());
+		}
+		else {
+			setPageComplete(checkFile() && (txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty()));
+		}
 	}
 
 	private boolean checkFile() {
@@ -178,6 +179,8 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 	@Override
 	public IWizardPage getNextPage() {
 
+		updateConfig();
+		
 		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
 				NextPageEventType.CLICK_FROM_PREV_PAGE);
 		

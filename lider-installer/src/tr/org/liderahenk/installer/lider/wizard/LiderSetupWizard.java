@@ -256,12 +256,12 @@ public class LiderSetupWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		// TODO
 		return true;
 	}
 
 	@Override
 	public boolean performCancel() {
+		// TODO 
 		return super.performCancel();
 	}
 
