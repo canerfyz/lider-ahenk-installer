@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConfirmPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConnectionMethodPage;
-import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkDistributionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationStatusPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkSetupLocationPage;
@@ -39,7 +38,6 @@ public class AhenkSetupWizard extends Wizard {
 	AhenkSetupLocationPage locationPage = new AhenkSetupLocationPage(config);
 	AhenkConnectionMethodPage accessPage = new AhenkConnectionMethodPage(config);
 	AhenkInstallationMethodPage installMethodPage = new AhenkInstallationMethodPage(config);
-	AhenkDistributionMethodPage distMethodPage = new AhenkDistributionMethodPage(config);
 	AhenkConfirmPage confirmPage = new AhenkConfirmPage(config);
 	AhenkInstallationStatusPage statusPage = new AhenkInstallationStatusPage(config);
 	
@@ -49,7 +47,6 @@ public class AhenkSetupWizard extends Wizard {
 		addPage(locationPage);
 		addPage(accessPage);
 		addPage(installMethodPage);
-		addPage(distMethodPage);
 		addPage(confirmPage);
 		addPage(statusPage);
 		
@@ -199,17 +196,9 @@ public class AhenkSetupWizard extends Wizard {
         return pages.get(0);
     }
     
-    /*
-     * (non-Javadoc) Clicking to finish button executes this method. 
-     * After getting all the required info from user,
-     * open a dialog and start installation.
-     */
 	@Override
 	public boolean performFinish() {
-		
-		getContainer().getShell().setVisible(false);
-		
-		return false;
+		return true;
 	}
 
 	@Override
