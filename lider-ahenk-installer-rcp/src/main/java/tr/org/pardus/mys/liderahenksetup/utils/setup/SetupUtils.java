@@ -121,7 +121,7 @@ public class SetupUtils {
 		try {
 			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
 			manager.connect();
-			logger.log(Level.INFO, "Connection established to: {0} with username: {1}", new Object[] { ip, username });
+			logger.log(Level.INFO, "Connection established to: {0} with username: {1}", new Object[] { ip, username == null ? "root" : username });
 			return true;
 		} catch (SSHConnectionException e) {
 			logger.log(Level.SEVERE, e.getMessage());

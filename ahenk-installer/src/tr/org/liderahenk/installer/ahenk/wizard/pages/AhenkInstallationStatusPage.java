@@ -135,7 +135,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											// TODO gedit değiştirilecek
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), "gedit",
+													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(), "gedit",
 													null);
 
 											setProgressBar(increment, display);

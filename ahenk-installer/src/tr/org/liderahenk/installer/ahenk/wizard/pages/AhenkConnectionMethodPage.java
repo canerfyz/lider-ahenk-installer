@@ -327,7 +327,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 			config.setAhenkAccessMethod(AccessMethod.PRIVATE_KEY);
 			config.setPrivateKeyAbsPath(fileDialogText.getText());
 			if (!"".equals(passphraseTxt.getText()) && passphraseTxt.getText() != null) {
-				config.setPassphrase(passphrase.getText());
+				config.setPassphrase(passphraseTxt.getText());
 			}
 		}
 		
