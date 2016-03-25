@@ -34,6 +34,8 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	private Button useAptGetBtn = null;
 
 	private Button useDebBtn = null;
+	
+	private Button useWgetBtn = null;
 
 	private FileDialog fileDialog = null;
 
@@ -42,6 +44,8 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	private Button fileDialogBtn = null;
 
 	private String fileDialogResult = null;
+	
+	private Text downloadUrlTxt = null;
 
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -76,6 +80,7 @@ public class AhenkInstallationMethodPage extends WizardPage {
 				if (useAptGetBtn.getSelection()) {
 					fileDialogText.setEnabled(false);
 					fileDialogBtn.setEnabled(false);
+					downloadUrlTxt.setEnabled(false);
 					updatePageCompleteStatus();
 				}
 			}
@@ -96,6 +101,7 @@ public class AhenkInstallationMethodPage extends WizardPage {
 				if (useDebBtn.getSelection()) {
 					fileDialogText.setEnabled(true);
 					fileDialogBtn.setEnabled(true);
+					downloadUrlTxt.setEnabled(false);
 					updatePageCompleteStatus();
 				}
 			}
@@ -155,6 +161,43 @@ public class AhenkInstallationMethodPage extends WizardPage {
 			}
 		});
 
+		// Install by given URL
+		useWgetBtn = new Button(mainContainer, SWT.RADIO);
+		useWgetBtn.setText(Messages.getString("INSTALL_FROM_GIVEN_URL"));
+		
+		useWgetBtn.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (useWgetBtn.getSelection()) {
+					downloadUrlTxt.setEnabled(true);
+					fileDialogText.setEnabled(false);
+					fileDialogBtn.setEnabled(false);
+					updatePageCompleteStatus();
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		Composite downloadUrlContainer = new Composite(mainContainer, SWT.NONE);
+		GridLayout glDownloadUrl = new GridLayout(1, false);
+		downloadUrlContainer.setLayout(glDownloadUrl);
+		
+		downloadUrlTxt = new Text(downloadUrlContainer, SWT.BORDER);
+		GridData gdDownloadUrlTxt = new GridData();
+		gdDownloadUrlTxt.widthHint = 350;
+		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
+		downloadUrlTxt.setEnabled(false);
+		
+		downloadUrlTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
+		
 	}
 
 	private void updatePageCompleteStatus() {
@@ -163,11 +206,22 @@ public class AhenkInstallationMethodPage extends WizardPage {
 		if (useAptGetBtn.getSelection()) {
 			setPageComplete(true);
 		}
-		// else path of .deb file must be given
-		else if (fileDialogText.getText() != null && !"".equals(fileDialogText.getText())) {
-			setPageComplete(true);
+		// If install from deb is selected path of .deb file must be given
+		else if (useDebBtn.getSelection()) {
+			if (fileDialogText.getText() != null && !"".equals(fileDialogText.getText())) {
+				setPageComplete(true);
+			}
+			else {
+				setPageComplete(false);
+			}
 		} else {
-			setPageComplete(false);
+			// If install from URL is selected URL must be given
+			if (downloadUrlTxt.getText() != null && !"".equals(downloadUrlTxt.getText())) {
+				setPageComplete(true);
+			}
+			else {
+				setPageComplete(false);
+			}
 		}
 	}
 
@@ -176,9 +230,12 @@ public class AhenkInstallationMethodPage extends WizardPage {
 
 		if (useAptGetBtn.getSelection()) {
 			config.setAhenkInstallMethod(InstallMethod.APT_GET);
-		} else {
+		} else if (useDebBtn.getSelection()) {
 			config.setAhenkInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDebFileAbsPath(fileDialogText.getText());
+		} else {
+			config.setAhenkInstallMethod(InstallMethod.WGET);
+			config.setAhenkDownloadUrl(downloadUrlTxt.getText());
 		}
 
 		return super.getNextPage();

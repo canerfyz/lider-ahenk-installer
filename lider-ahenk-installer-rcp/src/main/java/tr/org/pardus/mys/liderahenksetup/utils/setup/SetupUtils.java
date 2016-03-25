@@ -75,6 +75,18 @@ public class SetupUtils {
 	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
+	 * DowNload file with its default file name on the server from provided URL.
+	 * Downloaded file will be in /tmp folder.
+	 */
+	private static final String DOWNLOAD_PACKAGE = "wget {0}";
+
+	/**
+	 * DowNload file with provided file name from provided URL. Downloaded file
+	 * will be in /tmp folder.
+	 */
+	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget -O /tmp/{0} {1}";
+
+	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
 	 * 
 	 * @param ip
@@ -867,4 +879,137 @@ public class SetupUtils {
 		}
 
 	}
+	
+	/**
+	 * Installs a deb package which has been downloaded before by
+	 * downloadPackage method. It searches the file in /tmp folder.
+	 * 
+	 * @param ip
+	 * @param username
+	 * @param password
+	 * @param port
+	 * @param privateKey
+	 * @param debPackage
+	 * @throws SSHConnectionException
+	 * @throws CommandExecutionException
+	 */
+	public static void installDownloadedPackage(final String ip, final String username, final String password,
+			final Integer port, final String privateKey, final String passphrase, final String filename)
+					throws SSHConnectionException, CommandExecutionException {
+		if (NetworkUtils.isLocal(ip)) {
+
+			logger.log(Level.INFO, "Installing package locally.");
+
+			try {
+
+				String command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + filename);
+
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.INFO, "Process ends with exit value: {} - err: {}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+
+				logger.log(Level.INFO, "Package {} installed successfully", filename);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+
+			logger.log(Level.INFO, "Installing package remotely on: {} with username: {}", new Object[] { ip, username });
+
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+					passphrase);
+			manager.connect();
+			manager.execCommand(INSTALL_PACKAGE, new Object[] { "/tmp/" + filename });
+			manager.disconnect();
+
+			logger.log(Level.INFO, "Package {} installed successfully", filename);
+		}
+	}
+	
+	/**
+	 * Downloads a file from given URL to given machine.
+	 * (Downloaded file wil be under /tmp folder.)
+	 * 
+	 * @param ip
+	 * @param username
+	 * @param password
+	 * @param port
+	 * @param privateKey
+	 * @param passphrase
+	 * @param filename
+	 * @param downloadUrl
+	 * @throws SSHConnectionException
+	 * @throws CommandExecutionException
+	 */
+	public static void downloadPackage(final String ip, final String username, final String password,
+			final Integer port, final String privateKey, final String passphrase, final String filename,
+			final String downloadUrl) throws SSHConnectionException, CommandExecutionException {
+		if (NetworkUtils.isLocal(ip)) {
+
+			logger.log(Level.INFO, "Executing command locally.");
+
+			String command;
+
+			try {
+
+				if (filename == null || "".equals(filename)) {
+					command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
+				} else {
+					command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
+				}
+
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.INFO, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+
+				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			try {
+				logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
+
+				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port,
+						privateKey, passphrase);
+				manager.connect();
+
+				String command;
+
+				if (filename == null || "".equals(filename)) {
+					command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
+				} else {
+					command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
+				}
+				
+				manager.execCommand(command, new Object[] {});
+				logger.log(Level.INFO, "Command: '{0}' executed successfully.",
+						new Object[] { command });
+
+				manager.disconnect();
+
+			} catch (SSHConnectionException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 }

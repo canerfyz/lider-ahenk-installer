@@ -89,7 +89,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
 			canGoBack = false;
-			
+
 			// Create a thread pool
 			final ExecutorService executor = Executors.newCachedThreadPool();
 
@@ -121,12 +121,14 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 									try {
 										printMessage("Trying to connect to: " + ip, display);
 
-										// Check authorization before starting installation
+										// Check authorization before starting
+										// installation
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
 												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
 												config.getPrivateKeyAbsPath(), config.getPassphrase());
 
-										// If we can connect to machine install Ahenk
+										// If we can connect to machine install
+										// Ahenk
 										if (canConnect) {
 											printMessage("Successfully connected to: " + ip, display);
 
@@ -135,7 +137,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											// TODO gedit değiştirilecek
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(), "gedit",
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "gedit",
 													null);
 
 											setProgressBar(increment, display);
@@ -151,13 +154,15 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										}
 
 									} catch (SSHConnectionException e) {
-										// Also update progress bar when installation fails
+										// Also update progress bar when
+										// installation fails
 										setProgressBar(increment, display);
 
 										isInstallationFinished = false;
 
 										// If any error occured user should be
-										// able to go back and change selections etc.
+										// able to go back and change selections
+										// etc.
 										canGoBack = true;
 
 										printMessage("Error occurred: " + e.getMessage(), display);
@@ -171,7 +176,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										isInstallationFinished = false;
 
 										// If any error occured user should be
-										// able to go back and change selections etc.
+										// able to go back and change selections
+										// etc.
 										canGoBack = true;
 
 										printMessage("Error occurred: " + e.getMessage(), display);
@@ -199,24 +205,27 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 									try {
 										printMessage("Trying to connect to: " + ip, display);
 
-										// Check authorization before starting installation
+										// Check authorization before starting
+										// installation
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
 												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
 												config.getPrivateKeyAbsPath(), config.getPassphrase());
 
-										// If we can connect to machine install Ahenk
+										// If we can connect to machine install
+										// Ahenk
 										if (canConnect) {
 											printMessage("Successfully connected to: " + ip, display);
 
-											printMessage("Ahenk is being installed to: " + ip + " from provided DEB file.",
+											printMessage(
+													"Ahenk is being installed to: " + ip + " from provided DEB file.",
 													display);
 
 											File debPackage = new File(config.getDebFileAbsPath());
 
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(),
-													config.getPassphrase(), debPackage);
-											
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage);
+
 											setProgressBar(increment, display);
 
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
@@ -237,7 +246,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										isInstallationFinished = false;
 
 										// If any error occured user should be
-										// able to go back and change selections etc.
+										// able to go back and change selections
+										// etc.
 										canGoBack = true;
 
 										printMessage("Error occurred: " + e.getMessage(), display);
@@ -251,7 +261,99 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										isInstallationFinished = false;
 
 										// If any error occured user should be
-										// able to go back and change selections etc.
+										// able to go back and change selections
+										// etc.
+										canGoBack = true;
+
+										printMessage("Error occurred: " + e.getMessage(), display);
+
+										e.printStackTrace();
+									}
+								}
+							};
+
+							executor.execute(runnable);
+
+						}
+
+					} else if (config.getAhenkInstallMethod() == InstallMethod.WGET) {
+
+						// Calculate progress bar increment size
+						final Integer increment = (Integer) (90 / config.getIpList().size());
+
+						for (final String ip : config.getIpList()) {
+
+							// Execute each installation in a new runnable.
+							Runnable runnable = new Runnable() {
+								@Override
+								public void run() {
+									try {
+										printMessage("Trying to connect to: " + ip, display);
+
+										// Check authorization before starting
+										// installation
+										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
+												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
+												config.getPrivateKeyAbsPath(), config.getPassphrase());
+
+										// If we can connect to machine install
+										// Ahenk
+										if (canConnect) {
+											printMessage("Successfully connected to: " + ip, display);
+
+											printMessage("Downloading Ahenk .deb package from: "
+													+ config.getAhenkDownloadUrl(), display);
+
+											SetupUtils.downloadPackage(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
+													config.getAhenkDownloadUrl());
+
+											printMessage("Successfully downloaded file", display);
+
+											printMessage("Ahenk is being installed to: " + ip
+													+ " from downloaded .deb file.", display);
+											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb");
+
+											setProgressBar(increment, display);
+
+											printMessage("Ahenk has been successfully installed to: " + ip, display);
+
+										} else {
+											printMessage(
+													"Could not connect to: " + ip + " | Passing over this machine..",
+													display);
+
+											setProgressBar(increment, display);
+										}
+
+									} catch (SSHConnectionException e) {
+										// Also update progress bar when
+										// installation fails
+										setProgressBar(increment, display);
+
+										isInstallationFinished = false;
+
+										// If any error occured user should be
+										// able to go back and change selections
+										// etc.
+										canGoBack = true;
+
+										printMessage("Error occurred: " + e.getMessage(), display);
+
+										e.printStackTrace();
+									} catch (CommandExecutionException e) {
+										// Also update progress bar when
+										// installation fails
+										setProgressBar(increment, display);
+
+										isInstallationFinished = false;
+
+										// If any error occured user should be
+										// able to go back and change selections
+										// etc.
 										canGoBack = true;
 
 										printMessage("Error occurred: " + e.getMessage(), display);
@@ -296,7 +398,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 					printMessage("Installation finished.", display);
 
 					config.setInstallationFinished(isInstallationFinished);
-					
+
 					// To enable finish button
 					setPageCompleteAsync(isInstallationFinished, display);
 				}
@@ -329,8 +431,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	}
 
 	/**
-	 * Sets progress bar selection (Increases progress 
-	 * bar percentage by increment value.)
+	 * Sets progress bar selection (Increases progress bar percentage by
+	 * increment value.)
 	 * 
 	 * @param selection
 	 */

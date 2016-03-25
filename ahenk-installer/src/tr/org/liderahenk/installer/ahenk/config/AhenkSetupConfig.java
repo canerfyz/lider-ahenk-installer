@@ -62,6 +62,8 @@ public class AhenkSetupConfig {
 	 */
 	private Integer port;
 	
+	private String ahenkDownloadUrl;
+	
 	// ------ Getter Setter ----- //
 	public boolean isInstallAhenkLocally() {
 		return installAhenkLocally;
@@ -205,6 +207,14 @@ public class AhenkSetupConfig {
 
 	public void setPort(Integer port) {
 		this.port = port;
+	}
+
+	public String getAhenkDownloadUrl() {
+		return ahenkDownloadUrl;
+	}
+
+	public void setAhenkDownloadUrl(String ahenkDownloadUrl) {
+		this.ahenkDownloadUrl = ahenkDownloadUrl;
 	}
 
 }
