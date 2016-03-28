@@ -35,9 +35,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	boolean canGoBack = false;
 
-	private static final String EJABBERD_REGISTER = "ejabberdctl register {0} {1} {2}";
+	private static final String EJABBERD_REGISTER = "{0}ejabberdctl register {1} {2} {3}";
 
-	private static final String EJABBERD_SRG_CREATE = "ejabberdctl srg-create {0} {1} {2} {3} {4}";
+	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create {1} {2} {3} {4} {5}";
 
 	public XmppInstallationStatus(LiderSetupConfig config) {
 		super(XmppInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -99,7 +99,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd", null);
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd",
+										null);
 
 								printMessage("Successfully installed package: " + config.getXmppPackageName());
 							} else if (config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
@@ -122,7 +123,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 							SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppAccessPassphrase(), file, "/etc/ejabberd/");
+									config.getXmppAccessPassphrase(), file, PropertyReader.property("xmpp.conf.path"));
 							printMessage("Configuration file successfully set.");
 							setProgressBar(60);
 
@@ -149,16 +150,19 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 							// --- Create Ejabberd Shared Roster Groups ---//
 							// Lider SRG
-							String createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "lider-srg",
-									config.getXmppHostname(), "Lider-SRG", "Lider-SRG", "lider-srg, ahenk-srg" });
+							String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
+									new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
+											config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
+											"lider-srg, ahenk-srg" });
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									config.getXmppAccessPassphrase(), createSrg);
 
 							// Ahenk SRG
-							createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "ahenk-srg",
-									config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "lider-srg" });
+							createSrg = prepareCommand(EJABBERD_SRG_CREATE,
+									new Object[] { PropertyReader.property("xmpp.bin.path"), "ahenk-srg",
+											config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "lider-srg" });
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
@@ -170,7 +174,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 							// Prepare register command for admin user
 							String register = prepareCommand(EJABBERD_REGISTER,
-									new Object[] { "admin", config.getXmppHostname(), config.getXmppAdminPwd() });
+									new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
+											config.getXmppHostname(), config.getXmppAdminPwd() });
 
 							// Register admin user in Ejabberd
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
@@ -180,8 +185,10 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							setProgressBar(90);
 
 							// Prepare register command for Lider user
-							register = prepareCommand(EJABBERD_REGISTER, new Object[] { config.getXmppLiderUsername(),
-									config.getXmppHostname(), config.getXmppLiderPassword() });
+							register = prepareCommand(EJABBERD_REGISTER,
+									new Object[] { PropertyReader.property("xmpp.bin.path"),
+											config.getXmppLiderUsername(), config.getXmppHostname(),
+											config.getXmppLiderPassword() });
 
 							// Register Lider server user in Ejabberd
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
@@ -321,8 +328,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 		// successfully.
 		if (canGoBack) {
 			return super.getPreviousPage();
-		} 
-		else {
+		} else {
 			return null;
 		}
 	}
