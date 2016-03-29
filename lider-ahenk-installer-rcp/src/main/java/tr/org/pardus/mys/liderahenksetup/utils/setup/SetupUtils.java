@@ -861,21 +861,16 @@ public class SetupUtils {
 			}
 
 		} else {
-			try {
-				logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
-						new Object[] { ip, username });
+			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
+					new Object[] { ip, username });
 
-				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
-				manager.connect();
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
+			manager.connect();
 
-				manager.execCommand(command, new Object[] {});
-				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+			manager.execCommand(command, new Object[] {});
+			logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
 
-				manager.disconnect();
-
-			} catch (SSHConnectionException e) {
-				e.printStackTrace();
-			}
+			manager.disconnect();
 		}
 
 	}
@@ -985,30 +980,25 @@ public class SetupUtils {
 			}
 
 		} else {
-			try {
-				logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
-
-				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port,
-						privateKey, passphrase);
-				manager.connect();
-
-				String command;
-
-				if (filename == null || "".equals(filename)) {
-					command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
-				} else {
-					command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
-				}
-				
-				manager.execCommand(command, new Object[] {});
-				logger.log(Level.INFO, "Command: '{0}' executed successfully.",
-						new Object[] { command });
-
-				manager.disconnect();
-
-			} catch (SSHConnectionException e) {
-				e.printStackTrace();
+			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
+			
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port,
+					privateKey, passphrase);
+			manager.connect();
+			
+			String command;
+			
+			if (filename == null || "".equals(filename)) {
+				command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
+			} else {
+				command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
 			}
+			
+			manager.execCommand(command, new Object[] {});
+			logger.log(Level.INFO, "Command: '{0}' executed successfully.",
+					new Object[] { command });
+			
+			manager.disconnect();
 		}
 	}
 	

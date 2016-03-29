@@ -244,6 +244,8 @@ public class LiderSetupConfig {
 	 */
 	private byte[] xmppDebFileContent;
 
+	private String xmppDownloadUrl;
+	
 	/**
 	 * XMPP hostname
 	 */
@@ -841,6 +843,14 @@ public class LiderSetupConfig {
 
 	public void setInstallationFinished(boolean isInstallationFinished) {
 		this.isInstallationFinished = isInstallationFinished;
+	}
+
+	public String getXmppDownloadUrl() {
+		return xmppDownloadUrl;
+	}
+
+	public void setXmppDownloadUrl(String xmppDownloadUrl) {
+		this.xmppDownloadUrl = xmppDownloadUrl;
 	}
 
 }

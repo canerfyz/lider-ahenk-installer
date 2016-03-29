@@ -92,7 +92,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 					// If installation method is not set, show an error message
 					// and do not try to install
 					if (config.getXmppInstallMethod() == InstallMethod.APT_GET
-							|| config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB) {
+							|| config.getXmppInstallMethod() == InstallMethod.PROVIDED_DEB
+							|| config.getXmppInstallMethod() == InstallMethod.WGET) {
 						try {
 
 							if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
@@ -112,6 +113,26 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), deb);
 
 								printMessage("Successfully installed package: " + deb.getName());
+							} else if (config.getXmppInstallMethod() == InstallMethod.WGET) {
+								printMessage("Downloading Ejabberd .deb package from: "
+										+ config.getXmppDownloadUrl());
+								
+								SetupUtils.downloadPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd.deb",
+										config.getXmppDownloadUrl());
+								
+								setProgressBar(30);
+
+								printMessage("Successfully downloaded file.");
+
+								printMessage("Ejabberd is being installed to: " + config.getXmppIp()
+										+ " from downloaded .deb file.");
+								SetupUtils.installDownloadedPackage(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd.deb");
+
+								printMessage("Ejabberd has been successfully installed to: " + config.getXmppIp());
 							}
 
 							setProgressBar(50);
@@ -139,12 +160,12 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							setProgressBar(70);
 							// -----------------------------------//
 
-							// ----- Restart Ejabberd service -----//
-							printMessage("Restarting Ejabberd service to apply changes.");
+							// ----- Starting Ejabberd service -----//
+							printMessage("Starting Ejabberd service to apply changes.");
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppAccessPassphrase(), "service ejabberd restart");
+									config.getXmppAccessPassphrase(), PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
 							setProgressBar(80);
 							// ------------------------------------//
 
@@ -153,7 +174,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
 									new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
 											config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
-											"lider-srg, ahenk-srg" });
+											"\\\\\"lider-srg\\\\\\ahenk-srg\\\\\"" });
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),

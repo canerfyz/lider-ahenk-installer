@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -34,10 +36,13 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	private Button btnAptGet;
 	private Button btnDebPackage;
+	private Button btnWget;
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
 
+	private Text downloadUrlTxt;
+	
 	private byte[] debContent;
 
 	public XmppInstallMethodPage(LiderSetupConfig config) {
@@ -59,6 +64,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				updatePageCompleteStatus();
 			}
@@ -74,6 +80,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
@@ -133,13 +140,58 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		
+		// Install by given URL
+		btnWget = new Button(container, SWT.RADIO);
+		btnWget.setText(Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));
+		
+		btnWget.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (btnWget.getSelection()) {
+					downloadUrlTxt.setEnabled(true);
+					txtFileName.setEnabled(false);
+					btnFileSelect.setEnabled(false);
+					updateConfig();
+					updatePageCompleteStatus();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		Composite downloadUrlContainer = GUIHelper.createComposite(container, 1);
+		GridLayout glDownloadUrl = new GridLayout(1, false);
+		downloadUrlContainer.setLayout(glDownloadUrl);
+		
+		downloadUrlTxt = GUIHelper.createText(downloadUrlContainer);
+		GridData gdDownloadUrlTxt = new GridData();
+		gdDownloadUrlTxt.widthHint = 350;
+		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
+		downloadUrlTxt.setEnabled(false);
+		
+		downloadUrlTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
 
 		updateConfig();
 		updatePageCompleteStatus();
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()));
+		if (btnAptGet.getSelection()) {
+			setPageComplete(true);
+		} else if (btnDebPackage.getSelection()) {
+			setPageComplete(checkFile());
+		} else {
+			setPageComplete(!"".equals(downloadUrlTxt.getText()));
+		}
 	}
 
 	private boolean checkFile() {
@@ -150,9 +202,12 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		if (btnDebPackage.getSelection()) {
 			config.setXmppInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setXmppPackageName(null);
-		} else {
+		} else if (btnAptGet.getSelection()) {
 			config.setXmppInstallMethod(InstallMethod.APT_GET);
 			config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
+		} else {
+			config.setXmppInstallMethod(InstallMethod.WGET);
+			config.setXmppDownloadUrl(downloadUrlTxt.getText());
 		}
 	}
 
