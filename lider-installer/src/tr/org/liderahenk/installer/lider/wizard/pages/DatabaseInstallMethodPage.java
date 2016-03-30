@@ -36,10 +36,13 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 	private Button btnAptGet;
 	private Button btnDebPackage;
+	private Button btnWget;
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
 	private Text txtDatabaseRootPassword;
+
+	private Text downloadUrlTxt;
 
 	private byte[] debContent;
 
@@ -63,6 +66,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				updatePageCompleteStatus();
 			}
@@ -78,6 +82,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
@@ -138,13 +143,35 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			}
 		});
 
-		Group grpRootPasswd = GUIHelper.createGroup(container, new GridLayout(2, false),
-				new GridData(SWT.FILL, SWT.FILL, false, false));
+		// Install by given URL
+		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_WGET"));
+		btnWget.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (btnWget.getSelection()) {
+					downloadUrlTxt.setEnabled(true);
+					txtFileName.setEnabled(false);
+					btnFileSelect.setEnabled(false);
+					updateConfig();
+					updatePageCompleteStatus();
+				}
+			}
 
-		GUIHelper.createLabel(grpRootPasswd, Messages.getString("DATABASE_ROOT_PASSWORD"));
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
 
-		txtDatabaseRootPassword = GUIHelper.createPasswordText(grpRootPasswd);
-		txtDatabaseRootPassword.addModifyListener(new ModifyListener() {
+		Composite downloadUrlContainer = GUIHelper.createComposite(container, new GridLayout(1, false),
+				new GridData(SWT.NO, SWT.NO, true, false));
+
+		downloadUrlTxt = GUIHelper.createText(downloadUrlContainer);
+		GridData gdDownloadUrlTxt = new GridData();
+		gdDownloadUrlTxt.widthHint = 350;
+		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
+		downloadUrlTxt.setEnabled(false);
+
+		downloadUrlTxt.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				updateConfig();
@@ -152,6 +179,23 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			}
 		});
 
+		Composite passwordComp = GUIHelper.createComposite(downloadUrlContainer, 2);
+		
+		GUIHelper.createLabel(passwordComp, Messages.getString("DATABASE_ROOT_PASSWORD"));
+
+		txtDatabaseRootPassword = GUIHelper.createPasswordText(passwordComp);
+		GridData gdRootPasswdTxt = new GridData();
+		gdRootPasswdTxt.widthHint = 200;
+		txtDatabaseRootPassword.setLayoutData(gdRootPasswdTxt);
+		txtDatabaseRootPassword.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
+		
+		
 		updateConfig();
 		updatePageCompleteStatus();
 	}
@@ -160,16 +204,24 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		if (btnDebPackage.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDatabasePackageName(null);
-		} else {
+		} else if (btnAptGet.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
 			config.setDatabasePackageName(PropertyReader.property("database.package.name"));
+		} else {
+			config.setDatabaseInstallMethod(InstallMethod.WGET);
+			config.setDatabaseDownloadUrl(downloadUrlTxt.getText());
 		}
 		config.setDatabaseRootPassword(txtDatabaseRootPassword.getText());
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete((btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()))
-				&& txtDatabaseRootPassword.getText() != null && !txtDatabaseRootPassword.getText().isEmpty());
+		if (btnAptGet.getSelection()) {
+			setPageComplete(btnAptGet.getSelection() && !txtDatabaseRootPassword.getText().isEmpty());
+		} else if (btnDebPackage.getSelection()) {
+			setPageComplete(checkFile() && !txtDatabaseRootPassword.getText().isEmpty());
+		} else {
+			setPageComplete(!"".equals(downloadUrlTxt.getText()) && !txtDatabaseRootPassword.getText().isEmpty());
+		}
 	}
 
 	private boolean checkFile() {
@@ -178,10 +230,9 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		
-		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
-				NextPageEventType.CLICK_FROM_PREV_PAGE);
-		
+
+		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+
 		return super.getPreviousPage();
 	}
 }

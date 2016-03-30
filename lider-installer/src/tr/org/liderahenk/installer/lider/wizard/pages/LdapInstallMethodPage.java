@@ -36,11 +36,14 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 	private Button btnAptGet;
 	private Button btnDebPackage;
+	private Button btnWget;
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
 	private Text txtLdapRootPassword;
 
+	private Text downloadUrlTxt;
+	
 	private byte[] debContent;
 
 	public LdapInstallMethodPage(LiderSetupConfig config) {
@@ -62,6 +65,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updatePageCompleteStatus();
 			}
 
@@ -78,6 +82,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 			public void widgetSelected(SelectionEvent e) {
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
+				downloadUrlTxt.setEnabled(false);
 				updatePageCompleteStatus();
 			}
 
@@ -134,16 +139,54 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		
+		// Install by given URL
+		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LDAP_SETUP_METHOD_WGET"));
+		btnWget.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (btnWget.getSelection()) {
+					downloadUrlTxt.setEnabled(true);
+					txtFileName.setEnabled(false);
+					btnFileSelect.setEnabled(false);
+					updateConfig();
+					updatePageCompleteStatus();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		Composite downloadUrlContainer = GUIHelper.createComposite(container, new GridLayout(1, false),
+				new GridData(SWT.NO, SWT.NO, true, false));
 
-		Group grpRootPasswd = GUIHelper.createGroup(container, new GridLayout(2, false),
-				new GridData(SWT.FILL, SWT.FILL, false, false));
+		downloadUrlTxt = GUIHelper.createText(downloadUrlContainer);
+		GridData gdDownloadUrlTxt = new GridData();
+		gdDownloadUrlTxt.widthHint = 350;
+		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
+		downloadUrlTxt.setEnabled(false);
+		downloadUrlTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
 
-		GUIHelper.createLabel(grpRootPasswd, Messages.getString("LDAP_ROOT_PASSWORD"));
+		Composite passwordComp = GUIHelper.createComposite(downloadUrlContainer, 2);
+		
+		GUIHelper.createLabel(passwordComp, Messages.getString("LDAP_ROOT_PASSWORD"));
 
-		txtLdapRootPassword = GUIHelper.createPasswordText(grpRootPasswd);
+		txtLdapRootPassword = GUIHelper.createPasswordText(passwordComp);
+		GridData gdRootPasswdTxt = new GridData();
+		gdRootPasswdTxt.widthHint = 200;
+		txtLdapRootPassword.setLayoutData(gdRootPasswdTxt);
 		txtLdapRootPassword.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
+				updateConfig();
 				updatePageCompleteStatus();
 			}
 		});
@@ -156,19 +199,23 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		if (btnDebPackage.getSelection()) {
 			config.setLdapInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setLdapPackageName(null);
-		} else {
+		} else if (btnAptGet.getSelection()) {
 			config.setLdapInstallMethod(InstallMethod.APT_GET);
-			config.setLdapPackageName(PropertyReader.property("ldap.package.name"));
+			config.setLdapPackageName(PropertyReader.property("Ldap.package.name"));
+		} else {
+			config.setLdapInstallMethod(InstallMethod.WGET);
+			config.setLdapDownloadUrl(downloadUrlTxt.getText());
 		}
 		config.setLdapRootPassword(txtLdapRootPassword.getText());
 	}
 
 	private void updatePageCompleteStatus() {
 		if (btnAptGet.getSelection()) {
-			setPageComplete(txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty());
-		}
-		else {
-			setPageComplete(checkFile() && (txtLdapRootPassword.getText() != null && !txtLdapRootPassword.getText().isEmpty()));
+			setPageComplete(btnAptGet.getSelection() && !txtLdapRootPassword.getText().isEmpty());
+		} else if (btnDebPackage.getSelection()) {
+			setPageComplete(checkFile() && !txtLdapRootPassword.getText().isEmpty());
+		} else {
+			setPageComplete(!"".equals(downloadUrlTxt.getText()) && !txtLdapRootPassword.getText().isEmpty());
 		}
 	}
 

@@ -86,6 +86,8 @@ public class LiderSetupConfig {
 	 * File content of the provided DEB package
 	 */
 	private byte[] databaseDebFileContent;
+	
+	private String databaseDownloadUrl;
 
 	/**
 	 * ###################################
@@ -167,6 +169,8 @@ public class LiderSetupConfig {
 	 * LDAP configuration file content
 	 */
 	private String ldapConfContent;
+	
+	private String ldapDownloadUrl;
 	
 	/**
 	 * ###################################
@@ -851,6 +855,22 @@ public class LiderSetupConfig {
 
 	public void setXmppDownloadUrl(String xmppDownloadUrl) {
 		this.xmppDownloadUrl = xmppDownloadUrl;
+	}
+
+	public String getDatabaseDownloadUrl() {
+		return databaseDownloadUrl;
+	}
+
+	public void setDatabaseDownloadUrl(String databaseDownloadUrl) {
+		this.databaseDownloadUrl = databaseDownloadUrl;
+	}
+
+	public String getLdapDownloadUrl() {
+		return ldapDownloadUrl;
+	}
+
+	public void setLdapDownloadUrl(String ldapDownloadUrl) {
+		this.ldapDownloadUrl = ldapDownloadUrl;
 	}
 
 }

@@ -109,6 +109,36 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
+					} else if (config.getLdapInstallMethod() == InstallMethod.WGET) {
+						try {
+							printMessage("Downloading OpenLDAP .deb package from: "
+									+ config.getLdapDownloadUrl());
+							
+							SetupUtils.downloadPackage(config.getLdapIp(), config.getLdapAccessUsername(),
+									config.getLdapAccessPasswd(), config.getLdapPort(),
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openldap.deb",
+									config.getLdapDownloadUrl());
+							
+							setProgressBar(30);
+							
+							printMessage("Successfully downloaded file.");
+							
+							printMessage("OpenLDAP is being installed to: " + config.getLdapIp()
+							+ " from downloaded .deb file.");
+							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
+									config.getLdapAccessPasswd(), config.getLdapPort(),
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openldap.deb");
+							
+							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");

@@ -153,6 +153,45 @@ public class DatabaseInstallationStatus extends WizardPage
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
+					} else if (config.getDatabaseInstallMethod() == InstallMethod.WGET) {
+						try {
+							printMessage("Downloading MariaDB .deb package from: "
+									+ config.getDatabaseDownloadUrl());
+							
+							SetupUtils.downloadPackage(config.getDatabaseIp(),
+									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
+									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
+									config.getDatabaseAccessPassphrase(), "mariadb.deb",
+									config.getDatabaseDownloadUrl());
+							
+							setProgressBar(30);
+							
+							printMessage("Successfully downloaded file.");
+							
+							printMessage("MariaDB is being installed to: " + config.getDatabaseIp()
+							+ " from downloaded .deb file.");
+							
+							SetupUtils.installDownloadedPackageNonInteractively(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), "mariadb.deb", debconfValues);
+							
+							printMessage("MariaDB has been successfully installed to: " + config.getDatabaseIp());
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							// If any error occured user should be able to go
+							// back and change selections etc.
+							canGoBack = true;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
+						
 					} else {
 						isInstallationFinished = false;
 						// If any error occured user should be able to go
