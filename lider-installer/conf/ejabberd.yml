@@ -428,6 +428,7 @@ acl:
   admin:
     user:
       - "admin": "localhost"
+      - "admin": "im.mys.pardus.org.tr"
 
   ##
   ## Blocked users

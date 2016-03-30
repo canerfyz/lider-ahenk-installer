@@ -174,7 +174,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
 									new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
 											config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
-											"\\\\\"lider-srg\\\\\\ahenk-srg\\\\\"" });
+											"\'lider-srg\\nahenk-srg\'" });
+
+							// TODO After starting ejabberd we may need to wait a little bit. 
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
@@ -183,7 +185,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// Ahenk SRG
 							createSrg = prepareCommand(EJABBERD_SRG_CREATE,
 									new Object[] { PropertyReader.property("xmpp.bin.path"), "ahenk-srg",
-											config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "lider-srg" });
+											config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
 
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),

@@ -142,9 +142,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		});
 		
 		// Install by given URL
-		btnWget = new Button(container, SWT.RADIO);
-		btnWget.setText(Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));
-		
+		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));
 		btnWget.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
