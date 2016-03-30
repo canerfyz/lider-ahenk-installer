@@ -1000,6 +1000,90 @@ public class SetupUtils {
 			
 			manager.disconnect();
 		}
+		
+		
+	}
+	
+	/**
+	 * Installs a deb package which has been downloaded before by
+	 * downloadPackage method. Before installing the package it uses
+	 * debconf-set-selections to insert default values which asked during the
+	 * interactive installation. It searches the file in /tmp folder.
+	 * 
+	 * @param ip
+	 * @param username
+	 * @param password
+	 * @param port
+	 * @param privateKey
+	 * @param debPackage
+	 * @param debconfValues
+	 * @throws SSHConnectionException
+	 * @throws CommandExecutionException
+	 */
+	public static void installDownloadedPackageNonInteractively(final String ip, final String username, final String password,
+			final Integer port, final String privateKey, final String passphrase, final String filename, final String[] debconfValues)
+					throws SSHConnectionException, CommandExecutionException {
+		if (NetworkUtils.isLocal(ip)) {
+
+			try {
+
+				// Set frontend as noninteractive
+				String command = SET_DEBIAN_FRONTEND;
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+
+				// Set debconf values
+				for (String value : debconfValues) {
+
+					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+					process = Runtime.getRuntime().exec(command);
+
+					exitValue = process.waitFor();
+					if (exitValue != 0) {
+						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
+								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+						throw new CommandExecutionException("Failed to execute command: " + command);
+					}
+
+				}
+
+				// Finally, install the downloaded package
+				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename);
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
+			manager.connect();
+
+			// Set frontend as noninteractive
+			manager.execCommand(SET_DEBIAN_FRONTEND, new Object[] {});
+
+			manager.disconnect();
+			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
+			manager.connect();
+
+			// Set debconf values
+			for (String value : debconfValues) {
+				manager.execCommand(DEBCONF_SET_SELECTIONS, new Object[] { value });
+			}
+
+			manager.disconnect();
+
+			// Finally, install the downloaded package
+			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename);
+		}
 	}
 	
 }
