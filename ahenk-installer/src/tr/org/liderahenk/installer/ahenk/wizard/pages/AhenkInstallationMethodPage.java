@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
 /**
@@ -228,17 +229,29 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	@Override
 	public IWizardPage getNextPage() {
 
+		AhenkConfirmPage confPage = (AhenkConfirmPage) super.getNextPage();
+
+		// Set config variables and confirm page labels.
 		if (useAptGetBtn.getSelection()) {
 			config.setAhenkInstallMethod(InstallMethod.APT_GET);
+			confPage.getInstallLabel().setText("- " + Messages.getString("USE_REPOSITORY"));
 		} else if (useDebBtn.getSelection()) {
 			config.setAhenkInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDebFileAbsPath(fileDialogText.getText());
+			confPage.getInstallLabel().setText("- " + Messages.getString("USE_GIVEN_DEB"));
 		} else {
 			config.setAhenkInstallMethod(InstallMethod.WGET);
 			config.setAhenkDownloadUrl(downloadUrlTxt.getText());
+			confPage.getInstallLabel().setText("- " + Messages.getString("USE_GIVEN_URL"));
 		}
-
-		return super.getNextPage();
+		
+		if (config.getAhenkAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
+			confPage.getAccessLabel().setText("- " + Messages.getString("ACCESSING_WITH_USERNAME_AND_PASSWORD"));
+		} else {
+			confPage.getAccessLabel().setText("- " + Messages.getString("ACCESSING_WITH_PRIVATE_KEY"));
+		}
+		
+		return confPage;
 	}
 
 }
