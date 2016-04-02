@@ -116,7 +116,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 							
 							SetupUtils.downloadPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openldap.deb",
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp", "openldap.deb",
 									config.getLdapDownloadUrl());
 							
 							setProgressBar(30);
@@ -127,7 +127,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 							+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openldap.deb");
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp", "openldap.deb");
 							
 							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {

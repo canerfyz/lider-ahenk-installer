@@ -47,6 +47,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	boolean canGoBack = false;
 
 	private int progressBarPercent;
+	
+	private final static String MAKE_DIR_UNDER_TMP = "mkdir /tmp/{0}";
 
 	// Status variable for the possible errors on this page
 	IStatus ipStatus;
@@ -299,23 +301,27 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// If we can connect to machine install
 										// Ahenk
 										if (canConnect) {
+											
 											printMessage("Successfully connected to: " + ip, display);
 
+											printMessage("Creating directory under /tmp", display);
+
+											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), MAKE_DIR_UNDER_TMP.replace("{0}", "ahenkTmpDir"));
+											
 											printMessage("Downloading Ahenk .deb package from: "
 													+ config.getAhenkDownloadUrl(), display);
 
-											SetupUtils.downloadPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
-													config.getAhenkDownloadUrl());
+											SetupUtils.downloadPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir", "ahenk.deb", config.getAhenkDownloadUrl());
 
 											printMessage("Successfully downloaded file", display);
 
 											printMessage("Ahenk is being installed to: " + ip
 													+ " from downloaded .deb file.", display);
-											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb");
+
+											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir", "ahenk.deb");
 
 											setProgressBar(increment, display);
 
