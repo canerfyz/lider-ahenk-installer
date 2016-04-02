@@ -47,12 +47,6 @@ public class AhenkSetupConfig {
 	private String debFileAbsPath;
 
 	/**
-	 * AhenkSetupDistributionMethodPage variables
-	 */
-	private boolean useScp;
-	private boolean useTorrent;
-
-	/**
 	 * This variable is used to enable/disable finish button 
 	 */
 	private boolean isInstallationFinished = false;
@@ -159,22 +153,6 @@ public class AhenkSetupConfig {
 
 	public void setDebFileAbsPath(String debFileAbsPath) {
 		this.debFileAbsPath = debFileAbsPath;
-	}
-
-	public boolean isUseScp() {
-		return useScp;
-	}
-
-	public void setUseScp(boolean useScp) {
-		this.useScp = useScp;
-	}
-
-	public boolean isUseTorrent() {
-		return useTorrent;
-	}
-
-	public void setUseTorrent(boolean useTorrent) {
-		this.useTorrent = useTorrent;
 	}
 
 	public AccessMethod getAhenkAccessMethod() {
