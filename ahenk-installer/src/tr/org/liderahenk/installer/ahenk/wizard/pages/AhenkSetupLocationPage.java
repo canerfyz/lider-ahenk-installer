@@ -260,10 +260,6 @@ public class AhenkSetupLocationPage extends WizardPage {
 			List<String> remoteIpList = new ArrayList<String>();
 			remoteIpList.add("localhost");
 			config.setIpList(remoteIpList);
-			
-			//If Ahenk will be installed to local,
-			//then there is no need to ask for distribution method
-			pagesList.remove(3);
 		}
 
 		return super.getNextPage();
