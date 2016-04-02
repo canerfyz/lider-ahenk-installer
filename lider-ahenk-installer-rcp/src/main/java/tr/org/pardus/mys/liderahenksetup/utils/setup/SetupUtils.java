@@ -876,34 +876,44 @@ public class SetupUtils {
 	}
 	
 	/**
-	 * Installs a deb package which has been downloaded before by
-	 * downloadPackage method. It searches the file in /tmp folder.
+	 * * Installs a deb package which has been downloaded before by
+	 * downloadPackage method. It searches the file in /tmp/{tmpDir} folder.
 	 * 
 	 * @param ip
 	 * @param username
 	 * @param password
 	 * @param port
 	 * @param privateKey
-	 * @param debPackage
+	 * @param passphrase
+	 * @param tmpDir
+	 * @param filename
 	 * @throws SSHConnectionException
 	 * @throws CommandExecutionException
 	 */
 	public static void installDownloadedPackage(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final String passphrase, final String filename)
+			final Integer port, final String privateKey, final String passphrase, final String tmpDir, final String filename)
 					throws SSHConnectionException, CommandExecutionException {
+		String command;
+		
+		// Prepare command
+		if (!"".equals(filename)) {
+			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+		} else {
+			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+		}
+
 		if (NetworkUtils.isLocal(ip)) {
 
 			logger.log(Level.INFO, "Installing package locally.");
 
 			try {
 
-				String command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + filename);
 
 				Process process = Runtime.getRuntime().exec(command);
 
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
-					logger.log(Level.INFO, "Process ends with exit value: {} - err: {}",
+					logger.log(Level.SEVERE, "Process ends with exit value: {} - err: {}",
 							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
 					throw new CommandExecutionException("Failed to execute command: " + command);
 				}
@@ -923,7 +933,7 @@ public class SetupUtils {
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
 			manager.connect();
-			manager.execCommand(INSTALL_PACKAGE, new Object[] { "/tmp/" + filename });
+			manager.execCommand(command, new Object[] {});
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {} installed successfully", filename);
@@ -931,8 +941,10 @@ public class SetupUtils {
 	}
 	
 	/**
-	 * Downloads a file from given URL to given machine.
-	 * (Downloaded file wil be under /tmp folder.)
+	 * Downloads a file from given URL to given machine. It creates another
+	 * folder with provided name under /tmp to prevent duplication of files.
+	 * (e.g.: If tmpDir parameter is given as "ahenkTmpDir" then downloaded file
+	 * will be under /tmp/ahenkTmpDir/ folder.)
 	 * 
 	 * @param ip
 	 * @param username
@@ -946,27 +958,28 @@ public class SetupUtils {
 	 * @throws CommandExecutionException
 	 */
 	public static void downloadPackage(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final String passphrase, final String filename,
+			final Integer port, final String privateKey, final String passphrase, final String tmpDir, final String filename,
 			final String downloadUrl) throws SSHConnectionException, CommandExecutionException {
+		
+		String command;
+		
+		if (filename == null || "".equals(filename)) {
+			command = DOWNLOAD_PACKAGE.replace("{0}", tmpDir).replace("{1}", downloadUrl);
+		} else {
+			command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", tmpDir).replace("{1}", filename).replace("{2}", downloadUrl);
+		}
+
 		if (NetworkUtils.isLocal(ip)) {
 
 			logger.log(Level.INFO, "Executing command locally.");
 
-			String command;
-
 			try {
-
-				if (filename == null || "".equals(filename)) {
-					command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
-				} else {
-					command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
-				}
 
 				Process process = Runtime.getRuntime().exec(command);
 
 				int exitValue = process.waitFor();
 				if (exitValue != 0) {
-					logger.log(Level.INFO, "Process ends with exit value: {0} - err: {1}",
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
 							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
 					throw new CommandExecutionException("Failed to execute command: " + command);
 				}
@@ -981,28 +994,20 @@ public class SetupUtils {
 
 		} else {
 			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
-			
-			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port,
-					privateKey, passphrase);
+
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+					passphrase);
 			manager.connect();
-			
-			String command;
-			
-			if (filename == null || "".equals(filename)) {
-				command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
-			} else {
-				command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
-			}
-			
+
 			manager.execCommand(command, new Object[] {});
 			logger.log(Level.INFO, "Command: '{0}' executed successfully.",
-					new Object[] { command });
-			
+					new Object[] { DOWNLOAD_PACKAGE.replace("{0}", filename).replace("{1}", downloadUrl) });
+
 			manager.disconnect();
 		}
-		
-		
+
 	}
+	
 	
 	/**
 	 * Installs a deb package which has been downloaded before by
@@ -1021,7 +1026,7 @@ public class SetupUtils {
 	 * @throws CommandExecutionException
 	 */
 	public static void installDownloadedPackageNonInteractively(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final String passphrase, final String filename, final String[] debconfValues)
+			final Integer port, final String privateKey, final String passphrase, final String tmpDir, final String filename, final String[] debconfValues)
 					throws SSHConnectionException, CommandExecutionException {
 		if (NetworkUtils.isLocal(ip)) {
 
@@ -1054,7 +1059,7 @@ public class SetupUtils {
 				}
 
 				// Finally, install the downloaded package
-				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename);
+				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename);
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -1082,7 +1087,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			// Finally, install the downloaded package
-			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename);
+			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename);
 		}
 	}
 	
