@@ -75,16 +75,16 @@ public class SetupUtils {
 	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< '{0}'";
 
 	/**
-	 * DowNload file with its default file name on the server from provided URL.
-	 * Downloaded file will be in /tmp folder.
+	 * Download file with its default file name on the server from provided URL.
+	 * Downloaded file will be in /tmp/{0} folder.
 	 */
-	private static final String DOWNLOAD_PACKAGE = "wget {0}";
+	private static final String DOWNLOAD_PACKAGE = "wget ‐‐directory-prefix=/tmp/{0}/ {1}";
 
 	/**
 	 * DowNload file with provided file name from provided URL. Downloaded file
-	 * will be in /tmp folder.
+	 * will be in /tmp/{0} folder.
 	 */
-	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget -O /tmp/{0} {1}";
+	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget --output-document=/tmp/{0}/{1} {2}";
 
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
@@ -219,7 +219,7 @@ public class SetupUtils {
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
 			manager.connect();
-			String versions = manager.execCommand(CHECK_PACKAGE_EXIST_CMD, new Object[] { packageName });
+			String versions = null; //manager.execCommand(CHECK_PACKAGE_EXIST_CMD, new Object[] { packageName });
 			manager.disconnect();
 
 			/**
@@ -307,7 +307,7 @@ public class SetupUtils {
 
 				SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
 				manager.connect();
-				String versions = manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD, new Object[] { packageName });
+				String versions = null; //manager.execCommand(CHECK_PACKAGE_INSTALLED_CMD, new Object[] { packageName });
 				manager.disconnect();
 
 				boolean installed = versions.contains(version);
@@ -394,6 +394,7 @@ public class SetupUtils {
 
 				// If version is not given
 				if (version == null || "".equals(version)) {
+					System.out.println("---------------------------------------------------- " + packageName);
 					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, new Object[] { packageName });
 					logger.log(Level.INFO, "Package {0} installed successfully", new Object[] { packageName });
 				} else {

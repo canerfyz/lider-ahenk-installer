@@ -1,9 +1,11 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -112,15 +114,15 @@ public class SSHManager {
 	 * @throws CommandExecutionException
 	 * 
 	 */
-	public String execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
+	public void execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 
-		StringBuilder outputBuffer = new StringBuilder();
-
+		Channel channel = null;
+		
 		logger.log(Level.INFO, "Command: {0}", command);
 
 		try {
-			Channel channel = session.openChannel("exec");
+			channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand(command);
 
 			// Open channel and handle output stream
@@ -149,11 +151,34 @@ public class SSHManager {
 					int i = inputStream.read(tmp, 0, 1024);
 					if (i < 0)
 						break;
-					logger.log(Level.INFO, new String(tmp, 0, i));
+					String output = new String(tmp, 0, i);
+					logger.log(Level.INFO, output);
 				}
 				if (channel.isClosed()) {
 					logger.log(Level.INFO, "exit status: " + channel.getExitStatus());
-					break;
+					if (channel.getExitStatus() != 0) {
+						BufferedReader br = null;
+						StringBuilder output = new StringBuilder();
+						String line;
+						try {
+							br = new BufferedReader(new InputStreamReader(channel.getExtInputStream()));
+							while ((line = br.readLine()) != null) {
+								output.append(line);
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						} finally {
+							if (br != null) {
+								try {
+									br.close();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+						System.out.println("OUTPUT:" + output.toString());
+						throw new CommandExecutionException("Exit status: " + channel.getExitStatus());
+					}
 				}
 				try {
 					Thread.sleep(1000);
@@ -161,14 +186,17 @@ public class SSHManager {
 				}
 			}
 
-			channel.disconnect();
-
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, e.getMessage());
 			throw new CommandExecutionException(e.getMessage());
+		} finally {
+			if (channel != null) {
+				try {
+					channel.disconnect();
+				} catch (Exception e) {
+				}
+			}
 		}
-
-		return outputBuffer.toString();
 	}
 
 	/**
@@ -180,8 +208,8 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(final String command, final Object[] params) throws CommandExecutionException {
-		return execCommand(command, params, null);
+	public void execCommand(final String command, final Object[] params) throws CommandExecutionException {
+		execCommand(command, params, null);
 	}
 
 	/**
@@ -195,7 +223,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
+	public void execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 		String tmpCommand = command;
 		if (params != null) {
@@ -204,7 +232,7 @@ public class SSHManager {
 				tmpCommand = tmpCommand.replaceAll("\\{" + i + "\\}", param);
 			}
 		}
-		return execCommand(tmpCommand, outputStreamProvider);
+		execCommand(tmpCommand, outputStreamProvider);
 	}
 
 	/**
