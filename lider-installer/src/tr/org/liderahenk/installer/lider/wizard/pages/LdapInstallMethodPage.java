@@ -201,7 +201,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 			config.setLdapPackageName(null);
 		} else if (btnAptGet.getSelection()) {
 			config.setLdapInstallMethod(InstallMethod.APT_GET);
-			config.setLdapPackageName(PropertyReader.property("Ldap.package.name"));
+			config.setLdapPackageName(PropertyReader.property("ldap.package.name"));
 		} else {
 			config.setLdapInstallMethod(InstallMethod.WGET);
 			config.setLdapDownloadUrl(downloadUrlTxt.getText());

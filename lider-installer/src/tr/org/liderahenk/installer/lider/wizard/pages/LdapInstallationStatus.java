@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
@@ -20,7 +21,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
-public class LdapInstallationStatus extends WizardPage implements ILdapPage {
+public class LdapInstallationStatus extends WizardPage implements ILdapPage, InstallationStatusPage {
 
 	private LiderSetupConfig config;
 
@@ -143,9 +144,13 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-
+					
 					setProgressBar(100);
+
+					config.setInstallationFinished(isInstallationFinished);
+					
 					setPageCompleteAsync(isInstallationFinished);
+
 				}
 
 				/**
@@ -202,7 +207,8 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage {
 			thread.start();
 		}
 
-		return super.getNextPage();
+		// Select next page.
+		return PageFlowHelper.selectNextPage(config, this);
 	}
 
 	/**
