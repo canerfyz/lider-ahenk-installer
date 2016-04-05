@@ -351,6 +351,8 @@ public class LiderSetupConfig {
 	 */
 	private byte[] liderDebFileContent;
 
+	private String liderDownloadUrl;
+	
 	/**
 	 * Lider configuration file content
 	 */
@@ -871,6 +873,14 @@ public class LiderSetupConfig {
 
 	public void setLdapDownloadUrl(String ldapDownloadUrl) {
 		this.ldapDownloadUrl = ldapDownloadUrl;
+	}
+
+	public String getLiderDownloadUrl() {
+		return liderDownloadUrl;
+	}
+
+	public void setLiderDownloadUrl(String liderDownloadUrl) {
+		this.liderDownloadUrl = liderDownloadUrl;
 	}
 
 }

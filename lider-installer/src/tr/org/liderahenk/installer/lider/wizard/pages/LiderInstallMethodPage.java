@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -34,10 +36,13 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	private Button btnAptGet;
 	private Button btnDebPackage;
+	private Button btnWget;
 	private Text txtFileName;
 	private Button btnFileSelect;
 	private FileDialog dialog;
 
+	private Text downloadUrlTxt;
+	
 	private byte[] debContent;
 
 	public LiderInstallMethodPage(LiderSetupConfig config) {
@@ -59,6 +64,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		btnAptGet.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				updatePageCompleteStatus();
 			}
@@ -74,6 +80,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				downloadUrlTxt.setEnabled(false);
 				updateConfig();
 				// Enable btnFileSelect only if btnDebPackage is selected
 				btnFileSelect.setEnabled(btnDebPackage.getSelection());
@@ -134,12 +141,56 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 			}
 		});
 
+		// Install by given URL
+		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));
+		btnWget.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (btnWget.getSelection()) {
+					downloadUrlTxt.setEnabled(true);
+					txtFileName.setEnabled(false);
+					btnFileSelect.setEnabled(false);
+					updateConfig();
+					updatePageCompleteStatus();
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		Composite downloadUrlContainer = GUIHelper.createComposite(container, 1);
+		GridLayout glDownloadUrl = new GridLayout(1, false);
+		downloadUrlContainer.setLayout(glDownloadUrl);
+		
+		downloadUrlTxt = GUIHelper.createText(downloadUrlContainer);
+		GridData gdDownloadUrlTxt = new GridData();
+		gdDownloadUrlTxt.widthHint = 350;
+		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
+		downloadUrlTxt.setEnabled(false);
+		
+		downloadUrlTxt.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updateConfig();
+				updatePageCompleteStatus();
+			}
+		});
+		
+		
 		updateConfig();
 		updatePageCompleteStatus();
 	}
 
 	private void updatePageCompleteStatus() {
-		setPageComplete(btnAptGet.getSelection() || (btnDebPackage.getSelection() && checkFile()));
+		if (btnAptGet.getSelection()) {
+			setPageComplete(true);
+		} else if (btnDebPackage.getSelection()) {
+			setPageComplete(checkFile());
+		} else {
+			setPageComplete(!"".equals(downloadUrlTxt.getText()));
+		}
 	}
 
 	private boolean checkFile() {
@@ -150,9 +201,12 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		if (btnDebPackage.getSelection()) {
 			config.setLiderInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setLiderPackageName(null);
-		} else {
+		} else if (btnAptGet.getSelection()) {
 			config.setLiderInstallMethod(InstallMethod.APT_GET);
 			config.setLiderPackageName(PropertyReader.property("lider.package.name"));
+		} else {
+			config.setLiderInstallMethod(InstallMethod.WGET);
+			config.setLiderDownloadUrl(downloadUrlTxt.getText());
 		}
 	}
 

@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -104,12 +106,51 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
+					} else if (config.getLiderInstallMethod() == InstallMethod.WGET) {
+						try {
+							printMessage("Downloading Lider .deb package from: "
+									+ config.getLiderDownloadUrl());
+							
+							// In case of folder name clash use current time as postfix
+							Date date = new Date();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+							String timestamp = dateFormat.format(date);
+
+							SetupUtils.downloadPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb",
+									config.getLiderDownloadUrl());
+							
+							setProgressBar(30);
+
+							printMessage("Successfully downloaded file.");
+
+							printMessage("Lider is being installed to: " + config.getLiderIp()
+									+ " from downloaded .deb file.");
+							SetupUtils.installDownloadedPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb");
+							
+							printMessage("Lider has been successfully installed to: " + config.getLiderIp());
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
+						
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
 
 					setProgressBar(100);
+					
+					config.setInstallationFinished(isInstallationFinished);
+					
 					setPageCompleteAsync(isInstallationFinished);
 				}
 
