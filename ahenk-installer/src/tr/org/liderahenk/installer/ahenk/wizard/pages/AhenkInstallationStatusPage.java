@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -306,14 +308,19 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											printMessage("Creating directory under /tmp", display);
 
+											// In case of folder name clash use current time as postfix
+											Date date = new Date();
+											SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+											String timestamp = dateFormat.format(date);
+											
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), MAKE_DIR_UNDER_TMP.replace("{0}", "ahenkTmpDir"));
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), MAKE_DIR_UNDER_TMP.replace("{0}", "ahenkTmpDir" + timestamp));
 											
 											printMessage("Downloading Ahenk .deb package from: "
 													+ config.getAhenkDownloadUrl(), display);
 
 											SetupUtils.downloadPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir", "ahenk.deb", config.getAhenkDownloadUrl());
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb", config.getAhenkDownloadUrl());
 
 											printMessage("Successfully downloaded file", display);
 
@@ -321,7 +328,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													+ " from downloaded .deb file.", display);
 
 											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir", "ahenk.deb");
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb");
 
 											setProgressBar(increment, display);
 
