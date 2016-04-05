@@ -140,6 +140,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		btnFileSelect.setEnabled(false);
 
 		// Install by given URL
 		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));

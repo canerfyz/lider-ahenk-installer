@@ -139,6 +139,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		btnFileSelect.setEnabled(false);
 		
 		// Install by given URL
 		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("LDAP_SETUP_METHOD_WGET"));
