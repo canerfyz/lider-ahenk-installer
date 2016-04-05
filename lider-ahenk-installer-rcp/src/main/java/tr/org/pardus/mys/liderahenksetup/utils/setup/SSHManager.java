@@ -1,11 +1,9 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -157,32 +155,15 @@ public class SSHManager {
 				if (channel.isClosed()) {
 					logger.log(Level.INFO, "exit status: " + channel.getExitStatus());
 					if (channel.getExitStatus() != 0) {
-						BufferedReader br = null;
-						StringBuilder output = new StringBuilder();
-						String line;
-						try {
-							br = new BufferedReader(new InputStreamReader(channel.getExtInputStream()));
-							while ((line = br.readLine()) != null) {
-								output.append(line);
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
-						} finally {
-							if (br != null) {
-								try {
-									br.close();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-							}
-						}
-						System.out.println("OUTPUT:" + output.toString());
 						throw new CommandExecutionException("Exit status: " + channel.getExitStatus());
 					}
+					
+					break;
 				}
 				try {
 					Thread.sleep(1000);
 				} catch (Exception ee) {
+					ee.printStackTrace();
 				}
 			}
 
