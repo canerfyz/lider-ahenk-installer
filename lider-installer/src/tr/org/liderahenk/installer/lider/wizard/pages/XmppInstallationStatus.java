@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -117,9 +119,14 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								printMessage("Downloading Ejabberd .deb package from: "
 										+ config.getXmppDownloadUrl());
 								
+								// In case of folder name clash use current time as postfix
+								Date date = new Date();
+								SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+								String timestamp = dateFormat.format(date);
+								
 								SetupUtils.downloadPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir", "ejabberd.deb",
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb",
 										config.getXmppDownloadUrl());
 								
 								setProgressBar(30);
@@ -130,7 +137,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 										+ " from downloaded .deb file.");
 								SetupUtils.installDownloadedPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir", "ejabberd.deb");
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb");
 								
 								printMessage("Ejabberd has been successfully installed to: " + config.getXmppIp());
 							}
@@ -376,6 +383,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 					}
 
 					setProgressBar(100);
+					
+					config.setInstallationFinished(isInstallationFinished);
+					
 					setPageCompleteAsync(isInstallationFinished);
 				}
 

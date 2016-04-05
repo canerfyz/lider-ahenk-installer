@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -158,10 +160,15 @@ public class DatabaseInstallationStatus extends WizardPage
 							printMessage("Downloading MariaDB .deb package from: "
 									+ config.getDatabaseDownloadUrl());
 							
+							// In case of folder name clash use current time as postfix
+							Date date = new Date();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+							String timestamp = dateFormat.format(date);
+							
 							SetupUtils.downloadPackage(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabaseAccessPassphrase(), "mariaDbTmp", "mariadb.deb", config.getDatabaseDownloadUrl());
+									config.getDatabaseAccessPassphrase(), "mariaDbTmp" + timestamp, "mariadb.deb", config.getDatabaseDownloadUrl());
 							
 							setProgressBar(30);
 							
@@ -172,7 +179,7 @@ public class DatabaseInstallationStatus extends WizardPage
 							
 							SetupUtils.installDownloadedPackageNonInteractively(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), "mariaDbTmp", "mariadb.deb", debconfValues);
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), "mariaDbTmp" + timestamp, "mariadb.deb", debconfValues);
 							
 							printMessage("MariaDB has been successfully installed to: " + config.getDatabaseIp());
 						} catch (CommandExecutionException e) {

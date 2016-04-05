@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -115,9 +117,14 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage("Downloading OpenLDAP .deb package from: "
 									+ config.getLdapDownloadUrl());
 							
+							// In case of folder name clash use current time as postfix
+							Date date = new Date();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+							String timestamp = dateFormat.format(date);
+							
 							SetupUtils.downloadPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp", "openldap.deb",
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
 									config.getLdapDownloadUrl());
 							
 							setProgressBar(30);
@@ -128,7 +135,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp", "openldap.deb");
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb");
 							
 							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {
