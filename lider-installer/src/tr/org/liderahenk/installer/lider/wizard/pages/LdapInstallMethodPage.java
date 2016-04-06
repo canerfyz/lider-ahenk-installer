@@ -225,14 +225,13 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 	}
 
 	@Override
-	public IWizardPage getNextPage() {
+	public IWizardPage getPreviousPage() {
+		
+		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 
-		updateConfig();
-		
-		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(
-				NextPageEventType.CLICK_FROM_PREV_PAGE);
-		
-		return super.getNextPage();
+		return super.getPreviousPage();
 	}
+	
+	
 
 }

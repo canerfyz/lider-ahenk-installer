@@ -10,6 +10,7 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
@@ -54,6 +55,14 @@ public class LdapConfirmPage extends WizardPage implements ILdapPage {
 	public IWizardPage getNextPage() {
 		// Set the IP info in the opening of page
 		lblIp.setText("- IP: " + config.getLdapIp());
+		
+		((ControlNextEvent) super.getNextPage()).setNextPageEventType(
+				NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
+		// Set page complete to true, otherwise it does not go into getNextPage
+		// method of DatabaseInstallationStatus page.
+		((WizardPage) super.getNextPage()).setPageComplete(true);
+		
 		return super.getNextPage();
 	}
 

@@ -236,4 +236,5 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		return super.getPreviousPage();
 	}
+	
 }
