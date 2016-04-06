@@ -20,6 +20,7 @@ import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.liderahenk.installer.lider.wizard.dialogs.DatabaseWarningDialog;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -133,7 +134,7 @@ public class DatabaseInstallationStatus extends WizardPage
 							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabaseAccessPassphrase(), deb, debconfValues);
+									config.getDatabaseAccessPassphrase(), deb, debconfValues, PackageInstaller.GDEBI);
 
 							setProgressBar(90);
 

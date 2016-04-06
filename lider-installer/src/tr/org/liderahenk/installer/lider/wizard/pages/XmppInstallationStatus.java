@@ -18,6 +18,7 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -112,7 +113,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), deb);
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), deb, PackageInstaller.DPKG);
 
 								printMessage("Successfully installed package: " + deb.getName());
 							} else if (config.getXmppInstallMethod() == InstallMethod.WGET) {

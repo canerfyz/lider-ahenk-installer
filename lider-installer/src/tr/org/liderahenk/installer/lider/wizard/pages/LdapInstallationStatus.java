@@ -17,21 +17,27 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
-public class LdapInstallationStatus extends WizardPage implements ILdapPage, InstallationStatusPage {
+public class LdapInstallationStatus extends WizardPage implements ILdapPage, InstallationStatusPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
 
+	private NextPageEventType nextPageEventType;
+	
 	boolean isInstallationFinished = false;
 
+	boolean canGoBack = false;
+	
 	public LdapInstallationStatus(LiderSetupConfig config) {
 		super(LdapInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("LDAP_INSTALLATION"));
@@ -61,7 +67,8 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
-		if (super.isCurrentPage() && !isInstallationFinished) {
+		if (super.isCurrentPage() && !isInstallationFinished
+				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
 			final Display display = Display.getCurrent();
 			Runnable runnable = new Runnable() {
@@ -87,10 +94,12 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage("Successfully installed package: " + config.getLdapPackageName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -99,16 +108,18 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						try {
 							SetupUtils.installPackageNonInteractively(config.getLdapIp(),
 									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues);
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues, PackageInstaller.GDEBI);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -140,10 +151,12 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -226,17 +239,32 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 	public String[] generateDebconfValues() {
 		String debconfPwd = PropertyReader.property("ldap.debconf.password1") + " " + config.getLdapRootPassword();
 		String debconfPwdAgain = PropertyReader.property("ldap.debconf.password2") + " " + config.getLdapRootPassword();
-		String debconfAdminPwd = PropertyReader.property("slapd slapd/internal/adminpw password") + " "
+		String debconfAdminPwd = PropertyReader.property("ldap.debconf.adminpw") + " "
 				+ config.getLdapRootPassword();
-		String debconfGeneratedPwd = PropertyReader.property("slapd slapd/internal/generated_adminpw password") + " "
+		String debconfGeneratedPwd = PropertyReader.property("ldap.debconf.generated.password") + " "
 				+ config.getLdapRootPassword();
 		return new String[] { debconfPwd, debconfPwdAgain, debconfAdminPwd, debconfGeneratedPwd };
 	}
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		// Do not allow to go back from this page.
-		return null;
+		// Do not allow to go back from this page if installation completed
+		// successfully.
+		if (canGoBack) {
+			return super.getPreviousPage();
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }

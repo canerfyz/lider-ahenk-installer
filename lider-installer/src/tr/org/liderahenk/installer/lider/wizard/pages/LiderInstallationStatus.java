@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
@@ -93,7 +94,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						try {
 							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb);
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb, PackageInstaller.DPKG);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
