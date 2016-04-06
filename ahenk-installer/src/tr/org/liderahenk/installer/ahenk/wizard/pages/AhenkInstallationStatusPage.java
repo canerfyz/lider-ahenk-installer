@@ -22,6 +22,7 @@ import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
@@ -228,7 +229,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage);
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.DPKG);
 
 											setProgressBar(increment, display);
 
