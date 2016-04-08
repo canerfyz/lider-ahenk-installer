@@ -57,7 +57,7 @@ public class PageFlowHelper {
 			}
 		} else if (page instanceof ILdapPage) {
 			if (config.isInstallXmpp()) {
-				return findFirstInstance(pagesList, ILdapPage.class);
+				return findFirstInstance(pagesList, IXmppPage.class);
 			} else if (config.isInstallLider()) {
 				return findFirstInstance(pagesList, ILiderPage.class);
 			}
