@@ -905,7 +905,7 @@ public class SetupUtils {
 	}
 
 	/**
-	 * * Installs a deb package which has been downloaded before by
+	 * Installs a deb package which has been downloaded before by
 	 * downloadPackage method. It searches the file in /tmp/{tmpDir} folder.
 	 * 
 	 * @param ip
@@ -916,20 +916,37 @@ public class SetupUtils {
 	 * @param passphrase
 	 * @param tmpDir
 	 * @param filename
+	 * @param packageInstaller
 	 * @throws SSHConnectionException
 	 * @throws CommandExecutionException
 	 */
 	public static void installDownloadedPackage(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String tmpDir,
-			final String filename) throws SSHConnectionException, CommandExecutionException {
+			final String filename, final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
+		
 		String command;
 
-		// Prepare command
-		if (!"".equals(filename)) {
-			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+		if (packageInstaller == PackageInstaller.DPKG) {
+			// Prepare command
+			if (!"".equals(filename)) {
+				command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+			} else {
+				command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+			}
 		} else {
-			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+			if (!"".equals(filename)) {
+				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+			} else {
+				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+			}
 		}
+		
+//		// Prepare command
+//		if (!"".equals(filename)) {
+//			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+//		} else {
+//			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+//		}
 
 		if (NetworkUtils.isLocal(ip)) {
 
@@ -1057,7 +1074,7 @@ public class SetupUtils {
 	 */
 	public static void installDownloadedPackageNonInteractively(final String ip, final String username,
 			final String password, final Integer port, final String privateKey, final String passphrase,
-			final String tmpDir, final String filename, final String[] debconfValues)
+			final String tmpDir, final String filename, final String[] debconfValues, final PackageInstaller packageInstaller)
 					throws SSHConnectionException, CommandExecutionException {
 		if (NetworkUtils.isLocal(ip)) {
 
@@ -1091,7 +1108,7 @@ public class SetupUtils {
 
 				// Finally, install the downloaded package
 				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir,
-						filename);
+						filename, packageInstaller);
 
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -1120,7 +1137,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			// Finally, install the downloaded package
-			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename);
+			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename, packageInstaller);
 		}
 	}
 
