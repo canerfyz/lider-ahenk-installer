@@ -329,7 +329,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													+ " from downloaded .deb file.", display);
 
 											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb");
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb", PackageInstaller.DPKG);
 
 											setProgressBar(increment, display);
 
@@ -396,9 +396,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 						printMessage("Invalid installation method. Installation cancelled.", Display.getCurrent());
 					}
 
-					executor.shutdown();
 
 					try {
+						executor.shutdown();
 						executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
