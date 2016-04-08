@@ -146,7 +146,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb");
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb", PackageInstaller.GDEBI);
 							
 							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {

@@ -138,7 +138,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 										+ " from downloaded .deb file.");
 								SetupUtils.installDownloadedPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb");
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb", PackageInstaller.DPKG);
 								
 								printMessage("Ejabberd has been successfully installed to: " + config.getXmppIp());
 							}

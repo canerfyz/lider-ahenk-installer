@@ -130,7 +130,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 									+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb");
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb", PackageInstaller.DPKG);
 							
 							printMessage("Lider has been successfully installed to: " + config.getLiderIp());
 						} catch (SSHConnectionException e) {
