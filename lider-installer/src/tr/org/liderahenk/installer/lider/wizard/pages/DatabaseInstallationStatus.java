@@ -180,7 +180,7 @@ public class DatabaseInstallationStatus extends WizardPage
 							
 							SetupUtils.installDownloadedPackageNonInteractively(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), "mariaDbTmp" + timestamp, "mariadb.deb", debconfValues);
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), "mariaDbTmp" + timestamp, "mariadb.deb", debconfValues, PackageInstaller.DPKG);
 							
 							printMessage("MariaDB has been successfully installed to: " + config.getDatabaseIp());
 						} catch (CommandExecutionException e) {
