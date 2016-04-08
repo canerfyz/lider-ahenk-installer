@@ -1,0 +1,186 @@
+#!/bin/bash
+# Standalone kurulum icin standard ayarlari yapar.
+# mail: fethigurcan@gmail.com
+
+CNCONFIGADMINDN="cn=admin,cn=config"
+CNCONFIGADMINPASSWD="secret"
+
+#Varsayilan sifre secret
+NEW_PASSWD=$(slappasswd -h {SSHA} -s $CNCONFIGADMINPASSWD)
+
+#mevcut cn=config sifresini siler ve yenisini ekler
+ldapmodify -Y EXTERNAL -H ldapi:/// << EOL
+dn: olcDatabase={0}config,cn=config
+replace: olcRootPW
+olcRootPW: $NEW_PASSWD
+
+dn: cn=config
+replace: olcAuthzRegexp
+olcAuthzRegexp: {0}uid=([^,]*),cn=[^,]*,cn=auth  ldap:///dc=mys,dc=pardus,dc=org??sub?(uid=\$1)
+-
+replace: olcSizeLimit
+olcSizeLimit: 10000
+EOL
+
+# Policy modulu icin gerekli schemayi yukler
+ldapadd -x -f /etc/ldap/schema/ppolicy.ldif -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD
+
+# Varsayilan gerekli modulleri ayarlar
+ldapmodify -Y EXTERNAL -H ldapi:/// << EOL
+dn: cn=module{0},cn=config
+changetype: modify
+add: olcModuleLoad
+olcModuleLoad: unique
+olcModuleLoad: memberof
+olcModuleLoad: refint
+olcModuleLoad: ppolicy
+EOL
+
+service slapd restart
+# liderahenk semasini yukler
+ldapadd -x -f /tmp/liderahenk.ldif -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD
+
+# mys.pardus.org veritabanini olusturur
+CNAME="mys.pardus.org"
+BASEDN="dc=mys,dc=pardus,dc=org"
+BASECN="mys"
+ORGANIZATION="Pardus MYS"
+
+ADMINCN="admin"
+ADMINPASSWD="secret"
+
+ADMINDN="cn=$ADMINCN,$BASEDN"
+ADMINGROUPDN="cn=Administrators,ou=Groups,$BASEDN"
+DEFAULTPOLICYDN="cn=Default,ou=Policies,$BASEDN"
+ADMINPASSWDHASH=$(slappasswd -h {SSHA} -s $ADMINPASSWD)
+DBPATH=/var/ldaps/$CNAME
+
+CURRENTDN=`ldapsearch -LLL -x -s sub -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD -b "cn=config" "(&(olcDatabase=*)(olcSuffix=$BASEDN))" | grep "dn: olcDatabase="`
+CURRENTDN=${CURRENTDN:4}
+
+if [ -n "$CURRENTDN" ]; then
+    echo "ERROR: $BASEDN already exists on database config entry $CURRENTDN!" 1>&2
+    exit 0
+fi
+
+if [ -d "$DBPATH" ]; then
+    echo "ERROR: Directory $DBPATH already exists!" 1>&2
+    exit 0
+fi
+
+mkdir -p $DBPATH
+chmod 755 $DBPATH
+chown openldap:openldap $DBPATH
+
+LASTDBCOUNT=`ldapsearch -LLL -x -s sub -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD -b "cn=config" "(olcDatabase=*)" | egrep -o "dn: olcDatabase={([0-9]+)}hdb" | tac | egrep -o -m1 "[0-9]+"`
+CURDBNO=`expr $LASTDBCOUNT + 1`
+
+ldapadd -x -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD << EOL
+dn: olcDatabase={$CURDBNO}hdb,cn=config
+objectClass: olcHdbConfig
+objectClass: olcDatabaseConfig
+olcDatabase: {$CURDBNO}hdb
+olcDbDirectory: $DBPATH
+olcAccess: {0}to attrs=userPassword,shadowLastChange by self write by anonymous auth by dn="$ADMINDN" write by group.exact="$ADMINGROUPDN" write by * none
+olcAccess: {1}to dn.base="" by * read
+olcAccess: {2}to * by self write by dn="$ADMINDN" write by group.exact="$ADMINGROUPDN" write by * read
+olcDbCheckpoint: 512 30
+olcDbConfig: {0}set_cachesize 0 2097152 0
+olcDbConfig: {1}set_lk_max_objects 1500
+olcDbConfig: {2}set_lk_max_locks 1500
+olcDbConfig: {3}set_lk_max_lockers 1500
+olcDbIndex: objectClass eq
+olcDbIndex: uid eq
+olcDbIndex: cn,sn,title approx
+olcLastMod: TRUE
+olcRootDN: $ADMINDN
+olcRootPW: $ADMINPASSWDHASH
+olcSuffix: $BASEDN
+
+#uid parametresini unique yapar. (unique modulu yuklu olmalidir.)
+dn: olcOverlay=unique,olcDatabase={$CURDBNO}hdb,cn=config
+objectClass: olcUniqueConfig
+objectClass: top
+objectClass: olcConfig
+objectClass: olcOverlayConfig
+olcOverlay: unique
+olcUniqueAttribute: uid
+
+#memberof modulunu aktive eder, boylece bir groupOfNames e her member eklendiginde eklenen member'in memberof parametresi de otomatik ayarlanir.
+dn: olcOverlay=memberof,olcDatabase={$CURDBNO}hdb,cn=config
+objectClass: olcMemberOf
+objectClass: top
+objectClass: olcConfig
+objectClass: olcOverlayConfig
+olcOverlay: memberof
+
+#refint modulunu aktive et. kayitlar arasinda memberof,member,manager,owner tutarliligni saglar.
+dn: olcOverlay=refint,olcDatabase={$CURDBNO}hdb,cn=config
+objectClass: olcRefintConfig
+objectClass: top
+objectClass: olcConfig
+objectClass: olcOverlayConfig
+olcOverlay: refint
+olcRefintAttribute: memberof member manager owner
+
+# ppolicy modulunu aktive et.
+dn: olcOverlay=ppolicy,olcDatabase={$CURDBNO}hdb,cn=config
+objectClass: olcPPolicyConfig
+objectClass: top
+objectClass: olcConfig
+objectClass: olcOverlayConfig
+olcOverlay: ppolicy
+olcPPolicyDefault: $DEFAULTPOLICYDN
+EOL
+
+service slapd restart
+
+ldapadd -x -D "$ADMINDN" -w $ADMINPASSWD << EOL
+#Root Organization
+dn: $BASEDN
+objectClass: dcObject
+objectClass: organization
+dc: $BASECN
+o: $ORGANIZATION
+description: The $ORGANIZATION
+
+# Organizational Role for Directory Manager
+dn: $ADMINDN
+objectClass: organizationalRole
+cn: $ADMINCN
+description: $ORGANIZATION Directory Manager
+
+dn: ou=Uncategorized,dc=mys,dc=pardus,dc=org
+objectClass: top
+objectClass: organizationalUnit
+ou: Uncategorized
+
+dn: ou=Groups,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=Policies,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: Policies
+
+dn: $ADMINGROUPDN
+objectClass: top
+objectClass: groupOfNames
+cn: Administrators
+member: $ADMINDN
+
+dn: $DEFAULTPOLICYDN
+objectClass: pwdPolicy
+objectClass: top
+objectClass: organizationalRole
+cn: Default
+pwdAttribute: userPassword
+pwdLockout: TRUE
+EOL
+
+service slapd restart
+
+#bitti
+exit 0

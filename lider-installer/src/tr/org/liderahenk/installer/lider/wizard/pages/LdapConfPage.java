@@ -1,5 +1,11 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -10,6 +16,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -122,6 +129,10 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 			}
 		});
 
+		// Read from file and bring default configuration
+		// in the opening of page
+		readFile("ldapconfig", st);
+		
 		setPageComplete(false);
 	}
 
@@ -132,6 +143,50 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		config.setLdapConfContent(st.getText());
 
 		return super.getNextPage();
+	}
+	
+	/**
+	 * Reads file from classpath location for current project and sets it to a
+	 * text in a GUI.
+	 * 
+	 * @param fileName
+	 */
+	private void readFile(String fileName, final StyledText guiText) {
+
+		BufferedReader br = null;
+		InputStream inputStream = null;
+
+		try {
+			String currentLine;
+
+			inputStream = this.getClass().getClassLoader().getResourceAsStream(fileName);
+
+			br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+			String readingText = "";
+
+			while ((currentLine = br.readLine()) != null) {
+				// Platform independent line separator.
+				readingText += currentLine + System.getProperty("line.separator");
+			}
+
+			final String tmpText = readingText;
+			Display.getCurrent().asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					guiText.setText(tmpText);
+				}
+			});
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
