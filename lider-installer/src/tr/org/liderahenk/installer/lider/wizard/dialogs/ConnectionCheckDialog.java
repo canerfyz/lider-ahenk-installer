@@ -56,14 +56,6 @@ public class ConnectionCheckDialog extends Dialog {
 		// Do not show close on the title bar and lock parent window.
 		super.setShellStyle(SWT.TITLE | SWT.APPLICATION_MODAL);
 
-		// getShell().addListener(SWT.Traverse, new Listener() {
-		// @Override
-		// public void handleEvent(Event e) {
-		// if (e.detail == SWT.TRAVERSE_ESCAPE) {
-		// e.doit = false;
-		// }
-		// }
-		// });
 	}
 
 	@Override
