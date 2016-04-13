@@ -314,6 +314,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								// --- Create Ejabberd Shared Roster Groups
 								// Lider SRG
+								// TODO "\'lider-srg\\nahenk-srg\'" runs as one srg: lider-srgnahenk-srg
 								String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
 										new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
 												config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
