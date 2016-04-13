@@ -236,17 +236,28 @@ public class AhenkNetworkScanPage extends WizardPage {
 		txtIpRange = new Text(inputContainer, SWT.BORDER);
 		txtIpRange.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+		GridData gd = new GridData();
+		gd.widthHint = 150;
+		
 		// Network Scan Button
 		btnScan = new Button(inputContainer, SWT.NONE);
 		btnScan.setText(Messages.getString("START_SCAN"));
+		btnScan.setLayoutData(gd);
 		btnScan.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 
 				// Start a new scan!
-				if (executor == null || executor.isShutdown() || executor.isTerminated()) {
+//				if (executor == null || executor.isShutdown() || executor.isTerminated()) {
+				System.out.println(executor != null ? executor.getActiveCount() : "executor is null");
+				if (executor == null || executor.getActiveCount() == 0) {
 
-					btnScan.setText(Messages.getString("STOP_SCAN"));
+					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							btnScan.setText(Messages.getString("STOP_SCAN"));
+						}
+					});
 
 					// If user provides an IP range, scan only it!
 					// otherwise find all IP addresses on the connected networks
@@ -301,17 +312,27 @@ public class AhenkNetworkScanPage extends WizardPage {
 						// Threads use this helper class to modify IP table.
 						TableThreadHelper tableHelper = new TableThreadHelper(tblVwrSetup, hosts);
 
+						// Calculate number of the hosts a thread can process
 						int numberOfHosts = ipAddresses.size();
-						int hostsPerThread = numberOfHosts / NUM_THREADS;
+						int hostsPerThread;
+						if (numberOfHosts < NUM_THREADS) {
+							hostsPerThread = 1;
+				 		} else {
+				 			hostsPerThread = numberOfHosts / NUM_THREADS;
+				 		}
 
 						logger.log(Level.INFO, "Hosts: {0}, Threads:{1}, Host per Thread: {2}",
 								new Object[] { numberOfHosts, NUM_THREADS, hostsPerThread });
 
 						for (int i = 0; i < numberOfHosts; i += hostsPerThread) {
-
-							int toIndex = i + hostsPerThread;
-							List<String> ipSubList = ipAddresses.subList(i,
-									toIndex < ipAddresses.size() ? toIndex : ipAddresses.size() - 1);
+							List<String> ipSubList;
+							if (numberOfHosts < NUM_THREADS) {
+								ipSubList = ipAddresses.subList(i, i + 1);
+							} else {
+					 			int toIndex = i + hostsPerThread;
+					 			ipSubList = ipAddresses.subList(i,
+					 					toIndex < ipAddresses.size() ? toIndex : ipAddresses.size() - 1);
+					 		}
 
 							NmapParameters params = new NmapParameters();
 							params.setIpList(ipSubList);
@@ -370,19 +391,24 @@ public class AhenkNetworkScanPage extends WizardPage {
 				// Executor already running! Force stop.
 				else {
 
-					btnScan.setText(Messages.getString("STOP_SCAN"));
+					Display.getCurrent().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							btnScan.setText(Messages.getString("START_SCAN"));
+						}
+					});
 
 					BusyIndicator.showWhile(btnScan.getDisplay(), new Thread() {
 						@Override
 						public void run() {
 							executor.shutdownNow();
 							// TODO print status: stopping threads
-							try {
-								while (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
-									logger.log(Level.INFO, "Awaiting completion of threads.");
-								}
-							} catch (InterruptedException e1) {
-							}
+//							try {
+//								while (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
+//									logger.log(Level.INFO, "Awaiting completion of threads.");
+//								}
+//							} catch (InterruptedException e1) {
+//							}
 						}
 					});
 
