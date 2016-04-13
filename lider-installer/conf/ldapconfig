@@ -1,6 +1,5 @@
 #!/bin/bash
 # Standalone kurulum icin standard ayarlari yapar.
-# mail: fethigurcan@gmail.com
 
 CNCONFIGADMINDN="cn=admin,cn=config"
 CNCONFIGADMINPASSWD="secret"
