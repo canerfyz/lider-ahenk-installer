@@ -56,7 +56,7 @@
 					<scanIntervalSeconds>10</scanIntervalSeconds>
 					<webAppSourceDirectory>${basedir}/target/repository/</webAppSourceDirectory>
 					<webApp>
-						<contextPath>/site</contextPath>
+						<contextPath>/site/installer</contextPath>
 					</webApp>
 				</configuration>
 			</plugin>
