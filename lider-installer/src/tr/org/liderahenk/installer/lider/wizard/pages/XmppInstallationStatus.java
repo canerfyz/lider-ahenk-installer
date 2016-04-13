@@ -42,6 +42,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create {1} {2} {3} {4} {5}";
 
+	private static final String CHOWN_EJABBERD = "chown -R ejabberd:ejabberd {0}";
+
 	public XmppInstallationStatus(LiderSetupConfig config) {
 		super(XmppInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("4.4 " + Messages.getString("XMPP_INSTALLATION"));
@@ -113,23 +115,24 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								SetupUtils.installPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), deb, PackageInstaller.DPKG);
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), deb,
+										PackageInstaller.DPKG);
 
 								printMessage("Successfully installed package: " + deb.getName());
 							} else if (config.getXmppInstallMethod() == InstallMethod.WGET) {
-								printMessage("Downloading Ejabberd .deb package from: "
-										+ config.getXmppDownloadUrl());
-								
-								// In case of folder name clash use current time as postfix
+								printMessage("Downloading Ejabberd .deb package from: " + config.getXmppDownloadUrl());
+
+								// In case of folder name clash use current time
+								// as postfix
 								Date date = new Date();
 								SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
 								String timestamp = dateFormat.format(date);
-								
+
 								SetupUtils.downloadPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb",
-										config.getXmppDownloadUrl());
-								
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
+										"ejabberdTmpDir" + timestamp, "ejabberd.deb", config.getXmppDownloadUrl());
+
 								setProgressBar(30);
 
 								printMessage("Successfully downloaded file.");
@@ -138,8 +141,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 										+ " from downloaded .deb file.");
 								SetupUtils.installDownloadedPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberdTmpDir" + timestamp, "ejabberd.deb", PackageInstaller.DPKG);
-								
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
+										"ejabberdTmpDir" + timestamp, "ejabberd.deb", PackageInstaller.DPKG);
+
 								printMessage("Ejabberd has been successfully installed to: " + config.getXmppIp());
 							}
 
@@ -148,14 +152,16 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							printMessage("Now, installer starts configuring Ejabberd, please wait..");
 
 							if (config.getXmppInstallMethod() == InstallMethod.APT_GET) {
-								
-								// ----- Set ejabberd.yml configuration file ---//
+
+								// ----- Set ejabberd.yml configuration file
 								File file = new File(config.getXmppAbsPathConfFile());
 
-								// ejabberd.yml file is in /etc/ejabberd at old versions
+								// ejabberd.yml file is in /etc/ejabberd at old
+								// versions
 								SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), file, "/etc/ejabberd/");
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), file,
+										"/etc/ejabberd/");
 								printMessage("Configuration file successfully set.");
 								setProgressBar(60);
 
@@ -166,69 +172,68 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								script = script.replaceAll("##", config.getXmppHostname());
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), script);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), script);
 								setProgressBar(70);
 								// -----------------------------------//
 
 								// ----- Starting Ejabberd service -----//
 								printMessage("Restarting Ejabberd service to apply changes.");
 
-								// Ejabberd starts immediately after installation at old versions.
+								// Ejabberd starts immediately after
+								// installation at old versions.
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), "service ejabberd restart");
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
+										"service ejabberd restart");
 								setProgressBar(80);
 								// ------------------------------------//
 
-								// --- Create Ejabberd Shared Roster Groups ---//
+								// --- Create Ejabberd Shared Roster Groups
 								// Lider SRG
 								String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
-										new Object[] { "", "lider-srg",
-												config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
-												"\'lider-srg\\nahenk-srg\'" });
+										new Object[] { "", "lider-srg", config.getXmppHostname(), "Lider-SRG",
+												"Lider-SRG", "\'lider-srg\\nahenk-srg\'" });
 
-								// TODO After starting ejabberd we may need to wait a little bit. 
+								// TODO After starting ejabberd we may need to
+								// wait a little bit.
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), createSrg);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
 
 								// Ahenk SRG
-								createSrg = prepareCommand(EJABBERD_SRG_CREATE,
-										new Object[] { "", "ahenk-srg",
-												config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
+								createSrg = prepareCommand(EJABBERD_SRG_CREATE, new Object[] { "", "ahenk-srg",
+										config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), createSrg);
-								// ------------------------------------------------//
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
+										// ------------------------------------------------//
 
-								// ---------- Create Ejabberd users -----------//
+								// ---------- Create Ejabberd users
 								printMessage("Creating Ejabberd users..");
 
 								// Prepare register command for admin user
-								String register = prepareCommand(EJABBERD_REGISTER,
-										new Object[] { "", "admin",
-												config.getXmppHostname(), config.getXmppAdminPwd() });
+								String register = prepareCommand(EJABBERD_REGISTER, new Object[] { "", "admin",
+										config.getXmppHostname(), config.getXmppAdminPwd() });
 
 								// Register admin user in Ejabberd
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), register);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
 								printMessage("Ejabberd user: admin has been successfully created");
 								setProgressBar(90);
 
 								// Prepare register command for Lider user
 								register = prepareCommand(EJABBERD_REGISTER,
-										new Object[] { "",
-												config.getXmppLiderUsername(), config.getXmppHostname(),
+										new Object[] { "", config.getXmppLiderUsername(), config.getXmppHostname(),
 												config.getXmppLiderPassword() });
 
 								// Register Lider server user in Ejabberd
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), register);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
 								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
 										+ " has been successfully created");
 								setProgressBar(95);
@@ -236,7 +241,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								isInstallationFinished = true;
 
-								// If installation finished delete the configuration
+								// If installation finished delete the
+								// configuration
 								// file created in /tmp
 								if (isInstallationFinished) {
 									deleteFile("ejabberd.yml");
@@ -252,19 +258,22 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								// TODO
 								// TODO
 								// --------------------------//
-								// TODO Add all users to ahenk srg by default (hint:
+								// TODO Add all users to ahenk srg by default
+								// (hint:
 								// @all@)
-								
+
 							} else {
-								// ----- Set ejabberd.yml configuration file ---//
+								// ----- Set ejabberd.yml configuration file
 								File file = new File(config.getXmppAbsPathConfFile());
 
 								SetupUtils.copyFile(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), file, PropertyReader.property("xmpp.conf.path"));
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), file,
+										PropertyReader.property("xmpp.conf.path"));
 								printMessage("Configuration file successfully set.");
 								setProgressBar(60);
-
+								// ------------ //
+								
 								// ------ Configure /etc/hosts file ---//
 								printMessage("Configuring hosts file for Ejabberd..");
 
@@ -272,32 +281,48 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								script = script.replaceAll("##", config.getXmppHostname());
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), script);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), script);
 								setProgressBar(70);
 								// -----------------------------------//
+
+								// --- Change owner of Ejabberd folder --- //
+								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
+										CHOWN_EJABBERD.replace("{0}", PropertyReader.property("xmpp.path")));
+								// ---------------- //
 
 								// ----- Starting Ejabberd service -----//
 								printMessage("Starting Ejabberd service to apply changes.");
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
+										PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
 								setProgressBar(80);
 								// ------------------------------------//
 
-								// --- Create Ejabberd Shared Roster Groups ---//
+								// TODO After starting ejabberd we may need to
+								// wait a little bit.
+								try {
+									Thread.sleep(20000);
+								} catch (InterruptedException e) {
+									Thread.currentThread().interrupt();
+									e.printStackTrace();
+								}
+
+								// --- Create Ejabberd Shared Roster Groups
 								// Lider SRG
+								// TODO "\'lider-srg\\nahenk-srg\'" runs as one srg: lider-srgnahenk-srg
 								String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
 										new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
 												config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
 												"\'lider-srg\\nahenk-srg\'" });
 
-								// TODO After starting ejabberd we may need to wait a little bit. 
-
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), createSrg);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
 
 								// Ahenk SRG
 								createSrg = prepareCommand(EJABBERD_SRG_CREATE,
@@ -305,11 +330,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 												config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), createSrg);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
 								// ------------------------------------------------//
 
-								// ---------- Create Ejabberd users -----------//
+								// --- Create Ejabberd users ---//
 								printMessage("Creating Ejabberd users..");
 
 								// Prepare register command for admin user
@@ -319,8 +344,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								// Register admin user in Ejabberd
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), register);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
 								printMessage("Ejabberd user: admin has been successfully created");
 								setProgressBar(90);
 
@@ -332,8 +357,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								// Register Lider server user in Ejabberd
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-										config.getXmppAccessPassphrase(), register);
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
 								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
 										+ " has been successfully created");
 								setProgressBar(95);
@@ -341,7 +366,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								isInstallationFinished = true;
 
-								// If installation finished delete the configuration
+								// If installation finished delete the
+								// configuration
 								// file created in /tmp
 								if (isInstallationFinished) {
 									deleteFile("ejabberd.yml");
@@ -357,7 +383,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								// TODO
 								// TODO
 								// --------------------------//
-								// TODO Add all users to ahenk srg by default (hint:
+								// TODO Add all users to ahenk srg by default
+								// (hint:
 								// @all@)
 							}
 						} catch (SSHConnectionException e) {
@@ -384,9 +411,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 					}
 
 					setProgressBar(100);
-					
+
 					config.setInstallationFinished(isInstallationFinished);
-					
+
 					setPageCompleteAsync(isInstallationFinished);
 				}
 
