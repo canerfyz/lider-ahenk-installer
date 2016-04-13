@@ -68,7 +68,7 @@ public class NetworkUtils {
 	public static List<String> findIpAddresses() throws UnknownHostException, SocketException {
 
 		List<String> ipAddresses = new ArrayList<String>();
-		
+		boolean add1921681 = true;
 		// Find all IP ranges of network interfaces belonging to the local machine. 
 		// (It may have multiple network interfaces, therefore might have multiple IP addresses)
     	Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
@@ -79,12 +79,28 @@ public class NetworkUtils {
     			for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
     				if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports only IPv4 at the moment, 
     																		   // So max mask length cannot exceed 32!
-    					SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
-    					ipAddresses.addAll(Arrays.asList(subnet.getInfo().getAllAddresses()));
+    					try {
+    						SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
+    						String[] adresses = subnet.getInfo().getAllAddresses();
+    						ipAddresses.addAll(Arrays.asList(adresses));
+    						if (adresses.length > 0) {
+    							if (adresses[0].startsWith("192.168.1.")) {
+    								add1921681 = false;
+    							}
+    						}
+    						logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
+						} catch (Exception e) {	
+							e.printStackTrace();
+							logger.log(Level.SEVERE, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength(), e);
+						}
     					
-    					logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
     				}
     			}
+    		}
+    	}
+    	if (add1921681) {
+    		for(int i=1;i<256;i++) {
+    			ipAddresses.add(i-1, ("192.168.1."+i));
     		}
     	}
     	
