@@ -8,6 +8,8 @@ lider-ahenk-installer is the installation wizard for Ahenk, Lider (and its compo
 
 * See [Lider Ahenk Installer wiki](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki) to get started!
 * See how to [setup development environment](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/01.-Setup-Development-Environment)
+* Learn how to [build & run](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/02.-Building-&-Running) installer.
+* [Export Lider Ahenk Installer](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/03.-Exporting-Installer) as custom RCP application.
 
 ## Contribution
 
