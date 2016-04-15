@@ -6,6 +6,9 @@ lider-ahenk-installer is the installation wizard for Ahenk, Lider (and its compo
 
 ## Documentation
 
+* See [Lider Ahenk Installer wiki](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki) to get started!
+* See how to [setup development environment](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/01.-Setup-Development-Environment)
+
 ## Contribution
 
 We encourage contributions to the project. To contribute:
