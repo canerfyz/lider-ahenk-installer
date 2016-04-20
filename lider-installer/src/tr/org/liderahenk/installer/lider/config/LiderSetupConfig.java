@@ -347,9 +347,19 @@ public class LiderSetupConfig {
 	private String liderDebFileName;
 
 	/**
+	 * File name of the provided TAR file
+	 */
+	private String liderTarFileName;
+	
+	/**
 	 * File content of the provided DEB package
 	 */
 	private byte[] liderDebFileContent;
+
+	/**
+	 * File content of the provided TAR file
+	 */
+	private byte[] liderTarFileContent;
 
 	private String liderDownloadUrl;
 	
@@ -881,6 +891,22 @@ public class LiderSetupConfig {
 
 	public void setLiderDownloadUrl(String liderDownloadUrl) {
 		this.liderDownloadUrl = liderDownloadUrl;
+	}
+
+	public String getLiderTarFileName() {
+		return liderTarFileName;
+	}
+
+	public void setLiderTarFileName(String liderTarFileName) {
+		this.liderTarFileName = liderTarFileName;
+	}
+
+	public byte[] getLiderTarFileContent() {
+		return liderTarFileContent;
+	}
+
+	public void setLiderTarFileContent(byte[] liderTarFileContent) {
+		this.liderTarFileContent = liderTarFileContent;
 	}
 
 }
