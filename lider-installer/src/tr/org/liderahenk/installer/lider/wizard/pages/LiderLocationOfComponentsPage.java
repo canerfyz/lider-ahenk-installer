@@ -301,10 +301,52 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	}
 
 	private boolean checkRequiredIps() {
-		return ((config.isInstallDatabase() && NetworkUtils.isIpValid(txtDatabaseIp.getText()))
-				|| (config.isInstallLdap() && NetworkUtils.isIpValid(txtLdapIp.getText()))
-				|| (config.isInstallXmpp() && NetworkUtils.isIpValid(txtXmppIp.getText()))
-				|| (config.isInstallLider() && NetworkUtils.isIpValid(txtLiderIp.getText())));
+		boolean databaseIpEntered = false; 
+		boolean ldapIpEntered = false; 
+		boolean xmppIpEntered = false; 
+		boolean liderIpEntered = false; 
+		
+		if (config.isInstallDatabase()) {
+			if (NetworkUtils.isIpValid(txtDatabaseIp.getText())) {
+				databaseIpEntered = true;
+			} else {
+				databaseIpEntered = false;
+			}
+		} else {
+			databaseIpEntered = true;
+		}
+		if (config.isInstallLdap()) {
+			if (NetworkUtils.isIpValid(txtLdapIp.getText())) {
+				ldapIpEntered = true;
+			} else {
+				ldapIpEntered = false;
+			}
+		}
+		else {
+			ldapIpEntered = false;
+		}
+		if (config.isInstallXmpp()) {
+			if (NetworkUtils.isIpValid(txtXmppIp.getText())) {
+				xmppIpEntered = true;
+			} else {
+				xmppIpEntered = false;
+			}
+		}
+		else {
+			xmppIpEntered = false;
+		}
+		if (config.isInstallLider()) {
+			if (NetworkUtils.isIpValid(txtLiderIp.getText())) {
+				liderIpEntered = true;
+			} else {
+				liderIpEntered = false;
+			}
+		}
+		else {
+			liderIpEntered = false;
+		}
+		
+		return (databaseIpEntered && ldapIpEntered && xmppIpEntered && liderIpEntered);
 	}
 
 	private void setConfigVariables() {

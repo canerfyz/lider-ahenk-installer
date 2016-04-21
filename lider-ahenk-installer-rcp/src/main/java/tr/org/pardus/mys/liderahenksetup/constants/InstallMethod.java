@@ -4,4 +4,5 @@ public enum InstallMethod {
 	APT_GET,
 	PROVIDED_DEB,
 	WGET,
+	TAR_GZ
 }

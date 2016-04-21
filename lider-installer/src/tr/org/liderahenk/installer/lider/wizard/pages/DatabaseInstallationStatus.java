@@ -80,6 +80,8 @@ public class DatabaseInstallationStatus extends WizardPage
 			final Display display = Display.getCurrent();
 			final Shell shell = display.getActiveShell();
 
+			canGoBack = false;
+			
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {

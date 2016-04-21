@@ -89,6 +89,8 @@ public class SetupUtils {
 	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget --output-document=/tmp/{0}/{1} {2}";
 
 	private static final String INSTALL_PACKAGE_GDEBI = "gdebi -n {0}";
+	
+	private static final String EXTRACT_FILE = "tar -xzvf {0} --directory {1}";
 
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
@@ -772,6 +774,11 @@ public class SetupUtils {
 	public static void copyFile(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final File fileToTranster, final String destDirectory)
 					throws SSHConnectionException, CommandExecutionException {
+		String destinationDir = destDirectory;
+		if (!destinationDir.endsWith("/")) {
+			destinationDir += "/";
+		}
+		
 //		if (NetworkUtils.isLocal(ip)) {
 //
 //			String destinationDir = destDirectory;
@@ -820,13 +827,12 @@ public class SetupUtils {
 //			}
 //
 //		} else {
-
 			logger.log(Level.INFO, "Copying file to: {0} with username: {1}", new Object[] { ip, username });
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
 			manager.connect();
-			manager.copyFileToRemote(fileToTranster, destDirectory, false);
+			manager.copyFileToRemote(fileToTranster, destinationDir, false);
 			manager.disconnect();
 
 			logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
@@ -1124,6 +1130,52 @@ public class SetupUtils {
 			// Finally, install the downloaded package
 			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename, packageInstaller);
 //		}
+	}
+	
+	public static void extractTarFile(final String ip, final String username, final String password,
+			final Integer port, final String privateKey, final String passphrase,
+			final String pathOfFile, final String extracingDestination) throws SSHConnectionException, CommandExecutionException {
+
+		String command = EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination);
+
+		if (NetworkUtils.isLocal(ip)) {
+
+			logger.log(Level.INFO, "Executing command locally.");
+
+			try {
+
+				Process process = Runtime.getRuntime().exec(command);
+
+				int exitValue = process.waitFor();
+				if (exitValue != 0) {
+					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+					throw new CommandExecutionException("Failed to execute command: " + command);
+				}
+
+				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
+					new Object[] { ip, username });
+
+			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+					passphrase);
+			manager.connect();
+
+			manager.execCommand(command, new Object[] {});
+			logger.log(Level.INFO, "Command: '{0}' executed successfully.",
+					new Object[] { EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination) });
+
+			manager.disconnect();
+		}
+
 	}
 
 }

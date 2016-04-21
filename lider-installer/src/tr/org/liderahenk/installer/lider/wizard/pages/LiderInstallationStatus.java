@@ -94,7 +94,8 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						try {
 							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb, PackageInstaller.DPKG);
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb,
+									PackageInstaller.DPKG);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
@@ -107,21 +108,64 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
+					} else if (config.getLiderInstallMethod() == InstallMethod.TAR_GZ) {
+						File tar = new File(config.getLiderTarFileName());
+
+						try {
+							// In case of folder name clash use current time as
+							// postfix
+							Date date = new Date();
+							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
+							String timestamp = dateFormat.format(date);
+							
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "mkdir /tmp/liderTmpDir" + timestamp);
+							
+							printMessage("Copying TAR file to: " + config.getLiderIp());
+							setProgressBar(30);
+
+							SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), tar,
+									"/tmp/liderTmpDir" + timestamp);
+
+							printMessage("TAR file successfully copied to: " + config.getLiderIp());
+							setProgressBar(60);
+							
+							printMessage("Extracting TAR file: " + tar.getName());
+							SetupUtils.extractTarFile(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "/tmp/liderTmpDir" + timestamp + "/" + tar.getName(), "/opt/");
+							setProgressBar(90);
+							isInstallationFinished = true;
+							printMessage("Successfully extracted package: " + tar.getName());
+							printMessage("Installation completed.");
+						} catch (SSHConnectionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						} catch (CommandExecutionException e) {
+							isInstallationFinished = false;
+							printMessage("Error occurred: " + e.getMessage());
+							e.printStackTrace();
+						}
+
 					} else if (config.getLiderInstallMethod() == InstallMethod.WGET) {
 						try {
-							printMessage("Downloading Lider .deb package from: "
-									+ config.getLiderDownloadUrl());
-							
-							// In case of folder name clash use current time as postfix
+							printMessage("Downloading Lider .deb package from: " + config.getLiderDownloadUrl());
+
+							// In case of folder name clash use current time as
+							// postfix
 							Date date = new Date();
 							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
 							String timestamp = dateFormat.format(date);
 
 							SetupUtils.downloadPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb",
-									config.getLiderDownloadUrl());
-							
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
+									"liderTmpDir" + timestamp, "lider.deb", config.getLiderDownloadUrl());
+
 							setProgressBar(30);
 
 							printMessage("Successfully downloaded file.");
@@ -130,8 +174,9 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 									+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "liderTmpDir" + timestamp, "lider.deb", PackageInstaller.DPKG);
-							
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
+									"liderTmpDir" + timestamp, "lider.deb", PackageInstaller.DPKG);
+
 							printMessage("Lider has been successfully installed to: " + config.getLiderIp());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
@@ -142,16 +187,16 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
-						
+
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
 
 					setProgressBar(100);
-					
+
 					config.setInstallationFinished(isInstallationFinished);
-					
+
 					setPageCompleteAsync(isInstallationFinished);
 				}
 
