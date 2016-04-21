@@ -61,6 +61,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	public void createControl(Composite parent) {
 
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
+		setControl(mainContainer);
 		
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
 		
@@ -99,7 +100,6 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		adminCnPwd.setText("secret");
 		
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
-		setControl(container);
 		
 		GUIHelper.createLabel(container, Messages.getString("LDAP_ENTER_CONF_CONTENT"));
 
@@ -198,10 +198,18 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		// Set config variables before going to next page
 		String text = st.getText();
 		Map<String, String> map = new HashMap<>();
+		map.put("#CNAME", cname.getText());
 		map.put("#BASEDN", baseDn.getText());
+		map.put("#BASECN", baseCn.getText());
+		map.put("#ORGANIZATION", organization.getText());
+		map.put("#ADMINCN", adminCn.getText());
+		map.put("#ADMINPASSWD", adminCnPwd.getText());
+		map.put("#CNCONFIGADMINDN", configAdminDn.getText());
+		map.put("#CNCONFIGADMINPASSWD", configAdminDnPwd.getText());
+		
 		text = SetupUtils.replace(map, text);
 		config.setLdapConfContent(text);
-		//		config.setLdapAbsPathConfFile(writeToFile(st.getText(), ""));
+		config.setLdapAbsPathConfFile(writeToFile(text, "ldapconfig"));
 
 		return super.getNextPage();
 	}
@@ -281,7 +289,4 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		return absPath;
 	}
 	
-	private void prepareConfigScript() {
-		
-	}
 }
