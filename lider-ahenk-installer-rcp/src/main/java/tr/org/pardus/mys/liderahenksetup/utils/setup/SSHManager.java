@@ -117,7 +117,7 @@ public class SSHManager {
 
 		Channel channel = null;
 		
-		logger.log(Level.INFO, "Command: {0}", command);
+		logger.log(Level.INFO, "Command: {}", command);
 
 		try {
 			channel = session.openChannel("exec");
