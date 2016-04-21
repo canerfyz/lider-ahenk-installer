@@ -196,11 +196,6 @@ public class LiderSetupConfig {
 	private String xmppPackageName;
 
 	/**
-	 * Root password for the XMPP server
-	 */
-	private String xmppRootPassword;
-
-	/**
 	 * XMPP server IP
 	 */
 	private String xmppIp;
@@ -790,14 +785,6 @@ public class LiderSetupConfig {
 
 	public void setXmppPackageName(String xmppPackageName) {
 		this.xmppPackageName = xmppPackageName;
-	}
-
-	public String getXmppRootPassword() {
-		return xmppRootPassword;
-	}
-
-	public void setXmppRootPassword(String xmppRootPassword) {
-		this.xmppRootPassword = xmppRootPassword;
 	}
 
 	public String getLdapConfContent() {

@@ -1,7 +1,11 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -223,8 +227,8 @@ public class SetupUtils {
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
 			manager.connect();
-			String versions = null; // manager.execCommand(CHECK_PACKAGE_EXIST_CMD,
-									// new Object[] { packageName });
+			String versions = null; 
+			 manager.execCommand(CHECK_PACKAGE_EXIST_CMD,new Object[] { packageName });
 			manager.disconnect();
 
 			/**
@@ -1196,5 +1200,25 @@ public class SetupUtils {
 		return text;
 	}
 	
+	public static File streamToFile(InputStream stream, String filename) {
+		try {
+			File file = new File(System.getProperty("java.io.tmpdir")+File.separator+filename);
+			OutputStream outputStream = new FileOutputStream(file);
+			int read = 0;
+			byte[] bytes = new byte[1024];
+	
+			while ((read = stream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, read);
+			}
+	
+			outputStream.close();
+			return file;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 }

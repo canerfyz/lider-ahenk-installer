@@ -272,7 +272,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		String absPath = null;
 
 		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
 
 			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
 
