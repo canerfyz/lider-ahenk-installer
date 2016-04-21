@@ -92,12 +92,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLdapPackageName());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
@@ -112,12 +107,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
