@@ -99,6 +99,8 @@ public class SSHManager {
 			throw new SSHConnectionException(e.getMessage());
 		}
 	}
+	
+	public static boolean USE_PTY = true;
 
 	/**
 	 * Executes command string via SSH
@@ -125,7 +127,7 @@ public class SSHManager {
 
 			// Open channel and handle output stream
 			InputStream inputStream = channel.getInputStream();
-			((ChannelExec) channel).setPty(true);
+			((ChannelExec) channel).setPty(USE_PTY);
 
 			OutputStream outputStream = null;
 			byte[] byteArray = null;

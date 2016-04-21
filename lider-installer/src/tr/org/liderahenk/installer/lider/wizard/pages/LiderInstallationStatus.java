@@ -23,6 +23,7 @@ import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 public class LiderInstallationStatus extends WizardPage implements ILiderPage {
@@ -206,8 +207,9 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 								config.getLiderAccessPasswd(), config.getLiderPort(),
 								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), datasourceConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
 						
-						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf &";
+						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
 						System.out.println("Command --> " + command);
+						SSHManager.USE_PTY = false;
 						// Start Karaf
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(),
@@ -217,6 +219,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 										return "\n".getBytes(StandardCharsets.UTF_8);
 									}
 						});
+						SSHManager.USE_PTY = true;
 						
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
