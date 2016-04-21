@@ -151,12 +151,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 		tblVwrSetup.setInput(hosts);
 		tblVwrSetup.refresh();
 
-		bar = new ProgressBar(container, SWT.SMOOTH | SWT.BORDER);
-		bar.setMaximum(100);
-		bar.setMinimum(0);
-		bar.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		bar.setForeground(PROGRESS_BAR_COLOR);
-
 		setPageComplete(false);
 
 	}
@@ -238,7 +232,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 		GridData gd = new GridData();
 		gd.widthHint = 150;
-		
+
 		// Network Scan Button
 		btnScan = new Button(inputContainer, SWT.NONE);
 		btnScan.setText(Messages.getString("START_SCAN"));
@@ -248,7 +242,8 @@ public class AhenkNetworkScanPage extends WizardPage {
 			public void widgetSelected(SelectionEvent e) {
 
 				// Start a new scan!
-//				if (executor == null || executor.isShutdown() || executor.isTerminated()) {
+				// if (executor == null || executor.isShutdown() ||
+				// executor.isTerminated()) {
 				System.out.println(executor != null ? executor.getActiveCount() : "executor is null");
 				if (executor == null || executor.getActiveCount() == 0) {
 
@@ -304,6 +299,13 @@ public class AhenkNetworkScanPage extends WizardPage {
 							@Override
 							protected void afterExecute(Runnable r, Throwable t) {
 								super.afterExecute(r, t);
+								final int selection = 100 - (executor.getActiveCount() / NUM_THREADS * 100);
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										bar.setSelection(selection);
+									}
+								});
 								running.remove(r);
 								logger.log(Level.INFO, "Running threads: {0}", running);
 							}
@@ -317,9 +319,9 @@ public class AhenkNetworkScanPage extends WizardPage {
 						int hostsPerThread;
 						if (numberOfHosts < NUM_THREADS) {
 							hostsPerThread = 1;
-				 		} else {
-				 			hostsPerThread = numberOfHosts / NUM_THREADS;
-				 		}
+						} else {
+							hostsPerThread = numberOfHosts / NUM_THREADS;
+						}
 
 						logger.log(Level.INFO, "Hosts: {0}, Threads:{1}, Host per Thread: {2}",
 								new Object[] { numberOfHosts, NUM_THREADS, hostsPerThread });
@@ -329,10 +331,10 @@ public class AhenkNetworkScanPage extends WizardPage {
 							if (numberOfHosts < NUM_THREADS) {
 								ipSubList = ipAddresses.subList(i, i + 1);
 							} else {
-					 			int toIndex = i + hostsPerThread;
-					 			ipSubList = ipAddresses.subList(i,
-					 					toIndex < ipAddresses.size() ? toIndex : ipAddresses.size() - 1);
-					 		}
+								int toIndex = i + hostsPerThread;
+								ipSubList = ipAddresses.subList(i,
+										toIndex < ipAddresses.size() ? toIndex : ipAddresses.size() - 1);
+							}
 
 							NmapParameters params = new NmapParameters();
 							params.setIpList(ipSubList);
@@ -340,7 +342,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 							params.setSudoPassword(getSudoPasswdIfExists());
 							params.setSudoUsername(getSudoUsernameIfExists());
 							params.setTimingTemplate(getSelectedTimingTemplate());
-
+							
 							RunnableNmap4j nmap4jThread = new RunnableNmap4j(tableHelper, params);
 							executor.execute(nmap4jThread);
 						}
@@ -369,10 +371,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 						// if (bar.isDisposed()) {
 						// return;
 						// }
-						// int selection = executor
-						// .getActiveCount()
-						// / NUM_THREADS
-						// * 100;
+//						int selection = executor.getActiveCount() / NUM_THREADS * 100;
 						// bar.setSelection(selection);
 						// logger.log(Level.INFO,
 						// "EXECUTOR INFO: {0}", selection);
@@ -403,12 +402,14 @@ public class AhenkNetworkScanPage extends WizardPage {
 						public void run() {
 							executor.shutdownNow();
 							// TODO print status: stopping threads
-//							try {
-//								while (!executor.awaitTermination(10, TimeUnit.SECONDS)) {
-//									logger.log(Level.INFO, "Awaiting completion of threads.");
-//								}
-//							} catch (InterruptedException e1) {
-//							}
+							// try {
+							// while (!executor.awaitTermination(10,
+							// TimeUnit.SECONDS)) {
+							// logger.log(Level.INFO, "Awaiting completion of
+							// threads.");
+							// }
+							// } catch (InterruptedException e1) {
+							// }
 						}
 					});
 

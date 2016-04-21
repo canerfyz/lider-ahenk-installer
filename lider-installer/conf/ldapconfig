@@ -1,8 +1,15 @@
 #!/bin/bash
 # Standalone kurulum icin standard ayarlari yapar.
 
-CNCONFIGADMINDN="cn=admin,cn=config"
-CNCONFIGADMINPASSWD="secret"
+CNAME="#CNAME"
+BASEDN="#BASEDN"
+BASECN="#BASECN"
+ORGANIZATION="#ORGANIZATION"
+
+ADMINCN="#ADMINCN"
+ADMINPASSWD="#ADMINPASSWD"
+CNCONFIGADMINDN="#CNCONFIGADMINDN"
+CNCONFIGADMINPASSWD="#CNCONFIGADMINPASSWD"
 
 #Varsayilan sifre secret
 NEW_PASSWD=$(slappasswd -h {SSHA} -s $CNCONFIGADMINPASSWD)
@@ -15,7 +22,7 @@ olcRootPW: $NEW_PASSWD
 
 dn: cn=config
 replace: olcAuthzRegexp
-olcAuthzRegexp: {0}uid=([^,]*),cn=[^,]*,cn=auth  ldap:///dc=mys,dc=pardus,dc=org??sub?(uid=\$1)
+olcAuthzRegexp: {0}uid=([^,]*),cn=[^,]*,cn=auth  ldap:///$BASEDN??sub?(uid=\$1)
 -
 replace: olcSizeLimit
 olcSizeLimit: 10000
@@ -40,13 +47,6 @@ service slapd restart
 ldapadd -x -f /tmp/liderahenk.ldif -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD
 
 # mys.pardus.org veritabanini olusturur
-CNAME="mys.pardus.org"
-BASEDN="dc=mys,dc=pardus,dc=org"
-BASECN="mys"
-ORGANIZATION="Pardus MYS"
-
-ADMINCN="admin"
-ADMINPASSWD="secret"
 
 ADMINDN="cn=$ADMINCN,$BASEDN"
 ADMINGROUPDN="cn=Administrators,ou=Groups,$BASEDN"

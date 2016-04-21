@@ -1,10 +1,15 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -21,10 +26,12 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -34,7 +41,16 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	private LiderSetupConfig config;
 
 	private StyledText st;
-
+	
+	private Text configAdminDn;
+	private Text configAdminDnPwd;
+	private Text cname;
+	private Text baseDn;
+	private Text baseCn;
+	private Text organization;
+	private Text adminCn;
+	private Text adminCnPwd;
+	
 	public LdapConfPage(LiderSetupConfig config) {
 		super(LdapConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("LDAP_CONF"));
@@ -44,9 +60,47 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	@Override
 	public void createControl(Composite parent) {
 
-		Composite container = GUIHelper.createComposite(parent, 1);
-		setControl(container);
+		Composite mainContainer = GUIHelper.createComposite(parent, 1);
+		
+		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
+		
+		Composite lineCont = GUIHelper.createComposite(propertyContainer, 2);
+		
+		GUIHelper.createLabel(lineCont, "Organization");
+		organization = GUIHelper.createText(lineCont);
+		organization.setText("Pardus MYS");
 
+		GUIHelper.createLabel(lineCont, "Organization CN");
+		cname = GUIHelper.createText(lineCont);
+		cname.setText("mys.pardus.org");
+
+		GUIHelper.createLabel(lineCont, "Base DN");
+		baseDn = GUIHelper.createText(lineCont);
+		baseDn.setText("dc=mys,dc=pardus,dc=org");
+
+		GUIHelper.createLabel(lineCont, "Base CN");
+		baseCn = GUIHelper.createText(lineCont);
+		baseCn.setText("mys");
+
+		GUIHelper.createLabel(lineCont, "Config Admin DN");
+		configAdminDn = GUIHelper.createText(lineCont);
+		configAdminDn.setText("cn=admin,cn=config");
+
+		GUIHelper.createLabel(lineCont, "Config Admin DN Password");
+		configAdminDnPwd = GUIHelper.createText(lineCont);
+		configAdminDnPwd.setText("secret");
+
+		GUIHelper.createLabel(lineCont, "Admin CN");
+		adminCn = GUIHelper.createText(lineCont);
+		adminCn.setText("admin");
+		
+		GUIHelper.createLabel(lineCont, "Admin CN Password");
+		adminCnPwd = GUIHelper.createText(lineCont);
+		adminCnPwd.setText("secret");
+		
+		Composite container = GUIHelper.createComposite(mainContainer, 1);
+		setControl(container);
+		
 		GUIHelper.createLabel(container, Messages.getString("LDAP_ENTER_CONF_CONTENT"));
 
 		// Add a text area for configuration.
@@ -133,6 +187,8 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		// in the opening of page
 		readFile("ldapconfig", st);
 		
+		
+
 		setPageComplete(false);
 	}
 
@@ -140,7 +196,12 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	public IWizardPage getNextPage() {
 
 		// Set config variables before going to next page
-		config.setLdapConfContent(st.getText());
+		String text = st.getText();
+		Map<String, String> map = new HashMap<>();
+		map.put("#BASEDN", baseDn.getText());
+		text = SetupUtils.replace(map, text);
+		config.setLdapConfContent(text);
+		//		config.setLdapAbsPathConfFile(writeToFile(st.getText(), ""));
 
 		return super.getNextPage();
 	}
@@ -189,4 +250,38 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		}
 	}
 
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param namePrefix
+	 * @param nameSuffix
+	 * @return absolute path of created temp file
+	 */
+	private String writeToFile(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return absPath;
+	}
+	
+	private void prepareConfigScript() {
+		
+	}
 }

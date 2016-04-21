@@ -1,13 +1,7 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -175,53 +169,53 @@ public class SetupUtils {
 	public static boolean packageExists(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName,
 			final String version) throws CommandExecutionException, SSHConnectionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Checking package locally.");
-
-			BufferedReader reader = null;
-
-			try {
-
-				String command = CHECK_PACKAGE_EXIST_CMD.replace("{0}", packageName);
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				// If input stream starts with "N:"
-				// it means that there is not such package.
-				if (version == null || "".equals(version)) {
-					boolean exists = !StringUtils.convertStream(process.getInputStream()).startsWith("N:");
-
-					return exists;
-				} else {
-					boolean exists = StringUtils.convertStream(process.getInputStream()).contains(version);
-
-					logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
-							new Object[] { packageName, version, exists });
-
-					return exists;
-				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} finally {
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Checking package locally.");
+//
+//			BufferedReader reader = null;
+//
+//			try {
+//
+//				String command = CHECK_PACKAGE_EXIST_CMD.replace("{0}", packageName);
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				// If input stream starts with "N:"
+//				// it means that there is not such package.
+//				if (version == null || "".equals(version)) {
+//					boolean exists = !StringUtils.convertStream(process.getInputStream()).startsWith("N:");
+//
+//					return exists;
+//				} else {
+//					boolean exists = StringUtils.convertStream(process.getInputStream()).contains(version);
+//
+//					logger.log(Level.INFO, "Does package {0}:{1} exist: {2}",
+//							new Object[] { packageName, version, exists });
+//
+//					return exists;
+//				}
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} finally {
+//				if (reader != null) {
+//					try {
+//						reader.close();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		} else {
 
 			logger.log(Level.INFO, "Checking package remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
@@ -247,11 +241,10 @@ public class SetupUtils {
 
 				return exists;
 			}
-		}
+//		}
 
-		logger.log(Level.INFO, "Does package {0}:{1} exist: {2}", new Object[] { packageName, version, false });
-
-		return false;
+//		logger.log(Level.INFO, "Does package {0}:{1} exist: {2}", new Object[] { packageName, version, false });
+//		return false;
 	}
 
 	/**
@@ -273,45 +266,45 @@ public class SetupUtils {
 	public static boolean packageInstalled(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName,
 			final String version) throws CommandExecutionException, SSHConnectionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Checking package locally.");
-
-			BufferedReader reader = null;
-
-			try {
-
-				String command = CHECK_PACKAGE_INSTALLED_CMD.replace("{0}", packageName);
-				Process process = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", command });
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				boolean installed = StringUtils.convertStream(process.getInputStream()).contains(version);
-
-				logger.log(Level.INFO, "Is package {0}:{1} installed: {2}",
-						new Object[] { packageName, version, installed });
-
-				return installed;
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} finally {
-				if (reader != null) {
-					try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Checking package locally.");
+//
+//			BufferedReader reader = null;
+//
+//			try {
+//
+//				String command = CHECK_PACKAGE_INSTALLED_CMD.replace("{0}", packageName);
+//				Process process = Runtime.getRuntime().exec(new String[] { "/bin/sh", "-c", command });
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				boolean installed = StringUtils.convertStream(process.getInputStream()).contains(version);
+//
+//				logger.log(Level.INFO, "Is package {0}:{1} installed: {2}",
+//						new Object[] { packageName, version, installed });
+//
+//				return installed;
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			} finally {
+//				if (reader != null) {
+//					try {
+//						reader.close();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//		} else {
 			try {
 				logger.log(Level.INFO, "Checking package remotely on: {0} with username: {1}",
 						new Object[] { ip, username });
@@ -333,7 +326,7 @@ public class SetupUtils {
 			} catch (SSHConnectionException e) {
 				e.printStackTrace();
 			}
-		}
+//		}
 
 		logger.log(Level.INFO, "Is package {0}:{1} installed: {2}", new Object[] { packageName, version, false });
 
@@ -359,46 +352,46 @@ public class SetupUtils {
 	public static void installPackage(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String packageName, final String version)
 					throws SSHConnectionException, CommandExecutionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Installing package locally.");
-
-			try {
-
-				String command;
-				String logMessage;
-
-				// If version is not given
-				if (version == null || version.isEmpty()) {
-					command = INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION.replace("{0}", packageName);
-					logMessage = "Package {0} installed successfully";
-				} else {
-					command = INSTALL_PACKAGE_FROM_REPO_CMD.replace("{0}", packageName).replace("{1}", version);
-					logMessage = "Package {0}:{1} installed successfully";
-				}
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-				if (version == null || "".equals(version)) {
-					logger.log(Level.INFO, logMessage, new Object[] { packageName, version });
-				} else {
-					logger.log(Level.INFO, logMessage, new Object[] { packageName });
-				}
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
-			try {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Installing package locally.");
+//
+//			try {
+//
+//				String command;
+//				String logMessage;
+//
+//				// If version is not given
+//				if (version == null || version.isEmpty()) {
+//					command = INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION.replace("{0}", packageName);
+//					logMessage = "Package {0} installed successfully";
+//				} else {
+//					command = INSTALL_PACKAGE_FROM_REPO_CMD.replace("{0}", packageName).replace("{1}", version);
+//					logMessage = "Package {0}:{1} installed successfully";
+//				}
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//				if (version == null || "".equals(version)) {
+//					logger.log(Level.INFO, logMessage, new Object[] { packageName, version });
+//				} else {
+//					logger.log(Level.INFO, logMessage, new Object[] { packageName });
+//				}
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
+//			try {
 				logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}",
 						new Object[] { ip, username });
 
@@ -408,7 +401,6 @@ public class SetupUtils {
 
 				// If version is not given
 				if (version == null || "".equals(version)) {
-					System.out.println("---------------------------------------------------- " + packageName);
 					manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, new Object[] { packageName });
 					logger.log(Level.INFO, "Package {0} installed successfully", new Object[] { packageName });
 				} else {
@@ -417,11 +409,11 @@ public class SetupUtils {
 							new Object[] { packageName, version });
 				}
 				manager.disconnect();
-
-			} catch (SSHConnectionException e) {
-				e.printStackTrace();
-			}
-		}
+//
+//			} catch (SSHConnectionException e) {
+//				e.printStackTrace();
+//			}
+//		}
 
 	}
 
@@ -448,48 +440,42 @@ public class SetupUtils {
 	public static void installPackageNoninteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName,
 			final String version, final String[] debconfValues)
-					throws CommandExecutionException, SSHConnectionException {
+					throws Exception {
 
-		if (NetworkUtils.isLocal(ip)) {
-
-			try {
-
-				// Set frontend as noninteractive
-				String command = SET_DEBIAN_FRONTEND;
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				// Set debconf values
-				for (String value : debconfValues) {
-
-					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
-					process = Runtime.getRuntime().exec(command);
-
-					exitValue = process.waitFor();
-					if (exitValue != 0) {
-						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
-								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-						throw new CommandExecutionException("Failed to execute command: " + command);
-					}
-
-				}
-
-				// Finally, install the package
-				SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, packageName, version);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//				// Set frontend as noninteractive
+//				String command = SET_DEBIAN_FRONTEND;
+//				Process process = new ProcessBuilder("/bin/bash", "-c", command).start();
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				// Set debconf values
+//				for (String value : debconfValues) {
+//
+//					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+//					process = new ProcessBuilder("sudo", "-u", username, "/bin/bash", "-c", command).start();
+//
+//					exitValue = process.waitFor();
+//					OutputStream stream = process.getOutputStream();
+//					stream.write((password + "\n").getBytes(StandardCharsets.UTF_8));
+//					if (exitValue != 0) {
+//						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
+//								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//						throw new CommandExecutionException("Failed to execute command: " + command);
+//					}
+//
+//				}
+//
+//				// Finally, install the package
+//				SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, packageName, version);
+//
+//		} else {
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
@@ -511,7 +497,7 @@ public class SetupUtils {
 
 			// Finally, install the package
 			SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, packageName, version);
-		}
+//		}
 
 	}
 
@@ -541,32 +527,32 @@ public class SetupUtils {
 			command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + debPackage.getName());
 		}
 
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Installing package locally.");
-
-			try {
-
-				copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Installing package locally.");
+//
+//			try {
+//
+//				copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 
 			logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
@@ -580,7 +566,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
-		}
+//		}
 	}
 
 	/**
@@ -600,47 +586,39 @@ public class SetupUtils {
 	 */
 	public static void installPackageNonInteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final File debPackage,
-			final String[] debconfValues, final PackageInstaller packageInstaller) throws CommandExecutionException, SSHConnectionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			try {
-
-				// Set frontend as noninteractive
-				String command = SET_DEBIAN_FRONTEND;
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				// Set debconf values
-				for (String value : debconfValues) {
-
-					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
-					process = Runtime.getRuntime().exec(command);
-
-					exitValue = process.waitFor();
-					if (exitValue != 0) {
-						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
-								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-						throw new CommandExecutionException("Failed to execute command: " + command);
-					}
-
-				}
-
-				// Finally, install the package
-				SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, debPackage, packageInstaller);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+			final String[] debconfValues, final PackageInstaller packageInstaller) throws Exception {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//				// Set frontend as noninteractive
+//				String command = SET_DEBIAN_FRONTEND;
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				// Set debconf values
+//				for (String value : debconfValues) {
+//
+//					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+//					process = Runtime.getRuntime().exec(command);
+//
+//					exitValue = process.waitFor();
+//					if (exitValue != 0) {
+//						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
+//								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//						throw new CommandExecutionException("Failed to execute command: " + command);
+//					}
+//
+//				}
+//
+//				// Finally, install the package
+//				SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, debPackage, packageInstaller);
+//
+//		} else {
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
@@ -662,7 +640,7 @@ public class SetupUtils {
 
 			// Finally, install the package
 			SetupUtils.installPackage(ip, username, password, port, privateKey, passphrase, debPackage, packageInstaller);
-		}
+//		}
 
 	}
 
@@ -681,31 +659,31 @@ public class SetupUtils {
 	public static void uninstallPackage(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName)
 					throws CommandExecutionException, SSHConnectionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Uninstalling package locally.");
-
-			try {
-
-				String command = UNINSTALL_PACKAGE_CMD.replace("{0}", packageName);
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Uninstalling package locally.");
+//
+//			try {
+//
+//				String command = UNINSTALL_PACKAGE_CMD.replace("{0}", packageName);
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 
 			logger.log(Level.INFO, "Uninstalling package remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
@@ -717,7 +695,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
-		}
+//		}
 	}
 
 	/**
@@ -735,31 +713,31 @@ public class SetupUtils {
 	public static void addRepository(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String repository)
 					throws CommandExecutionException, SSHConnectionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Adding repository locally.");
-
-			try {
-
-				String command = ADD_APP_REPO_CMD.replace("{0}", repository);
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Repository {0} added successfully", repository);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Adding repository locally.");
+//
+//			try {
+//
+//				String command = ADD_APP_REPO_CMD.replace("{0}", repository);
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Repository {0} added successfully", repository);
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 
 			logger.log(Level.INFO, "Adding repository remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
@@ -771,7 +749,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Repository {0} added successfully", repository);
-		}
+//		}
 
 	}
 
@@ -791,56 +769,59 @@ public class SetupUtils {
 	public static void copyFile(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final File fileToTranster, final String destDirectory)
 					throws SSHConnectionException, CommandExecutionException {
-		
 		String destinationDir = destDirectory;
 		if (!destinationDir.endsWith("/")) {
 			destinationDir += "/";
 		}
-//		destinationDir += fileToTranster.getName();
-
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Copying file to: {0}", destinationDir);
-
-			InputStream in = null;
-			OutputStream out = null;
-
-			try {
-
-				in = new FileInputStream(fileToTranster);
-				out = new FileOutputStream(destinationDir);
-
-				byte[] buf = new byte[1024];
-				int len;
-				while ((len = in.read(buf)) > 0) {
-					out.write(buf, 0, len);
-				}
-
-				logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				if (in != null) {
-					try {
-						in.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				if (out != null) {
-					try {
-						in.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-		} else {
-
+		
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			String destinationDir = destDirectory;
+//			if (!destinationDir.endsWith("/")) {
+//				destinationDir += "/";
+//			}
+//			destinationDir += fileToTranster.getName();
+//
+//			logger.log(Level.INFO, "Copying file to: {0}", destinationDir);
+//
+//			InputStream in = null;
+//			OutputStream out = null;
+//
+//			try {
+//
+//				in = new FileInputStream(fileToTranster);
+//				out = new FileOutputStream(destinationDir);
+//
+//				byte[] buf = new byte[1024];
+//				int len;
+//				while ((len = in.read(buf)) > 0) {
+//					out.write(buf, 0, len);
+//				}
+//
+//				logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
+//
+//			} catch (FileNotFoundException e) {
+//				e.printStackTrace();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} finally {
+//				if (in != null) {
+//					try {
+//						in.close();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//				if (out != null) {
+//					try {
+//						in.close();
+//					} catch (IOException e) {
+//						e.printStackTrace();
+//					}
+//				}
+//			}
+//
+//		} else {
 			logger.log(Level.INFO, "Copying file to: {0} with username: {1}", new Object[] { ip, username });
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
@@ -850,7 +831,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
-		}
+//		}
 	}
 
 	/**
@@ -870,30 +851,30 @@ public class SetupUtils {
 	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String command)
 					throws SSHConnectionException, CommandExecutionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Executing command locally.");
-
-			try {
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Executing command locally.");
+//
+//			try {
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
@@ -905,7 +886,7 @@ public class SetupUtils {
 			logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
 
 			manager.disconnect();
-		}
+//		}
 
 	}
 
@@ -953,30 +934,30 @@ public class SetupUtils {
 //			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
 //		}
 
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Installing package locally.");
-
-			try {
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {} - err: {}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Package {} installed successfully", filename);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Installing package locally.");
+//
+//			try {
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {} - err: {}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Package {} installed successfully", filename);
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 
 			logger.log(Level.INFO, "Installing package remotely on: {} with username: {}",
 					new Object[] { ip, username });
@@ -988,7 +969,7 @@ public class SetupUtils {
 			manager.disconnect();
 
 			logger.log(Level.INFO, "Package {} installed successfully", filename);
-		}
+//		}
 	}
 
 	/**
@@ -1021,30 +1002,30 @@ public class SetupUtils {
 					downloadUrl);
 		}
 
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Executing command locally.");
-
-			try {
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Executing command locally.");
+//
+//			try {
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
@@ -1057,7 +1038,7 @@ public class SetupUtils {
 					new Object[] { DOWNLOAD_PACKAGE.replace("{0}", filename).replace("{1}", downloadUrl) });
 
 			manager.disconnect();
-		}
+//		}
 
 	}
 
@@ -1081,47 +1062,47 @@ public class SetupUtils {
 			final String password, final Integer port, final String privateKey, final String passphrase,
 			final String tmpDir, final String filename, final String[] debconfValues, final PackageInstaller packageInstaller)
 					throws SSHConnectionException, CommandExecutionException {
-		if (NetworkUtils.isLocal(ip)) {
-
-			try {
-
-				// Set frontend as noninteractive
-				String command = SET_DEBIAN_FRONTEND;
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				// Set debconf values
-				for (String value : debconfValues) {
-
-					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
-					process = Runtime.getRuntime().exec(command);
-
-					exitValue = process.waitFor();
-					if (exitValue != 0) {
-						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
-								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-						throw new CommandExecutionException("Failed to execute command: " + command);
-					}
-
-				}
-
-				// Finally, install the downloaded package
-				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir,
-						filename, packageInstaller);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			try {
+//
+//				// Set frontend as noninteractive
+//				String command = SET_DEBIAN_FRONTEND;
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				// Set debconf values
+//				for (String value : debconfValues) {
+//
+//					command = DEBCONF_SET_SELECTIONS.replace("{0}", value);
+//					process = Runtime.getRuntime().exec(command);
+//
+//					exitValue = process.waitFor();
+//					if (exitValue != 0) {
+//						logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}", new Object[] {
+//								process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//						throw new CommandExecutionException("Failed to execute command: " + command);
+//					}
+//
+//				}
+//
+//				// Finally, install the downloaded package
+//				SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir,
+//						filename, packageInstaller);
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 
 			SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 					passphrase);
@@ -1143,7 +1124,7 @@ public class SetupUtils {
 
 			// Finally, install the downloaded package
 			SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename, packageInstaller);
-		}
+//		}
 	}
 	
 	public static void extractTarFile(final String ip, final String username, final String password,

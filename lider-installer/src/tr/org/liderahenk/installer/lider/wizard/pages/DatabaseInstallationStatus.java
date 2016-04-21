@@ -115,14 +115,7 @@ public class DatabaseInstallationStatus extends WizardPage
 							isInstallationFinished = true;
 
 							printMessage("Successfully installed package: " + config.getDatabasePackageName());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							// If any error occured user should be able to go
 							// back and change selections etc.
@@ -143,14 +136,7 @@ public class DatabaseInstallationStatus extends WizardPage
 							isInstallationFinished = true;
 
 							printMessage("Successfully installed package: " + deb.getName());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							// If any error occured user should be able to go
 							// back and change selections etc.

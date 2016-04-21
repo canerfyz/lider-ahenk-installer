@@ -3,6 +3,8 @@ package tr.org.pardus.mys.liderahenksetup.utils.network;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.nmap4j.data.nmaprun.Host;
 
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
@@ -42,6 +44,8 @@ public class RunnableNmap4j implements Runnable {
 					}
 				}
 				tableHelper.refresh();
+				
+				
 			}
 		} catch (CommandExecutionException e) {
 			e.printStackTrace();

@@ -338,29 +338,29 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								printMessage("Creating Ejabberd users..");
 
 								// Prepare register command for admin user
-								String register = prepareCommand(EJABBERD_REGISTER,
-										new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
-												config.getXmppHostname(), config.getXmppAdminPwd() });
+//								String register = prepareCommand(EJABBERD_REGISTER,
+//										new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
+//												config.getXmppHostname(), config.getXmppAdminPwd() });
 
 								// Register admin user in Ejabberd
-								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
-								printMessage("Ejabberd user: admin has been successfully created");
-								setProgressBar(90);
+//								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+//										config.getXmppAccessPasswd(), config.getXmppPort(),
+//										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
+//								printMessage("Ejabberd user: admin has been successfully created");
+//								setProgressBar(90);
 
 								// Prepare register command for Lider user
-								register = prepareCommand(EJABBERD_REGISTER,
-										new Object[] { PropertyReader.property("xmpp.bin.path"),
-												config.getXmppLiderUsername(), config.getXmppHostname(),
-												config.getXmppLiderPassword() });
+//								register = prepareCommand(EJABBERD_REGISTER,
+//										new Object[] { PropertyReader.property("xmpp.bin.path"),
+//												config.getXmppLiderUsername(), config.getXmppHostname(),
+//												config.getXmppLiderPassword() });
 
 								// Register Lider server user in Ejabberd
-								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
-								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
-										+ " has been successfully created");
+//								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+//										config.getXmppAccessPasswd(), config.getXmppPort(),
+//										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
+//								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
+//										+ " has been successfully created");
 								setProgressBar(95);
 								// --------------------------------------------//
 

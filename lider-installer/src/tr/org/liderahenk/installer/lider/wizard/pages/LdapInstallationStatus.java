@@ -94,22 +94,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLdapPackageName());
-							
-							// TODO 
-							// TODO 
-							// TODO 
-//							printMessage("Please wait, configuring LDAP.");
-//							SetupUtils.copyFile(config.getLdapIp(),
-//									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-//									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), fileToTranster, destDirectory);
-//							printMessage("Successfully configured package.");
-							
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
@@ -124,12 +109,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
+						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
 							printMessage("Error occurred: " + e.getMessage());
