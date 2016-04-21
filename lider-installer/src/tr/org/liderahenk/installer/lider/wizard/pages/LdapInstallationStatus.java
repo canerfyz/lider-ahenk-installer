@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -92,6 +94,16 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + config.getLdapPackageName());
+							
+							// TODO 
+							// TODO 
+							// TODO 
+//							printMessage("Please wait, configuring LDAP.");
+//							SetupUtils.copyFile(config.getLdapIp(),
+//									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
+//									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), fileToTranster, destDirectory);
+//							printMessage("Successfully configured package.");
+							
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
 							canGoBack = true;
@@ -160,6 +172,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
+						
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
@@ -266,5 +279,5 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
-
+	
 }
