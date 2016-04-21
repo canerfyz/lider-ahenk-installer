@@ -1,8 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -156,6 +154,39 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
+					}
+					
+					// TODO dosyayı gönder
+					// TODO chmod
+					// TODO execute
+					File ldapConfigFile;
+					try {
+						ldapConfigFile = new File(config.getLdapAbsPathConfFile());
+
+						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
+										config.getLdapAccessPasswd(), config.getLdapPort(),
+										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
+						
+						// Maket it executable
+						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
+										config.getLdapAccessPasswd(), config.getLdapPort(),
+										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "chmod +x /tmp/" + ldapConfigFile.getName());
+
+						// Run LDAP config script
+						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
+								config.getLdapAccessPasswd(), config.getLdapPort(),
+								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
+						
+					} catch (SSHConnectionException e) {
+						isInstallationFinished = false;
+						canGoBack = true;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
+					} catch (CommandExecutionException e) {
+						isInstallationFinished = false;
+						canGoBack = true;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
 					}
 					
 					setProgressBar(100);

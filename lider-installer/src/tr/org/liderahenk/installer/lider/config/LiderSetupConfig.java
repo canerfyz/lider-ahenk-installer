@@ -173,6 +173,11 @@ public class LiderSetupConfig {
 	private String ldapDownloadUrl;
 	
 	/**
+	 * Absolute path of LDAP configuration file.
+	 */
+	private String ldapAbsPathConfFile;
+	
+	/**
 	 * ###################################
 	 * 
 	 * XMPP Configuration
@@ -907,6 +912,14 @@ public class LiderSetupConfig {
 
 	public void setLiderTarFileContent(byte[] liderTarFileContent) {
 		this.liderTarFileContent = liderTarFileContent;
+	}
+
+	public String getLdapAbsPathConfFile() {
+		return ldapAbsPathConfFile;
+	}
+
+	public void setLdapAbsPathConfFile(String ldapAbsPathConfFile) {
+		this.ldapAbsPathConfFile = ldapAbsPathConfFile;
 	}
 
 }
