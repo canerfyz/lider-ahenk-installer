@@ -254,6 +254,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		map.put("#LDAP_ROOT_PWD", ldapPassword.getText());
 		map.put("#LDAP_BASE_DN", ldapBase.getText());
 		map.put("#HOST_IP", config.getXmppIp());
+		map.put("#LIDER_USERNAME", liderUserTxt.getText());
 		
 		text = SetupUtils.replace(map, text);
 		config.setXmppConfContent(text);
