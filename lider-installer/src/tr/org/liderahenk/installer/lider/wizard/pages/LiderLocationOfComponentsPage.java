@@ -323,7 +323,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			}
 		}
 		else {
-			ldapIpEntered = false;
+			ldapIpEntered = true;
 		}
 		if (config.isInstallXmpp()) {
 			if (NetworkUtils.isIpValid(txtXmppIp.getText())) {
@@ -333,7 +333,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			}
 		}
 		else {
-			xmppIpEntered = false;
+			xmppIpEntered = true;
 		}
 		if (config.isInstallLider()) {
 			if (NetworkUtils.isIpValid(txtLiderIp.getText())) {
@@ -343,7 +343,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			}
 		}
 		else {
-			liderIpEntered = false;
+			liderIpEntered = true;
 		}
 		
 		return (databaseIpEntered && ldapIpEntered && xmppIpEntered && liderIpEntered);
