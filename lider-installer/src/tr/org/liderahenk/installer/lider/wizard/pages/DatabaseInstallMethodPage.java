@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -16,8 +17,10 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -26,6 +29,7 @@ import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -61,21 +65,21 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		// Ask user if database will be installed from a .deb package or via
 		// apt-get
-		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_APT_GET"));
-		btnAptGet.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				downloadUrlTxt.setEnabled(false);
-				updateConfig();
-				updatePageCompleteStatus();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-		btnAptGet.setSelection(true);
+//		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_APT_GET"));
+//		btnAptGet.addSelectionListener(new SelectionListener() {
+//
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				downloadUrlTxt.setEnabled(false);
+//				updateConfig();
+//				updatePageCompleteStatus();
+//			}
+//
+//			@Override
+//			public void widgetDefaultSelected(SelectionEvent e) {
+//			}
+//		});
+//		btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
@@ -93,6 +97,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
+		btnDebPackage.setSelection(true);
 
 		Group grpDebPackage = GUIHelper.createGroup(container, new GridLayout(2, false),
 				new GridData(SWT.FILL, SWT.FILL, false, false));
@@ -101,6 +106,34 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		txtFileName.setEnabled(false); // do not let user to change it! It will
 										// be updated on file selection
 
+		// Copy mariadb.deb to /tmp and bring it as default deb in page
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("mariadb-server_default_10_0_24.deb");
+		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server_default_10_0_24.deb");
+		txtFileName.setText(mariadbDeb.getAbsolutePath());
+		
+		// Set file to config as array of bytes
+		debContent = new byte[(int) mariadbDeb.length()];
+		
+		FileInputStream stream = null;
+		try {
+			stream = new FileInputStream(mariadbDeb);
+			stream.read(debContent);
+			stream.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		config.setDatabaseDebFileContent(debContent);
+		config.setDatabaseDebFileName(mariadbDeb.getAbsolutePath());
+		
 		// Upload deb package if necessary
 		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnFileSelect.addSelectionListener(new SelectionListener() {
@@ -142,7 +175,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		btnFileSelect.setEnabled(false);
+		btnFileSelect.setEnabled(true);
 
 		// Install by given URL
 		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_WGET"));
@@ -196,6 +229,10 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			}
 		});
 		
+		Label label1 = GUIHelper.createLabel(passwordComp, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
+		Label label2 = GUIHelper.createLabel(passwordComp, "Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
+		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
+		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		
 		updateConfig();
 		updatePageCompleteStatus();
@@ -205,10 +242,12 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		if (btnDebPackage.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDatabasePackageName(null);
-		} else if (btnAptGet.getSelection()) {
-			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
-			config.setDatabasePackageName(PropertyReader.property("database.package.name"));
-		} else {
+		} 
+//		else if (btnAptGet.getSelection()) {
+//			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
+//			config.setDatabasePackageName(PropertyReader.property("database.package.name"));
+//		} 
+		else {
 			config.setDatabaseInstallMethod(InstallMethod.WGET);
 			config.setDatabaseDownloadUrl(downloadUrlTxt.getText());
 		}
@@ -216,9 +255,15 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 	}
 
 	private void updatePageCompleteStatus() {
-		if (btnAptGet.getSelection()) {
-			setPageComplete(btnAptGet.getSelection() && !txtDatabaseRootPassword.getText().isEmpty());
-		} else if (btnDebPackage.getSelection()) {
+//		if (btnAptGet.getSelection()) {
+//			setPageComplete(btnAptGet.getSelection() && !txtDatabaseRootPassword.getText().isEmpty());
+//		} else if (btnDebPackage.getSelection()) {
+//			setPageComplete(checkFile() && !txtDatabaseRootPassword.getText().isEmpty());
+//		} else {
+//			setPageComplete(!"".equals(downloadUrlTxt.getText()) && !txtDatabaseRootPassword.getText().isEmpty());
+//		}
+
+		if (btnDebPackage.getSelection()) {
 			setPageComplete(checkFile() && !txtDatabaseRootPassword.getText().isEmpty());
 		} else {
 			setPageComplete(!"".equals(downloadUrlTxt.getText()) && !txtDatabaseRootPassword.getText().isEmpty());
