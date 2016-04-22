@@ -89,6 +89,8 @@ public class SetupUtils {
 
 	private static final String EXTRACT_FILE = "tar -xzvf {0} --directory {1}";
 
+	private static final String INSTALL_GDEBI = "apt-get install -y gdebi";
+
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
 	 * 
@@ -342,21 +344,24 @@ public class SetupUtils {
 			final String privateKey, final String passphrase, final File debPackage,
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 
+		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+
+		copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
+
 		String command;
+		
+		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+				passphrase);
+
+		manager.connect();
 
 		if (packageInstaller == PackageInstaller.DPKG) {
 			command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + debPackage.getName());
 		} else {
 			command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + debPackage.getName());
+			manager.execCommand(INSTALL_GDEBI, new Object[] {});
 		}
-
-		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
-
-		copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
-
-		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
-				passphrase);
-		manager.connect();
+		
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
@@ -553,8 +558,15 @@ public class SetupUtils {
 			final String filename, final PackageInstaller packageInstaller)
 					throws SSHConnectionException, CommandExecutionException {
 
-		String command;
+		logger.log(Level.INFO, "Installing package remotely on: {} with username: {}", new Object[] { ip, username });
 
+		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+				passphrase);
+		
+		manager.connect();
+
+		String command;
+		
 		if (packageInstaller == PackageInstaller.DPKG) {
 			// Prepare command
 			if (!"".equals(filename)) {
@@ -568,13 +580,9 @@ public class SetupUtils {
 			} else {
 				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
 			}
+			manager.execCommand(INSTALL_GDEBI, new Object[] {});
 		}
-
-		logger.log(Level.INFO, "Installing package remotely on: {} with username: {}", new Object[] { ip, username });
-
-		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
-				passphrase);
-		manager.connect();
+		
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
