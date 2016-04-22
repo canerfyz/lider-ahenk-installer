@@ -78,6 +78,11 @@ public class SetupUtils {
 	 * Downloaded file will be in /tmp/{0} folder.
 	 */
 	private static final String DOWNLOAD_PACKAGE = "wget ‐‐directory-prefix=/tmp/{0}/ {1}";
+	
+	/**
+	 * Update package list before installing anything
+	 */
+	private static final String UPDATE_PACKAGE_LIST = "apt-get update";
 
 	/**
 	 * DowNload file with provided file name from provided URL. Downloaded file
@@ -264,6 +269,9 @@ public class SetupUtils {
 			final String privateKey, final String passphrase, final String packageName, final String version)
 					throws SSHConnectionException, CommandExecutionException {
 		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+		
+		// Update package list first!
+		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -303,6 +311,9 @@ public class SetupUtils {
 	public static void installPackageNoninteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName,
 			final String version, final String[] debconfValues) throws Exception {
+		
+		// Update package list first!
+		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -345,6 +356,9 @@ public class SetupUtils {
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 
 		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+		
+		// Update package list first!
+		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
 		copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
 
@@ -386,6 +400,9 @@ public class SetupUtils {
 	public static void installPackageNonInteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final File debPackage,
 			final String[] debconfValues, final PackageInstaller packageInstaller) throws Exception {
+		// Update package list first!
+		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
+		
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
