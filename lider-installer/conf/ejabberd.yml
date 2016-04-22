@@ -78,12 +78,12 @@ listen:
     ## file and uncomment this line:
     ##
     certfile: "/opt/ejabberd-16.02/conf/server.pem"
-    starttls: false
+    starttls: true
     ##
     ## Custom OpenSSL options
     ##
-    #protocol_options:
-    #  - "no_sslv3"
+    protocol_options:
+      - "no_sslv3"
     ##   - "no_tlsv1"
     max_stanza_size: 1165536
     shaper: c2s_shaper
@@ -102,8 +102,8 @@ listen:
     port: 5280
     #ip: "::"
     module: ejabberd_http
-    ## request_handlers:
-    ##   "/pub/archive": mod_http_fileserver
+    request_handlers:
+       "/pub/archive": mod_http_fileserver
     web_admin: true
     #http_poll: true
     http_bind: true
@@ -114,12 +114,12 @@ listen:
 ## Allowed values are: false optional required required_trusted
 ## You must specify a certificate file.
 ##
-s2s_use_starttls: optional
+##s2s_use_starttls: optional
 
 ##
 ## s2s_certfile: Specify a certificate file.
 ##
-s2s_certfile: "/opt/ejabberd-16.02/conf/server.pem"
+##s2s_certfile: "/opt/ejabberd-16.02/conf/server.pem"
 
 ###   ==============
 ###   AUTHENTICATION
@@ -215,8 +215,7 @@ acl:
   ##
   admin:
      user:
-         - "admin": "#SERVICE_NAME"
-         - "#LIDER_USERNAME": "#SERVICE_NAME"
+         - "admin"
 
   ##
   ## Blocked users
@@ -321,6 +320,7 @@ modules:
     ip: "#HOST_IP"
     port: 7777
   mod_adhoc: {}
+  mod_admin_extra: {}
   mod_announce: # recommends mod_adhoc
     access: announce
   mod_blocking: {} # requires mod_privacy
@@ -394,12 +394,12 @@ modules:
     access: register
   mod_roster: {}
   mod_shared_roster: {}
-  mod_stats: {}
-  mod_time: {}
+  ##mod_stats: {}
+  ##mod_time: {}
   mod_vcard: {}
   mod_version: {}
-  mod_admin_extra: {}
 
+allow_contrib_modules: true
 ### Local Variables:
 ### mode: yaml
 ### End:
