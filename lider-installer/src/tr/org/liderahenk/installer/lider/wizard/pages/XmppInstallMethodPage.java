@@ -222,15 +222,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 		Label label = GUIHelper.createLabel(warningComp,
 				"Ejabberd versiyon 16.02 depolarda bulunmamaktadır.\nBu nedenle Ejabberd kurulumu sadece DEB dosyasından veya link üzerinden yapılabilir.\nKuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
-		// Label label1 = GUIHelper.createLabel(warningComp, "Bu nedenle
-		// Ejabberd kurulumu sadece DEB dosyasından veya link üzerinden
-		// yapılabilir.");
-		// Label label2 = GUIHelper.createLabel(warningComp, "Kuruluma uygun deb
-		// dosyası varsayılan olarak getirilmiştir.");
-		//
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		// label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		// label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
 		updateConfig();
 		updatePageCompleteStatus();

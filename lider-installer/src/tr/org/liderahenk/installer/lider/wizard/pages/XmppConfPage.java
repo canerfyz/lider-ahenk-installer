@@ -24,6 +24,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -44,7 +45,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	private Text adminPwdTxt;
 	private Text liderUserTxt;
 	private Text liderPwdTxt;
-	
+
 	private Text host;
 	private Text ldapServer;
 	private Text ldapRootDn;
@@ -63,24 +64,29 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	public void createControl(Composite parent) {
 
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
-		
+
 		setControl(mainContainer);
-		
+
+		Label label = GUIHelper.createLabel(mainContainer,
+				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
+
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
-		
+
 		Composite lineCont = GUIHelper.createComposite(propertyContainer, 2);
-		
+
 		GUIHelper.createLabel(lineCont, "Servis Adı");
 		host = GUIHelper.createText(lineCont);
 		host.setText("im.mys.pardus.org.tr");
-		
+
 		GUIHelper.createLabel(lineCont, "LDAP Sunucu");
 		ldapServer = GUIHelper.createText(lineCont);
 		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
 
 		GUIHelper.createLabel(lineCont, "LDAP Admin");
 		ldapRootDn = GUIHelper.createText(lineCont);
-		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null
+				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
 
 		GUIHelper.createLabel(lineCont, "LDAP Admin Parola");
 		ldapPassword = GUIHelper.createText(lineCont);
@@ -89,7 +95,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		GUIHelper.createLabel(lineCont, "LDAP Arama Kökü");
 		ldapBase = GUIHelper.createText(lineCont);
 		ldapBase.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
-		
+
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
 
 		GridData gdForTxt = new GridData();
@@ -132,7 +138,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 				updatePageCompleteStatus();
 			}
 		});
-		
+
 		GUIHelper.createLabel(liderContainer, Messages.getString("PASSWORD"));
 
 		liderPwdTxt = GUIHelper.createText(liderContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
@@ -220,18 +226,17 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		// -----------------------------------//
 
 		updatePageCompleteStatus();
-		
+
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("ejabberd.yml", st);
 	}
 
 	private void updatePageCompleteStatus() {
-		if (!"".equals(adminPwdTxt.getText()) 
-				&& !"".equals(liderUserTxt.getText()) && !"".equals(liderPwdTxt.getText())) {
+		if (!"".equals(adminPwdTxt.getText()) && !"".equals(liderUserTxt.getText())
+				&& !"".equals(liderPwdTxt.getText())) {
 			setPageComplete(true);
-		}
-		else {
+		} else {
 			setPageComplete(false);
 		}
 	}
@@ -255,12 +260,12 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		map.put("#LDAP_BASE_DN", ldapBase.getText());
 		map.put("#HOST_IP", config.getXmppIp());
 		map.put("#LIDER_USERNAME", liderUserTxt.getText());
-		
+
 		text = SetupUtils.replace(map, text);
 		config.setXmppConfContent(text);
 		// Write configuration to file
 		config.setXmppAbsPathConfFile(writeToFile(text, "ejabberd.yml"));
-		
+
 		return super.getNextPage();
 	}
 
