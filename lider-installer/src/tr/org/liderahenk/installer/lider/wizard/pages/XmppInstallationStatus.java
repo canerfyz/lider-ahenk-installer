@@ -146,7 +146,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 									config.getXmppAccessPassphrase(), file, PropertyReader.property("xmpp.conf.path"));
 							printMessage("Configuration file successfully set.");
 							setProgressBar(35);
-							
+
 							//
 							// Change owner
 							//
@@ -222,9 +222,10 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							//
 							// Create admin user
 							//
+							String register = null;
 							try {
 								printMessage("Creating admin user");
-								String register = prepareCommand(EJABBERD_REGISTER,
+								register = prepareCommand(EJABBERD_REGISTER,
 										new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
 												config.getXmppHostname(), config.getXmppAdminPwd() });
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
@@ -234,6 +235,8 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							} catch (Exception e) {
 								e.printStackTrace();
 								printMessage("Could not create admin user: " + e.getMessage());
+								printMessage("Please run the following command on target machine to create user: "
+										+ register);
 							}
 							setProgressBar(75);
 
@@ -258,15 +261,22 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							//
 							// Create Lider user
 							//
-							printMessage("Creating Lider user");
-							String register = prepareCommand(EJABBERD_REGISTER,
-									new Object[] { PropertyReader.property("xmpp.bin.path"),
-											config.getXmppLiderUsername(), config.getXmppHostname(),
-											config.getXmppLiderPassword() });
-							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppAccessPassphrase(), register);
-							printMessage("Created Lider user");
+							try {
+								printMessage("Creating Lider user");
+								register = prepareCommand(EJABBERD_REGISTER,
+										new Object[] { PropertyReader.property("xmpp.bin.path"),
+												config.getXmppLiderUsername(), config.getXmppHostname(),
+												config.getXmppLiderPassword() });
+								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
+								printMessage("Created Lider user");
+							} catch (Exception e) {
+								e.printStackTrace();
+								printMessage("Could not create Lider user: " + e.getMessage());
+								printMessage("Please run the following command manually on target machine to create user: "
+										+ register);
+							}
 							setProgressBar(90);
 
 							//
