@@ -22,6 +22,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -88,6 +89,10 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
+		
+		Label label = GUIHelper.createLabel(container,
+				"Hazır gelen değerler diğer bileşenlerin kurulumlarına veya\nvarsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		
 		container = new ScrolledComposite(container, SWT.V_SCROLL);
 		container.setLayout(new GridLayout(1, false));
