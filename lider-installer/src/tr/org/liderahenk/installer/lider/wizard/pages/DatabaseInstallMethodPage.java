@@ -133,15 +133,20 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 					File deb = new File(debFileName);
 					debContent = new byte[(int) deb.length()];
 
-					FileInputStream stream;
+					FileInputStream stream = null;
 					try {
 						stream = new FileInputStream(deb);
 						stream.read(debContent);
-						stream.close();
 					} catch (FileNotFoundException e1) {
 						e1.printStackTrace();
 					} catch (IOException e1) {
 						e1.printStackTrace();
+					} finally {
+						try {
+							stream.close();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 					}
 
 					// Set deb file
@@ -210,10 +215,10 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 			}
 		});
 
-		Label label1 = GUIHelper.createLabel(passwordComp,
-				"Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
-		Label label2 = GUIHelper.createLabel(passwordComp,
-				"Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
+		Composite warningComp = GUIHelper.createComposite(downloadUrlContainer, 1);
+		
+		Label label1 = GUIHelper.createLabel(warningComp, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
+		Label label2 = GUIHelper.createLabel(warningComp, "Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
 		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
