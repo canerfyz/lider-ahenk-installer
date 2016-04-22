@@ -32,6 +32,15 @@ public class AhenkSetupConfig {
 	private String password;
 
 	/**
+	 * AhenkConfPage variables
+	 */
+	private String host;
+	private String serviceName;
+	private String liderJid;
+	private String ahenkConfContent;
+	private String ahenkAbsPathConfFile;
+
+	/**
 	 * AhenkSetupConnectionMethodPage variables (Cm: Connection Method)
 	 */
 	private AccessMethod ahenkAccessMethod;
@@ -47,17 +56,17 @@ public class AhenkSetupConfig {
 	private String debFileAbsPath;
 
 	/**
-	 * This variable is used to enable/disable finish button 
+	 * This variable is used to enable/disable finish button
 	 */
 	private boolean isInstallationFinished = false;
-	
+
 	/**
 	 * Port for SSH connection.
 	 */
 	private Integer port;
-	
+
 	private String ahenkDownloadUrl;
-	
+
 	// ------ Getter Setter ----- //
 	public boolean isInstallAhenkLocally() {
 		return installAhenkLocally;
@@ -193,6 +202,47 @@ public class AhenkSetupConfig {
 
 	public void setAhenkDownloadUrl(String ahenkDownloadUrl) {
 		this.ahenkDownloadUrl = ahenkDownloadUrl;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public String getLiderJid() {
+		return liderJid;
+	}
+
+	public void setLiderJid(String liderJid) {
+		this.liderJid = liderJid;
+	}
+
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getAhenkConfContent() {
+		return ahenkConfContent;
+	}
+
+	public void setAhenkConfContent(String ahenkConfContent) {
+		this.ahenkConfContent = ahenkConfContent;
+	}
+
+
+	public String getAhenkAbsPathConfFile() {
+		return ahenkAbsPathConfFile;
+	}
+
+	public void setAhenkAbsPathConfFile(String ahenkAbsPathConfFile) {
+		this.ahenkAbsPathConfFile = ahenkAbsPathConfFile;
 	}
 
 }
