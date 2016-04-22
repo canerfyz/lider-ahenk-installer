@@ -43,6 +43,9 @@ public class DatabaseInstallationStatus extends WizardPage
 	boolean isInstallationFinished = false;
 
 	boolean canGoBack = false;
+	
+	// TODO database parametric
+	private final static String CREATE_DATABASE = "mysql -uroot -p{0} -e 'CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'";
 
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
 		super(DatabaseInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -194,6 +197,32 @@ public class DatabaseInstallationStatus extends WizardPage
 						canGoBack = true;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
+					
+					try {
+						printMessage("Creating database.");
+						
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), CREATE_DATABASE.replace("{0}", config.getDatabaseRootPassword()));
+						
+						printMessage("Database created successfully.");
+						
+					} catch (CommandExecutionException e) {
+						isInstallationFinished = false;
+						// If any error occured user should be able to go
+						// back and change selections etc.
+						canGoBack = true;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
+					} catch (SSHConnectionException e) {
+						isInstallationFinished = false;
+						// If any error occured user should be able to go
+						// back and change selections etc.
+						canGoBack = true;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
+					}
+					
 					setProgressBar(100);
 
 					config.setInstallationFinished(isInstallationFinished);
