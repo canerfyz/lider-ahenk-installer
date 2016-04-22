@@ -105,28 +105,7 @@ public class DatabaseInstallationStatus extends WizardPage
 
 					printMessage("Installing package...");
 
-					if (config.getDatabaseInstallMethod() == InstallMethod.APT_GET) {
-						try {
-							SetupUtils.installPackageNoninteractively(config.getDatabaseIp(),
-									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabaseAccessPassphrase(), config.getDatabasePackageName(), null,
-									debconfValues);
-
-							setProgressBar(90);
-
-							isInstallationFinished = true;
-
-							printMessage("Successfully installed package: " + config.getDatabasePackageName());
-						} catch (Exception e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
+					if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getDatabaseDebFileName());
 						try {
 							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),

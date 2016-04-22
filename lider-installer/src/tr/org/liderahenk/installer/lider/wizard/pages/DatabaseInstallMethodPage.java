@@ -27,7 +27,6 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -38,7 +37,6 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 	private LiderSetupConfig config;
 
-	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Text txtFileName;
@@ -62,24 +60,6 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
-
-		// Ask user if database will be installed from a .deb package or via
-		// apt-get
-//		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_APT_GET"));
-//		btnAptGet.addSelectionListener(new SelectionListener() {
-//
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				downloadUrlTxt.setEnabled(false);
-//				updateConfig();
-//				updatePageCompleteStatus();
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-//		});
-//		btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("DB_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
@@ -107,13 +87,14 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 										// be updated on file selection
 
 		// Copy mariadb.deb to /tmp and bring it as default deb in page
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("mariadb-server_default_10_0_24.deb");
+		InputStream inputStream = this.getClass().getClassLoader()
+				.getResourceAsStream("mariadb-server_default_10_0_24.deb");
 		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server_default_10_0_24.deb");
 		txtFileName.setText(mariadbDeb.getAbsolutePath());
-		
+
 		// Set file to config as array of bytes
 		debContent = new byte[(int) mariadbDeb.length()];
-		
+
 		FileInputStream stream = null;
 		try {
 			stream = new FileInputStream(mariadbDeb);
@@ -130,10 +111,10 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 				e1.printStackTrace();
 			}
 		}
-		
+
 		config.setDatabaseDebFileContent(debContent);
 		config.setDatabaseDebFileName(mariadbDeb.getAbsolutePath());
-		
+
 		// Upload deb package if necessary
 		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnFileSelect.addSelectionListener(new SelectionListener() {
@@ -214,7 +195,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		});
 
 		Composite passwordComp = GUIHelper.createComposite(downloadUrlContainer, 2);
-		
+
 		GUIHelper.createLabel(passwordComp, Messages.getString("DATABASE_ROOT_PASSWORD"));
 
 		txtDatabaseRootPassword = GUIHelper.createPasswordText(passwordComp);
@@ -228,12 +209,14 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 				updatePageCompleteStatus();
 			}
 		});
-		
-		Label label1 = GUIHelper.createLabel(passwordComp, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
-		Label label2 = GUIHelper.createLabel(passwordComp, "Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
+
+		Label label1 = GUIHelper.createLabel(passwordComp,
+				"Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
+		Label label2 = GUIHelper.createLabel(passwordComp,
+				"Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
 		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		
+
 		updateConfig();
 		updatePageCompleteStatus();
 	}
@@ -242,12 +225,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		if (btnDebPackage.getSelection()) {
 			config.setDatabaseInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDatabasePackageName(null);
-		} 
-//		else if (btnAptGet.getSelection()) {
-//			config.setDatabaseInstallMethod(InstallMethod.APT_GET);
-//			config.setDatabasePackageName(PropertyReader.property("database.package.name"));
-//		} 
-		else {
+		} else {
 			config.setDatabaseInstallMethod(InstallMethod.WGET);
 			config.setDatabaseDownloadUrl(downloadUrlTxt.getText());
 		}
@@ -255,14 +233,6 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 	}
 
 	private void updatePageCompleteStatus() {
-//		if (btnAptGet.getSelection()) {
-//			setPageComplete(btnAptGet.getSelection() && !txtDatabaseRootPassword.getText().isEmpty());
-//		} else if (btnDebPackage.getSelection()) {
-//			setPageComplete(checkFile() && !txtDatabaseRootPassword.getText().isEmpty());
-//		} else {
-//			setPageComplete(!"".equals(downloadUrlTxt.getText()) && !txtDatabaseRootPassword.getText().isEmpty());
-//		}
-
 		if (btnDebPackage.getSelection()) {
 			setPageComplete(checkFile() && !txtDatabaseRootPassword.getText().isEmpty());
 		} else {
@@ -281,5 +251,5 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		return super.getPreviousPage();
 	}
-	
+
 }
