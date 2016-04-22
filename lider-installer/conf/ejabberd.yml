@@ -73,7 +73,7 @@ log_rate_limit: 100
 ##
 hosts:
   - "localhost"
-  - "im.mys.pardus.org.tr"
+  - "#SERVICE_NAME"
 ##
 ## route_subdomains: Delegate subdomains to other XMPP servers.
 ## For example, if this ejabberd serves example.org and you want
@@ -244,7 +244,7 @@ auth_method: ldap
 ##
 ## List of LDAP servers:
 ldap_servers:
-   - "192.168.56.101"
+   - "#LDAP_SERVER"
 ##
 ## Encryption of connection to LDAP servers:
 ## ldap_encrypt: none
@@ -255,13 +255,13 @@ ldap_port: 389
 ## ldap_port: 636
 ##
 ## LDAP manager:
-ldap_rootdn: "cn=admin,dc=mys,dc=pardus,dc=org"
+ldap_rootdn: "#LDAP_ROOT_DN"
 ##
 ## Password of LDAP manager:
-ldap_password: "secret"
+ldap_password: "#LDAP_ROOT_PWD"
 ##
 ## Search base of LDAP directory:
-ldap_base: "dc=mys,dc=pardus,dc=org"
+ldap_base: "#LDAP_BASE_DN"
 ##
 ## LDAP attribute that holds user ID:
 ldap_uids:
@@ -285,7 +285,7 @@ ldap_filter: "(|(objectClass=pardusDevice)(&(objectClass=pardusAccount)(objectCl
 ## To use both anonymous and internal authentication:
 ##
 host_config:
-   "im.mys.pardus.org.tr":
+   "#SERVICE_NAME":
      auth_method:
        - internal
        - ldap
@@ -539,8 +539,8 @@ language: "en"
 ##
 modules:
   mod_proxy65:
-    host: "proxy.im.mys.pardus.org.tr"
-    ip: "192.168.1.159"
+    host: "proxy.#SERVICE_NAME"
+    ip: "#HOST_IP"
     port: 7777
   mod_adhoc: {}
   mod_announce: # recommends mod_adhoc
