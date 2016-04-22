@@ -208,7 +208,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									config.getXmppAccessPassphrase(),
-									PropertyReader.property("xmpp.bin.path") + "ejabberdctl restart");
+									PropertyReader.property("xmpp.bin.path")
+											+ "ejabberdctl stop && pkill -u ejabberd && "
+											+ PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
 							setProgressBar(65);
 							try {
 								Thread.sleep(5000);
@@ -247,7 +249,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									config.getXmppAccessPassphrase(),
-									PropertyReader.property("xmpp.bin.path") + "ejabberdctl restart");
+									PropertyReader.property("xmpp.bin.path")
+											+ "ejabberdctl stop && pkill -u ejabberd && "
+											+ PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
 							setProgressBar(80);
 							try {
 								Thread.sleep(5000);
@@ -274,8 +278,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							} catch (Exception e) {
 								e.printStackTrace();
 								printMessage("Could not create Lider user: " + e.getMessage());
-								printMessage("Please run the following command manually on target machine to create user: "
-										+ register);
+								printMessage(
+										"Please run the following command manually on target machine to create user: "
+												+ register);
 							}
 							setProgressBar(90);
 
@@ -286,7 +291,9 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
 									config.getXmppAccessPassphrase(),
-									PropertyReader.property("xmpp.bin.path") + "ejabberdctl restart");
+									PropertyReader.property("xmpp.bin.path")
+											+ "ejabberdctl stop && pkill -u ejabberd && "
+											+ PropertyReader.property("xmpp.bin.path") + "ejabberdctl start");
 							try {
 								Thread.sleep(1000);
 							} catch (InterruptedException e) {
