@@ -181,7 +181,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		// Copy ejabberd.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("lider_default_1_0_0.tar.gz");
 		File liderTar= SetupUtils.streamToFile(inputStream, "lider_default_1_0_0.tar.gz");
-		txtFileName.setText(liderTar.getAbsolutePath());
+		txtTarFileName.setText(liderTar.getAbsolutePath());
 		
 		// Set file to config as array of bytes
 		debContent = new byte[(int) liderTar.length()];
