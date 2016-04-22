@@ -114,7 +114,6 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		try {
 			stream = new FileInputStream(ldapDeb);
 			stream.read(debContent);
-			stream.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e1) {
