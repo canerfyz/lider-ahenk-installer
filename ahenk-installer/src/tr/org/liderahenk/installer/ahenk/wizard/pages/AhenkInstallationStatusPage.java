@@ -1,8 +1,9 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.InputStream;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +33,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
+ * @author Volkan Şahin <bm.volkansahin@gmail.com> 
  */
 
 public class AhenkInstallationStatusPage extends WizardPage implements ControlNextEvent, InstallationStatusPage {
@@ -202,6 +204,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 						// Calculate progress bar increment size
 						final Integer increment = (Integer) (90 / config.getIpList().size());
+						
+						
+						final File fileConf = new File(writeToFile(config.getAhenkConfContent(),"ahenk.conf"));
 
 						for (final String ip : config.getIpList()) {
 
@@ -225,48 +230,44 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											printMessage("Ahenk is being installed to: " + ip + " from provided DEB file.",display);
 
-											
-											
 											File debPackage = new File(config.getDebFileAbsPath());
+											
 											InputStream stream = this.getClass().getResourceAsStream("/conf/liderahenk.list");
-											
-											System.out.println("11");
-											
-											if(stream !=null)
-												System.out.println("stream null değil");
-											
-											System.out.println("12");
-											//TODO 
 											File file = SetupUtils.streamToFile(stream,"liderahenk.list");
-											
-											System.out.println("13");
-											if(file !=null)
-												System.out.println("file null değil");
-											
-											System.out.println("14");
 											
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													file, "/etc/apt/sources.list.d/");
-											System.out.println("source yollandı");
 											
 											try {
 												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 														"wget -qO - http://ftp.pardus.org.tr/Release.pub | apt-key add -");
 												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 														"apt-get update");
-												System.out.println("up-get update");
 												
 											} catch (Exception e) {
-												System.out.println("EXC");
+												System.out.println("EXCEPTION about adding new repo");
 											}
 											
-									
-
+											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"rm -rf /etc/ahenk");
+											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"rm -rf /opt/ahenk");
+											
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.GDEBI);
 
 											setProgressBar(increment, display);
+											
+											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"sudo systemctl stop ahenk.service");
+											
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													fileConf, "/etc/ahenk/");
+											
+											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"sudo systemctl start ahenk.service");
+				
 
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
 
@@ -534,5 +535,36 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	@Override
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
+	}
+	
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param namePrefix
+	 * @param nameSuffix
+	 * @return absolute path of created temp file
+	 */
+	private String writeToFile(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return absPath;
 	}
 }
