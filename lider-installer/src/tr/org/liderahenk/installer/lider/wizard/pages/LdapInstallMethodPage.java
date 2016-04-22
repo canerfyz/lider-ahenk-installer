@@ -27,7 +27,6 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -38,7 +37,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 	private LiderSetupConfig config;
 
-	private Button btnAptGet;
+//	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Text txtFileName;
@@ -230,8 +229,10 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 			}
 		});
 
-		Label label1 = GUIHelper.createLabel(passwordComp, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
-		Label label2 = GUIHelper.createLabel(passwordComp, "Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
+		Composite warningComp = GUIHelper.createComposite(downloadUrlContainer, 1);
+		
+		Label label1 = GUIHelper.createLabel(warningComp, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
+		Label label2 = GUIHelper.createLabel(warningComp, "Hazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
 		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		

@@ -3,10 +3,8 @@ package tr.org.liderahenk.installer.lider.wizard.pages;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -39,7 +37,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
 
-	private Button btnAptGet;
+//	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Text txtFileName;
@@ -47,7 +45,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 	private FileDialog dialog;
 
 	private Text downloadUrlTxt;
-	
+
 	private byte[] debContent;
 
 	public XmppInstallMethodPage(LiderSetupConfig config) {
@@ -65,21 +63,22 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 		// Ask user if Xmpp will be installed from a .deb package or via
 		// apt-get
-//		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_APT_GET"));
-//		btnAptGet.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				downloadUrlTxt.setEnabled(false);
-//				updateConfig();
-//				updatePageCompleteStatus();
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-//		});
-//		btnAptGet.setSelection(true);
-		
+		// btnAptGet = GUIHelper.createButton(container, SWT.RADIO,
+		// Messages.getString("XMPP_SETUP_METHOD_APT_GET"));
+		// btnAptGet.addSelectionListener(new SelectionListener() {
+		// @Override
+		// public void widgetSelected(SelectionEvent e) {
+		// downloadUrlTxt.setEnabled(false);
+		// updateConfig();
+		// updatePageCompleteStatus();
+		// }
+		//
+		// @Override
+		// public void widgetDefaultSelected(SelectionEvent e) {
+		// }
+		// });
+		// btnAptGet.setSelection(true);
+
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
@@ -109,7 +108,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ejabberd_default_16_02.deb");
 		File ejabberdDeb = SetupUtils.streamToFile(inputStream, "ejabberd_default_16_02.deb");
 		txtFileName.setText(ejabberdDeb.getAbsolutePath());
-		
+
 		// Set file to config as array of bytes
 		debContent = new byte[(int) ejabberdDeb.length()];
 
@@ -129,10 +128,10 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		config.setXmppDebFileContent(debContent);
 		config.setXmppDebFileName(ejabberdDeb.getAbsolutePath());
-		
+
 		// Upload deb package if necessary
 		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnFileSelect.addSelectionListener(new SelectionListener() {
@@ -181,8 +180,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 			}
 		});
 		btnFileSelect.setEnabled(true);
-		
-		
+
 		// Install by given URL
 		btnWget = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_INSTALL_FROM_GIVEN_URL"));
 		btnWget.addSelectionListener(new SelectionListener() {
@@ -196,22 +194,22 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 					updatePageCompleteStatus();
 				}
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		Composite downloadUrlContainer = GUIHelper.createComposite(container, 1);
 		GridLayout glDownloadUrl = new GridLayout(1, false);
 		downloadUrlContainer.setLayout(glDownloadUrl);
-		
+
 		downloadUrlTxt = GUIHelper.createText(downloadUrlContainer);
 		GridData gdDownloadUrlTxt = new GridData();
 		gdDownloadUrlTxt.widthHint = 350;
 		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
 		downloadUrlTxt.setEnabled(false);
-		
+
 		downloadUrlTxt.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -220,26 +218,32 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 			}
 		});
 
-		Label label = GUIHelper.createLabel(downloadUrlContainer, "Ejabberd versiyon 16.02 depolarda bulunmamaktadır.");
-		Label label1 = GUIHelper.createLabel(downloadUrlContainer, "Bu nedenle Ejabberd kurulumu sadece DEB dosyasından veya link üzerinden yapılabilir.");
-		Label label2 = GUIHelper.createLabel(downloadUrlContainer, "Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
-		
+		Composite warningComp = GUIHelper.createComposite(downloadUrlContainer, 1);
+
+		Label label = GUIHelper.createLabel(warningComp,
+				"Ejabberd versiyon 16.02 depolarda bulunmamaktadır.\nBu nedenle Ejabberd kurulumu sadece DEB dosyasından veya link üzerinden yapılabilir.\nKuruluma uygun deb dosyası varsayılan olarak getirilmiştir.");
+		// Label label1 = GUIHelper.createLabel(warningComp, "Bu nedenle
+		// Ejabberd kurulumu sadece DEB dosyasından veya link üzerinden
+		// yapılabilir.");
+		// Label label2 = GUIHelper.createLabel(warningComp, "Kuruluma uygun deb
+		// dosyası varsayılan olarak getirilmiştir.");
+		//
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		
+		// label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
+		// label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
+
 		updateConfig();
 		updatePageCompleteStatus();
 	}
 
 	private void updatePageCompleteStatus() {
-//		if (btnAptGet.getSelection()) {
-//			setPageComplete(true);
-//		} else if (btnDebPackage.getSelection()) {
-//			setPageComplete(checkFile());
-//		} else {
-//			setPageComplete(!"".equals(downloadUrlTxt.getText()));
-//		}
+		// if (btnAptGet.getSelection()) {
+		// setPageComplete(true);
+		// } else if (btnDebPackage.getSelection()) {
+		// setPageComplete(checkFile());
+		// } else {
+		// setPageComplete(!"".equals(downloadUrlTxt.getText()));
+		// }
 		if (btnDebPackage.getSelection()) {
 			setPageComplete(checkFile());
 		} else {
@@ -255,11 +259,11 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		if (btnDebPackage.getSelection()) {
 			config.setXmppInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setXmppPackageName(null);
-		} 
-//		else if (btnAptGet.getSelection()) {
-//			config.setXmppInstallMethod(InstallMethod.APT_GET);
-//			config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
-//		} 
+		}
+		// else if (btnAptGet.getSelection()) {
+		// config.setXmppInstallMethod(InstallMethod.APT_GET);
+		// config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
+		// }
 		else {
 			config.setXmppInstallMethod(InstallMethod.WGET);
 			config.setXmppDownloadUrl(downloadUrlTxt.getText());
