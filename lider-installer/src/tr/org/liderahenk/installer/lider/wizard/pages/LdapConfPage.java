@@ -210,6 +210,10 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		text = SetupUtils.replace(map, text);
 		config.setLdapConfContent(text);
 		config.setLdapAbsPathConfFile(writeToFile(text, "ldapconfig"));
+		
+		config.setLdapBaseDn(this.baseDn.getText());
+		config.setLdapAdminCn(this.adminCn.getText());
+		config.setLdapAdminCnPwd(this.adminCnPwd.getText());
 
 		return super.getNextPage();
 	}
