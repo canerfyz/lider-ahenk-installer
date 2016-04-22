@@ -2,8 +2,6 @@ package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -159,9 +157,8 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
 					
-					// TODO dosyayı gönder
-					// TODO chmod
-					// TODO execute
+					printMessage("LDAP configuration starts.");
+					
 					File ldapConfigFile;
 					try {
 						ldapConfigFile = new File(config.getLdapAbsPathConfFile());
@@ -189,6 +186,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 								config.getLdapAccessPasswd(), config.getLdapPort(),
 								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
 						
+						printMessage("LDAP configuration completed successfully.");
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
 						canGoBack = true;
