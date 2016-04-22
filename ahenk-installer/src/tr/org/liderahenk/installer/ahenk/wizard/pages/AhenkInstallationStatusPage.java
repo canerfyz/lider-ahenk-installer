@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import java.io.File;
+import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
@@ -221,15 +223,48 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										if (canConnect) {
 											printMessage("Successfully connected to: " + ip, display);
 
-											printMessage(
-													"Ahenk is being installed to: " + ip + " from provided DEB file.",
-													display);
+											printMessage("Ahenk is being installed to: " + ip + " from provided DEB file.",display);
 
+											
+											
 											File debPackage = new File(config.getDebFileAbsPath());
+											InputStream stream = this.getClass().getResourceAsStream("/conf/liderahenk.list");
+											
+											System.out.println("11");
+											
+											if(stream !=null)
+												System.out.println("stream null değil");
+											
+											System.out.println("12");
+											//TODO 
+											File file = SetupUtils.streamToFile(stream,"liderahenk.list");
+											
+											System.out.println("13");
+											if(file !=null)
+												System.out.println("file null değil");
+											
+											System.out.println("14");
+											
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													file, "/etc/apt/sources.list.d/");
+											System.out.println("source yollandı");
+											
+											try {
+												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+														"wget -qO - http://ftp.pardus.org.tr/Release.pub | apt-key add -");
+												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+														"apt-get update");
+												System.out.println("up-get update");
+												
+											} catch (Exception e) {
+												System.out.println("EXC");
+											}
+											
+									
 
 											SetupUtils.installPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.DPKG);
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.GDEBI);
 
 											setProgressBar(increment, display);
 
