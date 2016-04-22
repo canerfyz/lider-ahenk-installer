@@ -34,11 +34,11 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 	private Text txtLogConsole;
 
 	private NextPageEventType nextPageEventType;
-	
+
 	boolean isInstallationFinished = false;
 
 	boolean canGoBack = false;
-	
+
 	public LdapInstallationStatus(LiderSetupConfig config) {
 		super(LdapInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("LDAP_INSTALLATION"));
@@ -85,26 +85,13 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 					printMessage("Installing package...");
 
-					if (config.getLdapInstallMethod() == InstallMethod.APT_GET) {
-						try {
-							SetupUtils.installPackageNoninteractively(config.getLdapIp(),
-									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), config.getLdapPackageName(), null, debconfValues);
-							setProgressBar(90);
-							isInstallationFinished = true;
-							printMessage("Successfully installed package: " + config.getLdapPackageName());
-						} catch (Exception e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
+					if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getLdapDebFileName());
 						try {
 							SetupUtils.installPackageNonInteractively(config.getLdapIp(),
 									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues, PackageInstaller.GDEBI);
+									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues,
+									PackageInstaller.GDEBI);
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully installed package: " + deb.getName());
@@ -116,29 +103,30 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						}
 					} else if (config.getLdapInstallMethod() == InstallMethod.WGET) {
 						try {
-							printMessage("Downloading OpenLDAP .deb package from: "
-									+ config.getLdapDownloadUrl());
-							
-							// In case of folder name clash use current time as postfix
+							printMessage("Downloading OpenLDAP .deb package from: " + config.getLdapDownloadUrl());
+
+							// In case of folder name clash use current time as
+							// postfix
 							Date date = new Date();
 							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
 							String timestamp = dateFormat.format(date);
-							
+
 							SetupUtils.downloadPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
+									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+									config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
 									config.getLdapDownloadUrl());
-							
+
 							setProgressBar(30);
-							
+
 							printMessage("Successfully downloaded file.");
-							
+
 							printMessage("OpenLDAP is being installed to: " + config.getLdapIp()
-							+ " from downloaded .deb file.");
+									+ " from downloaded .deb file.");
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
-									config.getLdapAccessPasswd(), config.getLdapPort(),
-									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb", PackageInstaller.GDEBI);
-							
+									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+									config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
+									PackageInstaller.GDEBI);
+
 							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
@@ -151,41 +139,53 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
-						
+
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
-					
+
 					printMessage("LDAP configuration starts.");
-					
+
 					File ldapConfigFile;
 					try {
 						ldapConfigFile = new File(config.getLdapAbsPathConfFile());
-						
-						InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("liderahenk.ldif");
+
+						InputStream inputStream = this.getClass().getClassLoader()
+								.getResourceAsStream("liderahenk.ldif");
 						File liderAhenkLdifFile = SetupUtils.streamToFile(inputStream, "liderahenk.ldif");
 						
+						// Delete previous databases
+						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), "rm -rf /var/ldaps/");
+
 						// Send liderahenk.ldif
 						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
-										config.getLdapAccessPasswd(), config.getLdapPort(),
-										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), liderAhenkLdifFile, "/tmp/");
-						
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), liderAhenkLdifFile, "/tmp/");
+
 						// Send LDAP config script
 						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
-								config.getLdapAccessPasswd(), config.getLdapPort(),
-								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
-						
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
+
 						// Maket it executable
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
-										config.getLdapAccessPasswd(), config.getLdapPort(),
-										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "chmod +x /tmp/" + ldapConfigFile.getName());
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), "chmod +x /tmp/" + ldapConfigFile.getName());
+						
+						// Install ldap-utils
+						SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), "ldap-utils", null);
 
 						// Run LDAP config script
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
-								config.getLdapAccessPasswd(), config.getLdapPort(),
-								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
+								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
+								config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
 						
+
 						printMessage("LDAP configuration completed successfully.");
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
@@ -198,11 +198,11 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						printMessage("Error occurred: " + e.getMessage());
 						e.printStackTrace();
 					}
-					
+
 					setProgressBar(100);
 
 					config.setInstallationFinished(isInstallationFinished);
-					
+
 					setPageCompleteAsync(isInstallationFinished);
 
 				}
@@ -273,8 +273,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 	public String[] generateDebconfValues() {
 		String debconfPwd = PropertyReader.property("ldap.debconf.password1") + " " + config.getLdapRootPassword();
 		String debconfPwdAgain = PropertyReader.property("ldap.debconf.password2") + " " + config.getLdapRootPassword();
-		String debconfAdminPwd = PropertyReader.property("ldap.debconf.adminpw") + " "
-				+ config.getLdapRootPassword();
+		String debconfAdminPwd = PropertyReader.property("ldap.debconf.adminpw") + " " + config.getLdapRootPassword();
 		String debconfGeneratedPwd = PropertyReader.property("ldap.debconf.generated.password") + " "
 				+ config.getLdapRootPassword();
 		return new String[] { debconfPwd, debconfPwdAgain, debconfAdminPwd, debconfGeneratedPwd };
@@ -300,5 +299,5 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
-	
+
 }

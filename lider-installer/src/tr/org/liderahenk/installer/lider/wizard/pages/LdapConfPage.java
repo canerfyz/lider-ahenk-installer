@@ -23,6 +23,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -62,6 +63,10 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 		setControl(mainContainer);
+		
+		Label label = GUIHelper.createLabel(mainContainer,
+				"Hazır gelen değerler daha önceki kurulumlara veya\nvarsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
 		
@@ -186,8 +191,6 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("ldapconfig", st);
-		
-		
 
 		setPageComplete(false);
 	}

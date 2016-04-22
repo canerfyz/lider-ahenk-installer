@@ -22,6 +22,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -38,14 +40,14 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 
 	private StyledText stMainConfig;
 	private StyledText stDatasourceConfig;
-	
+
 	// LDAP configuration
 	private Text ldapServer;
 	private Text ldapPort;
 	private Text ldapUsername;
 	private Text ldapPassword;
 	private Text ldapRootDn;
-	
+
 	// XMPP configuration
 	private Text xmppHost;
 	private Text xmppPort;
@@ -56,20 +58,20 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 	private Text xmppPacketReplyTimeout;
 	private Text xmppPingTimeout;
 	private Text xmppFilePath;
-	
+
 	// Database configuration
 	private Text dbServer;
 	private Text dbPort;
 	private Text dbDatabase;
 	private Text dbUsername;
 	private Text dbPassword;
-	
+
 	// Agent configuration
 	private Text agentLdapBaseDn;
 	private Text agentLdapIdAttribute;
 	private Text agentLdapJidAttribute;
 	private Text agentLdapObjectClasses;
-	
+
 	// User configuration
 	private Text userLdapBaseDn;
 	private Text userLdapUidAttribute;
@@ -88,148 +90,158 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
-		
+
+		Label label = GUIHelper.createLabel(container,
+				"Hazır gelen değerler diğer bileşenlerin kurulumlarına veya\nvarsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
+
 		container = new ScrolledComposite(container, SWT.V_SCROLL);
 		container.setLayout(new GridLayout(1, false));
 		container.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		
+
 		Composite innerContainer = new Composite(container, SWT.NONE);
 		innerContainer.setLayout(new GridLayout(1, false));
 		innerContainer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		
+
 		Composite lineCont = GUIHelper.createComposite(innerContainer, 2);
-		
+
 		//
 		// LDAP configuration
 		//
-		
+
 		GUIHelper.createLabel(lineCont, "LDAP sucunu adresi");
 		ldapServer = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
-		
+
 		GUIHelper.createLabel(lineCont, "LDAP sunucu portu");
 		ldapPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		ldapPort.setText(config.getLdapPort() != null ? config.getLdapPort() + "" : "389");
-		
-		GUIHelper.createLabel(lineCont, "LDAP Lider kullanıcısı");
+
+		GUIHelper.createLabel(lineCont, "LDAP Admin kullanıcısı");
 		ldapUsername = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-		ldapUsername.setText("cn=admin,dc=mys,dc=pardus,dc=org"); // TODO
-		
-		GUIHelper.createLabel(lineCont, "LDAP kullanıcı parolası");
+		ldapUsername.setText(config.getLdapAdminCn() != null && config.getLdapBaseDn() != null
+				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+
+		GUIHelper.createLabel(lineCont, "LDAP Admin parolası");
 		ldapPassword = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-		ldapPassword.setText("secret"); // TODO
-		
+		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
+
 		GUIHelper.createLabel(lineCont, "LDAP kök DN");
 		ldapRootDn = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-		ldapRootDn.setText("dc=mys,dc=pardus,dc=org"); // TODO
-		
+		ldapRootDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
+
 		//
 		// XMPP configuration
 		//
 		GUIHelper.createLabel(lineCont, "XMPP sucunu adresi");
 		xmppHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppHost.setText(config.getXmppIp() != null ? config.getXmppIp() : "im.mys.pardus.org.tr");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP sucunu portu");
 		xmppPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppPort.setText(config.getXmppPort() != null ? config.getXmppPort() + "" : "5222");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP Lider kullanıcısı");
 		xmppUsername = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppUsername.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP kullanıcı parolası");
 		xmppPassword = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppPassword.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "asddsa123");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP servis adı");
 		xmppServiceName = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im.mys.pardus.org.tr");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP maksimum bağlantı deneme sayısı");
 		xmppMaxRetryConnCount = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppMaxRetryConnCount.setText("5");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP paket zamanaşımı süresi");
-		xmppPacketReplyTimeout = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		xmppPacketReplyTimeout = GUIHelper.createText(lineCont,
+				new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppPacketReplyTimeout.setText("10000");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP ping zamanaşımı süresi");
 		xmppPingTimeout = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppPingTimeout.setText("3000");
-		
+
 		GUIHelper.createLabel(lineCont, "XMPP dosya transferi yolu");
 		xmppFilePath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppFilePath.setText("/tmp/xmpp-files/");
-		
+
 		//
 		// Database configuration
 		//
-		
+
 		GUIHelper.createLabel(lineCont, "Veritabanı sucunu adresi");
 		dbServer = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db.mys.pardus.org.tr");
-		
+
 		GUIHelper.createLabel(lineCont, "Veritabanı sunucu portu");
 		dbPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		dbPort.setText(config.getDatabasePort() != null ? config.getDatabasePort() + "" : "3306");
-		
+
 		GUIHelper.createLabel(lineCont, "Veritabanı adı");
 		dbDatabase = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		dbDatabase.setText("liderdb");
-		
+
 		GUIHelper.createLabel(lineCont, "Veritabanı kullanıcı adı");
 		dbUsername = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-		dbUsername.setText("root"); // TODO
-		
+		dbUsername.setText("root");
+
 		GUIHelper.createLabel(lineCont, "Veritabanı kullanıcı parolası");
 		dbPassword = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-		dbPassword.setText("qwert123"); // TODO
-		
+		dbPassword.setText(config.getDatabaseRootPassword() != null && !config.getDatabaseRootPassword().isEmpty()
+				? config.getDatabaseRootPassword() : "qwert123");
+
 		//
 		// Agent configuration
 		//
-		
+
 		GUIHelper.createLabel(lineCont, "Ajan LDAP kök DN");
 		agentLdapBaseDn = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		agentLdapBaseDn.setText("ou=Uncategorized,dc=mys,dc=pardus,dc=org");
-		
+
 		GUIHelper.createLabel(lineCont, "Ajan LDAP ID özniteliği");
 		agentLdapIdAttribute = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		agentLdapIdAttribute.setText("cn");
-		
+
 		GUIHelper.createLabel(lineCont, "Ajan LDAP JID özniteliği");
 		agentLdapJidAttribute = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		agentLdapJidAttribute.setText("uid");
-		
+
 		GUIHelper.createLabel(lineCont, "Ajan LDAP sınıfları");
-		agentLdapObjectClasses = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		agentLdapObjectClasses = GUIHelper.createText(lineCont,
+				new GridData(GridData.FILL, GridData.FILL, true, false));
 		agentLdapObjectClasses.setText("pardusDevice,device");
-		
+
 		//
 		// User configuration
 		//
-		
+
 		GUIHelper.createLabel(lineCont, "Kullanıcı LDAP kök DN");
 		userLdapBaseDn = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		userLdapBaseDn.setText("dc=mys,dc=pardus,dc=org");
-		
+
 		GUIHelper.createLabel(lineCont, "Kullanıcı LDAP ID özniteliği");
 		userLdapUidAttribute = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		userLdapUidAttribute.setText("uid");
-		
+
 		GUIHelper.createLabel(lineCont, "Kullanıcı LDAP yetki özniteliği");
-		userLdapPrivilegeAttribute = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		userLdapPrivilegeAttribute = GUIHelper.createText(lineCont,
+				new GridData(GridData.FILL, GridData.FILL, true, false));
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
-		
+
 		GUIHelper.createLabel(lineCont, "Kullanıcı LDAP sınıfları");
 		userLdapObjectClasses = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		userLdapObjectClasses.setText("pardusLider");
-		
+
 		GUIHelper.createLabel(lineCont, "Kullanıcı grubu LDAP sınıfları");
-		groupLdapObjectClasses = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		groupLdapObjectClasses = GUIHelper.createText(lineCont,
+				new GridData(GridData.FILL, GridData.FILL, true, false));
 		groupLdapObjectClasses.setText("groupOfNames");
-		
+
 		GUIHelper.createLabel(innerContainer, "Lider Genel Ayarlar");
 
 		// Add a text area for configuration.
@@ -248,13 +260,13 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 				}
 			}
 		});
-		
+
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("tr.org.liderahenk.cfg", stMainConfig);
-		
+
 		GUIHelper.createLabel(innerContainer, "Lider Veritabanı Ayarları");
-		
+
 		// Add a text area for configuration.
 		stDatasourceConfig = new StyledText(innerContainer, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
 		layoutData = new GridData(GridData.FILL, GridData.FILL, true, true);
@@ -271,7 +283,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 				}
 			}
 		});
-		
+
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("tr.org.liderahenk.datasource.cfg", stDatasourceConfig);
@@ -281,7 +293,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 		((ScrolledComposite) container).setExpandVertical(true);
 		((ScrolledComposite) container).setExpandHorizontal(true);
 		((ScrolledComposite) container).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		
+
 		setPageComplete(false);
 	}
 
@@ -318,11 +330,11 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 		map.put("#USERLDAPPRIVILEGEATTR", userLdapPrivilegeAttribute.getText());
 		map.put("#USERLDAPOBJECTCLASSES", userLdapObjectClasses.getText());
 		map.put("#GROUPLDAPOBJECTCLASSES", groupLdapObjectClasses.getText());
-		
+
 		text = SetupUtils.replace(map, text);
 		config.setLiderConfContent(text);
 		config.setLiderAbsPathConfFile(writeToFile(text, "tr.org.liderahenk.cfg"));
-		
+
 		// Database configuration
 		String text2 = stDatasourceConfig.getText();
 		Map<String, String> map2 = new HashMap<>();
@@ -331,14 +343,14 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 		map2.put("#DBDATABASE", dbDatabase.getText());
 		map2.put("#DBUSERNAME", dbUsername.getText());
 		map2.put("#DBPASSWORD", dbPassword.getText());
-		
+
 		text2 = SetupUtils.replace(map2, text2);
 		config.setDatasourceConfContent(text2);
 		config.setDatasourceAbsPathConfFile(writeToFile(text2, "tr.org.liderahenk.datasource.cfg"));
 
 		return super.getNextPage();
 	}
-	
+
 	/**
 	 * Reads file from classpath location for current project and sets it to a
 	 * text in a GUI.
