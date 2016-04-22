@@ -108,10 +108,15 @@ public class DatabaseInstallationStatus extends WizardPage
 					setProgressBar(20);
 
 					printMessage("Installing package...");
-
+					
 					if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getDatabaseDebFileName());
 						try {
+							SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+									"rm -rf /var/lib/mysql/");
+							
 							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
 									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
 									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
@@ -132,6 +137,11 @@ public class DatabaseInstallationStatus extends WizardPage
 						}
 					} else if (config.getDatabaseInstallMethod() == InstallMethod.WGET) {
 						try {
+							SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+									"rm -rf /var/lib/mysql/");
+							
 							printMessage("Downloading MariaDB .deb package from: " + config.getDatabaseDownloadUrl());
 
 							// In case of folder name clash use current time as
@@ -186,11 +196,6 @@ public class DatabaseInstallationStatus extends WizardPage
 					try {
 						printMessage("Creating database.");
 						
-						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
-								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"rm -rf /var/lib/mysql/liderdb/");
-
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
