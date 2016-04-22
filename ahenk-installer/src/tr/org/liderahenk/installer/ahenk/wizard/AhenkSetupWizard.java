@@ -11,6 +11,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
+import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConfPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConfirmPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkConnectionMethodPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPage;
@@ -38,8 +39,10 @@ public class AhenkSetupWizard extends Wizard {
 	AhenkSetupLocationPage locationPage = new AhenkSetupLocationPage(config);
 	AhenkConnectionMethodPage accessPage = new AhenkConnectionMethodPage(config);
 	AhenkInstallationMethodPage installMethodPage = new AhenkInstallationMethodPage(config);
+	AhenkConfPage confPage = new AhenkConfPage(config);
 	AhenkConfirmPage confirmPage = new AhenkConfirmPage(config);
 	AhenkInstallationStatusPage statusPage = new AhenkInstallationStatusPage(config);
+	
 	
 	@Override
 	public void addPages() {
@@ -47,6 +50,7 @@ public class AhenkSetupWizard extends Wizard {
 		addPage(locationPage);
 		addPage(accessPage);
 		addPage(installMethodPage);
+		addPage(confPage);
 		addPage(confirmPage);
 		addPage(statusPage);
 		
