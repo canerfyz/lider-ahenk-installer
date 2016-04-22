@@ -1,6 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -19,7 +20,10 @@ import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 public class LiderInstallationStatus extends WizardPage implements ILiderPage {
@@ -112,15 +116,9 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						File tar = new File(config.getLiderTarFileName());
 
 						try {
-							// In case of folder name clash use current time as
-							// postfix
-							Date date = new Date();
-							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
-							String timestamp = dateFormat.format(date);
-							
 							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "mkdir /tmp/liderTmpDir" + timestamp);
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "rm -rf /tmp/lider-temp && mkdir -p /tmp/lider-temp");
 							
 							printMessage("Copying TAR file to: " + config.getLiderIp());
 							setProgressBar(30);
@@ -128,7 +126,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), tar,
-									"/tmp/liderTmpDir" + timestamp);
+									"/tmp/lider-temp");
 
 							printMessage("TAR file successfully copied to: " + config.getLiderIp());
 							setProgressBar(60);
@@ -136,7 +134,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Extracting TAR file: " + tar.getName());
 							SetupUtils.extractTarFile(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "/tmp/liderTmpDir" + timestamp + "/" + tar.getName(), "/opt/");
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "/tmp/lider-temp/" + tar.getName(), "/opt/");
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully extracted package: " + tar.getName());
@@ -191,6 +189,46 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 					} else {
 						isInstallationFinished = false;
 						printMessage("Invalid installation method. Installation cancelled.");
+					}
+					
+					File liderConfigFile;
+					File datasourceConfigFile;
+					try {
+						liderConfigFile = new File(config.getLiderAbsPathConfFile());
+						datasourceConfigFile = new File(config.getDatasourceAbsPathConfFile());
+
+						// Copy tr.org.liderahenk.cfg
+						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
+										config.getLiderAccessPasswd(), config.getLiderPort(),
+										config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), liderConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
+						
+						// Copy tr.org.liderahenk.datasource.cfg
+						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(),
+								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), datasourceConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
+						
+						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
+						System.out.println("Command --> " + command);
+						SSHManager.USE_PTY = false;
+						// Start Karaf
+						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(),
+								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), command, new IOutputStreamProvider() {
+									@Override
+									public byte[] getStreamAsByteArray() {
+										return "\n".getBytes(StandardCharsets.UTF_8);
+									}
+						});
+						SSHManager.USE_PTY = true;
+						
+					} catch (SSHConnectionException e) {
+						isInstallationFinished = false;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
+					} catch (CommandExecutionException e) {
+						isInstallationFinished = false;
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
 					}
 
 					setProgressBar(100);

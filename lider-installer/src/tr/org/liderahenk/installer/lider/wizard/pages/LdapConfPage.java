@@ -210,6 +210,10 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		text = SetupUtils.replace(map, text);
 		config.setLdapConfContent(text);
 		config.setLdapAbsPathConfFile(writeToFile(text, "ldapconfig"));
+		
+		config.setLdapBaseDn(this.baseDn.getText());
+		config.setLdapAdminCn(this.adminCn.getText());
+		config.setLdapAdminCnPwd(this.adminCnPwd.getText());
 
 		return super.getNextPage();
 	}
@@ -272,7 +276,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		String absPath = null;
 
 		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
 
 			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
 

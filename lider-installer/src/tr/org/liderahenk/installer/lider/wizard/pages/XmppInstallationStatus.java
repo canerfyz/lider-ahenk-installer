@@ -40,7 +40,10 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 	private static final String EJABBERD_REGISTER = "{0}ejabberdctl register {1} {2} {3}";
 
-	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create {1} {2} {3} {4} {5}";
+//	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create {1} {2} {3} {4} {5}";
+	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create everyone {1} \"everyone\" this_is_everyone everyone";
+
+	private static final String EJABBERD_SRG_ADD_ALL = "{0}ejabberdctl srg-user-add @all@ {1} everyone {2}";
 
 	private static final String CHOWN_EJABBERD = "chown -R ejabberd:ejabberd {0}";
 
@@ -316,51 +319,57 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 								// Lider SRG
 								// TODO "\'lider-srg\\nahenk-srg\'" runs as one srg: lider-srgnahenk-srg
 								String createSrg = prepareCommand(EJABBERD_SRG_CREATE,
-										new Object[] { PropertyReader.property("xmpp.bin.path"), "lider-srg",
-												config.getXmppHostname(), "Lider-SRG", "Lider-SRG",
-												"\'lider-srg\\nahenk-srg\'" });
+										new Object[] { PropertyReader.property("xmpp.bin.path"), config.getXmppHostname()});
 
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
 										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
 
+								String addAll = prepareCommand(EJABBERD_SRG_ADD_ALL,
+										new Object[] { PropertyReader.property("xmpp.bin.path"), config.getXmppHostname(), config.getXmppHostname()});
+								
+								// Add all user to everyone as default
+								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), addAll);
+								
 								// Ahenk SRG
-								createSrg = prepareCommand(EJABBERD_SRG_CREATE,
-										new Object[] { PropertyReader.property("xmpp.bin.path"), "ahenk-srg",
-												config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
-
-								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
+//								createSrg = prepareCommand(EJABBERD_SRG_CREATE,
+//										new Object[] { PropertyReader.property("xmpp.bin.path"), "ahenk-srg",
+//												config.getXmppHostname(), "Ahenk-SRG", "Ahenk-SRG", "\'lider-srg\'" });
+//
+//								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+//										config.getXmppAccessPasswd(), config.getXmppPort(),
+//										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), createSrg);
 								// ------------------------------------------------//
 
 								// --- Create Ejabberd users ---//
 								printMessage("Creating Ejabberd users..");
 
 								// Prepare register command for admin user
-//								String register = prepareCommand(EJABBERD_REGISTER,
-//										new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
-//												config.getXmppHostname(), config.getXmppAdminPwd() });
+								String register = prepareCommand(EJABBERD_REGISTER,
+										new Object[] { PropertyReader.property("xmpp.bin.path"), "admin",
+												config.getXmppHostname(), config.getXmppAdminPwd() });
 
 								// Register admin user in Ejabberd
-//								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-//										config.getXmppAccessPasswd(), config.getXmppPort(),
-//										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
-//								printMessage("Ejabberd user: admin has been successfully created");
-//								setProgressBar(90);
+								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
+								printMessage("Ejabberd user: admin has been successfully created");
+								setProgressBar(90);
 
 								// Prepare register command for Lider user
-//								register = prepareCommand(EJABBERD_REGISTER,
-//										new Object[] { PropertyReader.property("xmpp.bin.path"),
-//												config.getXmppLiderUsername(), config.getXmppHostname(),
-//												config.getXmppLiderPassword() });
+								register = prepareCommand(EJABBERD_REGISTER,
+										new Object[] { PropertyReader.property("xmpp.bin.path"),
+												config.getXmppLiderUsername(), config.getXmppHostname(),
+												config.getXmppLiderPassword() });
 
 								// Register Lider server user in Ejabberd
-//								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
-//										config.getXmppAccessPasswd(), config.getXmppPort(),
-//										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
-//								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
-//										+ " has been successfully created");
+								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
+										config.getXmppAccessPasswd(), config.getXmppPort(),
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), register);
+								printMessage("Ejabberd user: " + config.getXmppLiderUsername()
+										+ " has been successfully created");
 								setProgressBar(95);
 								// --------------------------------------------//
 
@@ -378,14 +387,6 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 
 								printMessage("Installation finished..");
 
-								// ----- Add Users to SRG ----- //
-								// TODO
-								// TODO
-								// TODO
-								// --------------------------//
-								// TODO Add all users to ahenk srg by default
-								// (hint:
-								// @all@)
 							}
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;

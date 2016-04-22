@@ -86,7 +86,7 @@ public class LiderSetupConfig {
 	 * File content of the provided DEB package
 	 */
 	private byte[] databaseDebFileContent;
-	
+
 	private String databaseDownloadUrl;
 
 	/**
@@ -169,14 +169,20 @@ public class LiderSetupConfig {
 	 * LDAP configuration file content
 	 */
 	private String ldapConfContent;
-	
+
 	private String ldapDownloadUrl;
 	
+	private String ldapBaseDn;
+
+	private String ldapAdminCn;
+
+	private String ldapAdminCnPwd;
+
 	/**
 	 * Absolute path of LDAP configuration file.
 	 */
 	private String ldapAbsPathConfFile;
-	
+
 	/**
 	 * ###################################
 	 * 
@@ -194,11 +200,6 @@ public class LiderSetupConfig {
 	 * Package name to be installed as XMPP server
 	 */
 	private String xmppPackageName;
-
-	/**
-	 * Root password for the XMPP server
-	 */
-	private String xmppRootPassword;
 
 	/**
 	 * XMPP server IP
@@ -254,17 +255,17 @@ public class LiderSetupConfig {
 	private byte[] xmppDebFileContent;
 
 	private String xmppDownloadUrl;
-	
+
 	/**
 	 * XMPP hostname
 	 */
 	private String xmppHostname;
-	
+
 	/**
 	 * Password for user: admin in XMPP
 	 */
 	private String xmppAdminPwd;
-	
+
 	/**
 	 * Username for Lider Server user in XMPP.
 	 */
@@ -274,17 +275,17 @@ public class LiderSetupConfig {
 	 * Password for Lider Server user in XMPP.
 	 */
 	private String xmppLiderPassword;
-	
+
 	/**
 	 * XMPP configuration file content
 	 */
 	private String xmppConfContent;
-	
+
 	/**
 	 * Absolute path of XMPP configuration file.
 	 */
 	private String xmppAbsPathConfFile;
-	
+
 	/**
 	 * ###################################
 	 * 
@@ -355,7 +356,7 @@ public class LiderSetupConfig {
 	 * File name of the provided TAR file
 	 */
 	private String liderTarFileName;
-	
+
 	/**
 	 * File content of the provided DEB package
 	 */
@@ -367,17 +368,23 @@ public class LiderSetupConfig {
 	private byte[] liderTarFileContent;
 
 	private String liderDownloadUrl;
-	
+
 	/**
 	 * Lider configuration file content
 	 */
 	private String liderConfContent;
-	
+
+	private String liderAbsPathConfFile;
+
+	private String datasourceConfContent;
+
+	private String datasourceAbsPathConfFile;
+
 	/**
-	 * This variable is used to enable/disable finish button 
+	 * This variable is used to enable/disable finish button
 	 */
 	private boolean isInstallationFinished = false;
-	
+
 	/**
 	 * ###################################
 	 * 
@@ -786,14 +793,6 @@ public class LiderSetupConfig {
 		this.xmppPackageName = xmppPackageName;
 	}
 
-	public String getXmppRootPassword() {
-		return xmppRootPassword;
-	}
-
-	public void setXmppRootPassword(String xmppRootPassword) {
-		this.xmppRootPassword = xmppRootPassword;
-	}
-
 	public String getLdapConfContent() {
 		return ldapConfContent;
 	}
@@ -920,6 +919,54 @@ public class LiderSetupConfig {
 
 	public void setLdapAbsPathConfFile(String ldapAbsPathConfFile) {
 		this.ldapAbsPathConfFile = ldapAbsPathConfFile;
+	}
+
+	public String getLiderAbsPathConfFile() {
+		return liderAbsPathConfFile;
+	}
+
+	public void setLiderAbsPathConfFile(String liderAbsPathConfFile) {
+		this.liderAbsPathConfFile = liderAbsPathConfFile;
+	}
+
+	public String getDatasourceConfContent() {
+		return datasourceConfContent;
+	}
+
+	public void setDatasourceConfContent(String datasourceConfContent) {
+		this.datasourceConfContent = datasourceConfContent;
+	}
+
+	public String getDatasourceAbsPathConfFile() {
+		return datasourceAbsPathConfFile;
+	}
+
+	public void setDatasourceAbsPathConfFile(String datasourceAbsPathConfFile) {
+		this.datasourceAbsPathConfFile = datasourceAbsPathConfFile;
+	}
+
+	public String getLdapBaseDn() {
+		return ldapBaseDn;
+	}
+
+	public void setLdapBaseDn(String ldapBaseDn) {
+		this.ldapBaseDn = ldapBaseDn;
+	}
+
+	public String getLdapAdminCn() {
+		return ldapAdminCn;
+	}
+
+	public void setLdapAdminCn(String ldapAdminCn) {
+		this.ldapAdminCn = ldapAdminCn;
+	}
+
+	public String getLdapAdminCnPwd() {
+		return ldapAdminCnPwd;
+	}
+
+	public void setLdapAdminCnPwd(String ldapAdminCnPwd) {
+		this.ldapAdminCnPwd = ldapAdminCnPwd;
 	}
 
 }

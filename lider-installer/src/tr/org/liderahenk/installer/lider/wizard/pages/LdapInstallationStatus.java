@@ -1,6 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -156,16 +157,24 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						printMessage("Invalid installation method. Installation cancelled.");
 					}
 					
-					// TODO dosyayı gönder
-					// TODO chmod
-					// TODO execute
+					printMessage("LDAP configuration starts.");
+					
 					File ldapConfigFile;
 					try {
 						ldapConfigFile = new File(config.getLdapAbsPathConfFile());
-
+						
+						InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("liderahenk.ldif");
+						File liderAhenkLdifFile = SetupUtils.streamToFile(inputStream, "liderahenk.ldif");
+						
+						// Send liderahenk.ldif
 						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
 										config.getLdapAccessPasswd(), config.getLdapPort(),
-										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
+										config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), liderAhenkLdifFile, "/tmp/");
+						
+						// Send LDAP config script
+						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
+								config.getLdapAccessPasswd(), config.getLdapPort(),
+								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
 						
 						// Maket it executable
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
@@ -177,6 +186,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 								config.getLdapAccessPasswd(), config.getLdapPort(),
 								config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
 						
+						printMessage("LDAP configuration completed successfully.");
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
 						canGoBack = true;

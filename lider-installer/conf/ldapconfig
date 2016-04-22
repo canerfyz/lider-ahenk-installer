@@ -1,5 +1,4 @@
 #!/bin/bash
-# Standalone kurulum icin standard ayarlari yapar.
 
 CNAME="#CNAME"
 BASEDN="#BASEDN"
@@ -46,8 +45,6 @@ service slapd restart
 # liderahenk semasini yukler
 ldapadd -x -f /tmp/liderahenk.ldif -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD
 
-# mys.pardus.org veritabanini olusturur
-
 ADMINDN="cn=$ADMINCN,$BASEDN"
 ADMINGROUPDN="cn=Administrators,ou=Groups,$BASEDN"
 DEFAULTPOLICYDN="cn=Default,ou=Policies,$BASEDN"
@@ -74,30 +71,31 @@ chown openldap:openldap $DBPATH
 LASTDBCOUNT=`ldapsearch -LLL -x -s sub -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD -b "cn=config" "(olcDatabase=*)" | egrep -o "dn: olcDatabase={([0-9]+)}hdb" | tac | egrep -o -m1 "[0-9]+"`
 CURDBNO=`expr $LASTDBCOUNT + 1`
 
-ldapadd -x -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD << EOL
-dn: olcDatabase={$CURDBNO}hdb,cn=config
-objectClass: olcHdbConfig
+#ldapadd -x -D "$CNCONFIGADMINDN" -w $CNCONFIGADMINPASSWD << EOL
+ldapadd -Y EXTERNAL -H ldapi:/// << EOL
+dn: olcDatabase={$CURDBNO}mdb,cn=config
+objectClass: olcMdbConfig
 objectClass: olcDatabaseConfig
-olcDatabase: {$CURDBNO}hdb
+olcDatabase: {$CURDBNO}mdb
 olcDbDirectory: $DBPATH
+olcAccess: {0}to attrs=userPassword,shadowLastChange by self write by anonym
+ ous auth by * none
 olcAccess: {0}to attrs=userPassword,shadowLastChange by self write by anonymous auth by dn="$ADMINDN" write by group.exact="$ADMINGROUPDN" write by * none
 olcAccess: {1}to dn.base="" by * read
 olcAccess: {2}to * by self write by dn="$ADMINDN" write by group.exact="$ADMINGROUPDN" write by * read
 olcDbCheckpoint: 512 30
-olcDbConfig: {0}set_cachesize 0 2097152 0
-olcDbConfig: {1}set_lk_max_objects 1500
-olcDbConfig: {2}set_lk_max_locks 1500
-olcDbConfig: {3}set_lk_max_lockers 1500
 olcDbIndex: objectClass eq
-olcDbIndex: uid eq
-olcDbIndex: cn,sn,title approx
+olcDbIndex: cn,uid eq
+olcDbIndex: uidNumber,gidNumber eq
+olcDbIndex: member,memberUid eq
+olcDbMaxSize: 1073741824
 olcLastMod: TRUE
 olcRootDN: $ADMINDN
 olcRootPW: $ADMINPASSWDHASH
 olcSuffix: $BASEDN
 
 #uid parametresini unique yapar. (unique modulu yuklu olmalidir.)
-dn: olcOverlay=unique,olcDatabase={$CURDBNO}hdb,cn=config
+dn: olcOverlay=unique,olcDatabase={$CURDBNO}mdb,cn=config
 objectClass: olcUniqueConfig
 objectClass: top
 objectClass: olcConfig
@@ -106,7 +104,7 @@ olcOverlay: unique
 olcUniqueAttribute: uid
 
 #memberof modulunu aktive eder, boylece bir groupOfNames e her member eklendiginde eklenen member'in memberof parametresi de otomatik ayarlanir.
-dn: olcOverlay=memberof,olcDatabase={$CURDBNO}hdb,cn=config
+dn: olcOverlay=memberof,olcDatabase={$CURDBNO}mdb,cn=config
 objectClass: olcMemberOf
 objectClass: top
 objectClass: olcConfig
@@ -114,7 +112,7 @@ objectClass: olcOverlayConfig
 olcOverlay: memberof
 
 #refint modulunu aktive et. kayitlar arasinda memberof,member,manager,owner tutarliligni saglar.
-dn: olcOverlay=refint,olcDatabase={$CURDBNO}hdb,cn=config
+dn: olcOverlay=refint,olcDatabase={$CURDBNO}mdb,cn=config
 objectClass: olcRefintConfig
 objectClass: top
 objectClass: olcConfig
@@ -123,7 +121,7 @@ olcOverlay: refint
 olcRefintAttribute: memberof member manager owner
 
 # ppolicy modulunu aktive et.
-dn: olcOverlay=ppolicy,olcDatabase={$CURDBNO}hdb,cn=config
+dn: olcOverlay=ppolicy,olcDatabase={$CURDBNO}mdb,cn=config
 objectClass: olcPPolicyConfig
 objectClass: top
 objectClass: olcConfig
@@ -182,4 +180,4 @@ EOL
 service slapd restart
 
 #bitti
-exit 0
+exit 0 

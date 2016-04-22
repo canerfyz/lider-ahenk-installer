@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -30,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -38,10 +41,15 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
 
-	private Text hostnameTxt;
 	private Text adminPwdTxt;
 	private Text liderUserTxt;
 	private Text liderPwdTxt;
+	
+	private Text host;
+	private Text ldapServer;
+	private Text ldapRootDn;
+	private Text ldapPassword;
+	private Text ldapBase;
 
 	private StyledText st;
 
@@ -54,9 +62,35 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	@Override
 	public void createControl(Composite parent) {
 
-		Composite container = GUIHelper.createComposite(parent, 1);
+		Composite mainContainer = GUIHelper.createComposite(parent, 1);
+		
+		setControl(mainContainer);
+		
+		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
+		
+		Composite lineCont = GUIHelper.createComposite(propertyContainer, 2);
+		
+		GUIHelper.createLabel(lineCont, "Servis Adı");
+		host = GUIHelper.createText(lineCont);
+		host.setText("im.mys.pardus.org.tr");
+		
+		GUIHelper.createLabel(lineCont, "LDAP Sunucu");
+		ldapServer = GUIHelper.createText(lineCont);
+		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
 
-		setControl(container);
+		GUIHelper.createLabel(lineCont, "LDAP Admin");
+		ldapRootDn = GUIHelper.createText(lineCont);
+		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+
+		GUIHelper.createLabel(lineCont, "LDAP Admin Parola");
+		ldapPassword = GUIHelper.createText(lineCont);
+		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
+
+		GUIHelper.createLabel(lineCont, "LDAP Arama Kökü");
+		ldapBase = GUIHelper.createText(lineCont);
+		ldapBase.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
+		
+		Composite container = GUIHelper.createComposite(mainContainer, 1);
 
 		GridData gdForTxt = new GridData();
 		gdForTxt.widthHint = 125;
@@ -66,17 +100,6 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		Composite inputsContainer = GUIHelper.createComposite(container, new GridLayout(2, false),
 				new GridData(SWT.NO, SWT.NO, true, false));
-
-		GUIHelper.createLabel(inputsContainer, Messages.getString("HOSTNAME"));
-
-		hostnameTxt = GUIHelper.createText(inputsContainer);
-		hostnameTxt.setLayoutData(gdForTxt);
-		hostnameTxt.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
-			}
-		});
 
 		GUIHelper.createLabel(inputsContainer, Messages.getString("ADMIN_PASSWORD"));
 
@@ -204,7 +227,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	}
 
 	private void updatePageCompleteStatus() {
-		if (!"".equals(hostnameTxt.getText()) && !"".equals(adminPwdTxt.getText()) 
+		if (!"".equals(adminPwdTxt.getText()) 
 				&& !"".equals(liderUserTxt.getText()) && !"".equals(liderPwdTxt.getText())) {
 			setPageComplete(true);
 		}
@@ -218,14 +241,25 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		// Set config variables before going to next page
 		config.setXmppConfContent(st.getText());
-		config.setXmppHostname(hostnameTxt.getText());
+		config.setXmppHostname(host.getText());
 		config.setXmppAdminPwd(adminPwdTxt.getText());
 		config.setXmppLiderUsername(liderUserTxt.getText());
 		config.setXmppLiderPassword(liderPwdTxt.getText());
 
+		String text = st.getText();
+		Map<String, String> map = new HashMap<>();
+		map.put("#SERVICE_NAME", host.getText());
+		map.put("#LDAP_SERVER", ldapServer.getText());
+		map.put("#LDAP_ROOT_DN", ldapRootDn.getText());
+		map.put("#LDAP_ROOT_PWD", ldapPassword.getText());
+		map.put("#LDAP_BASE_DN", ldapBase.getText());
+		map.put("#HOST_IP", config.getXmppIp());
+		
+		text = SetupUtils.replace(map, text);
+		config.setXmppConfContent(text);
 		// Write configuration to file
-		config.setXmppAbsPathConfFile(writeToFile(st.getText(), "ejabberd.yml"));
-
+		config.setXmppAbsPathConfFile(writeToFile(text, "ejabberd.yml"));
+		
 		return super.getNextPage();
 	}
 
@@ -287,7 +321,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		String absPath = null;
 
 		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
 
 			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
 

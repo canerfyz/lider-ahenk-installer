@@ -893,6 +893,22 @@ public class SetupUtils {
 //		}
 
 	}
+	
+	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
+			final String privateKey, final String passphrase, final String command, IOutputStreamProvider outputStreamProvider)
+					throws SSHConnectionException, CommandExecutionException {
+		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
+				new Object[] { ip, username });
+
+		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+				passphrase);
+		manager.connect();
+
+		manager.execCommand(command, new Object[] {}, outputStreamProvider);
+		logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+
+		manager.disconnect();
+	}
 
 	/**
 	 * Installs a deb package which has been downloaded before by
@@ -1137,30 +1153,30 @@ public class SetupUtils {
 
 		String command = EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination);
 
-		if (NetworkUtils.isLocal(ip)) {
-
-			logger.log(Level.INFO, "Executing command locally.");
-
-			try {
-
-				Process process = Runtime.getRuntime().exec(command);
-
-				int exitValue = process.waitFor();
-				if (exitValue != 0) {
-					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
-							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
-					throw new CommandExecutionException("Failed to execute command: " + command);
-				}
-
-				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
-		} else {
+//		if (NetworkUtils.isLocal(ip)) {
+//
+//			logger.log(Level.INFO, "Executing command locally.");
+//
+//			try {
+//
+//				Process process = Runtime.getRuntime().exec(command);
+//
+//				int exitValue = process.waitFor();
+//				if (exitValue != 0) {
+//					logger.log(Level.SEVERE, "Process ends with exit value: {0} - err: {1}",
+//							new Object[] { process.exitValue(), StringUtils.convertStream(process.getErrorStream()) });
+//					throw new CommandExecutionException("Failed to execute command: " + command);
+//				}
+//
+//				logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+//
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//
+//		} else {
 			logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}",
 					new Object[] { ip, username });
 
@@ -1173,7 +1189,7 @@ public class SetupUtils {
 					new Object[] { EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination) });
 
 			manager.disconnect();
-		}
+//		}
 
 	}
 	
