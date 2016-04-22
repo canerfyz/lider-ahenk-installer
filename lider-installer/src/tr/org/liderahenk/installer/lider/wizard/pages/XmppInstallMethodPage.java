@@ -3,10 +3,8 @@ package tr.org.liderahenk.installer.lider.wizard.pages;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -39,7 +37,6 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
 
-	private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Text txtFileName;
@@ -63,23 +60,6 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		// Ask user if Xmpp will be installed from a .deb package or via
-		// apt-get
-//		btnAptGet = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_APT_GET"));
-//		btnAptGet.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				downloadUrlTxt.setEnabled(false);
-//				updateConfig();
-//				updatePageCompleteStatus();
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-//		});
-//		btnAptGet.setSelection(true);
-		
 		btnDebPackage = GUIHelper.createButton(container, SWT.RADIO, Messages.getString("XMPP_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
 
@@ -233,13 +213,6 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 	}
 
 	private void updatePageCompleteStatus() {
-//		if (btnAptGet.getSelection()) {
-//			setPageComplete(true);
-//		} else if (btnDebPackage.getSelection()) {
-//			setPageComplete(checkFile());
-//		} else {
-//			setPageComplete(!"".equals(downloadUrlTxt.getText()));
-//		}
 		if (btnDebPackage.getSelection()) {
 			setPageComplete(checkFile());
 		} else {
@@ -256,10 +229,6 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 			config.setXmppInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setXmppPackageName(null);
 		} 
-//		else if (btnAptGet.getSelection()) {
-//			config.setXmppInstallMethod(InstallMethod.APT_GET);
-//			config.setXmppPackageName(PropertyReader.property("xmpp.package.name"));
-//		} 
 		else {
 			config.setXmppInstallMethod(InstallMethod.WGET);
 			config.setXmppDownloadUrl(downloadUrlTxt.getText());
