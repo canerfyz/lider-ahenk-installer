@@ -1,6 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,14 +27,16 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
-public class LiderInstallationStatus extends WizardPage implements ILiderPage {
+public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage {
 
 	private LiderSetupConfig config;
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
-
+	
 	boolean isInstallationFinished = false;
+
+	boolean canGoBack = false;
 
 	public LiderInstallationStatus(LiderSetupConfig config) {
 		super(LiderInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -86,10 +89,12 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Successfully installed package: " + config.getLiderPackageName());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -105,10 +110,12 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Successfully installed package: " + deb.getName());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -141,10 +148,12 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Installation completed.");
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -178,10 +187,12 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 							printMessage("Lider has been successfully installed to: " + config.getLiderIp());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
+							canGoBack = false;
 							printMessage("Error occurred: " + e.getMessage());
 							e.printStackTrace();
 						}
@@ -193,10 +204,15 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 					
 					File liderConfigFile;
 					File datasourceConfigFile;
+					File setEnvFile;
+					InputStream inputStream;
 					try {
 						liderConfigFile = new File(config.getLiderAbsPathConfFile());
 						datasourceConfigFile = new File(config.getDatasourceAbsPathConfFile());
-
+						inputStream = this.getClass().getClassLoader()
+								.getResourceAsStream("setenv");
+						setEnvFile = SetupUtils.streamToFile(inputStream, "setenv");
+						
 						// Copy tr.org.liderahenk.cfg
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 										config.getLiderAccessPasswd(), config.getLiderPort(),
@@ -206,6 +222,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(),
 								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), datasourceConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
+						
+						// Copy setenv file
+						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(),
+								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), setEnvFile, "/opt/" + PropertyReader.property("lider.package.name") + "/bin/");
 						
 						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
 						System.out.println("Command --> " + command);
@@ -221,12 +242,16 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 						});
 						SSHManager.USE_PTY = true;
 						
+						isInstallationFinished = true;
+						
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
+						canGoBack = false;
 						printMessage("Error occurred: " + e.getMessage());
 						e.printStackTrace();
 					} catch (CommandExecutionException e) {
 						isInstallationFinished = false;
+						canGoBack = false;
 						printMessage("Error occurred: " + e.getMessage());
 						e.printStackTrace();
 					}
@@ -297,8 +322,13 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage {
 
 	@Override
 	public IWizardPage getPreviousPage() {
-		// Do not allow to go back from this page.
-		return null;
+		// Do not allow to go back from this page if installation completed
+		// successfully.
+		if (canGoBack) {
+			return super.getPreviousPage();
+		} else {
+			return null;
+		}
 	}
 
 }
