@@ -179,5 +179,27 @@ EOL
 
 service slapd restart
 
+ldapadd -x -D "$ADMINDN" -w $ADMINPASSWD << EOL
+dn: cn=liderAhenkConfig,$BASEDN
+objectClass: pardusLiderAhenkConfig
+cn: liderAhenkConfig
+liderServiceAddress: http://#LIDERIP:8181
+
+dn: cn=#LIDERCONSOLEUSER,$BASEDN
+objectClass: inetOrgPerson
+objectClass: organizationalPerson
+objectClass: pardusAccount
+objectClass: pardusLider
+objectClass: person
+objectClass: top
+cn: #LIDERCONSOLEUSER
+sn: #LIDERCONSOLEUSER
+uid: #LIDERCONSOLEUSER
+userPassword: #LIDERCONSOLEPWD
+liderPrivilege: [$BASEDN:ALL:true]
+EOL
+
+service slapd restart
+
 #bitti
 exit 0 

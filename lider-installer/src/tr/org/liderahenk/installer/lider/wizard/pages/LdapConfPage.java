@@ -51,6 +51,9 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	private Text organization;
 	private Text adminCn;
 	private Text adminCnPwd;
+	private Text liderIp;
+	private Text liderConsoleUser;
+	private Text liderConsoleUserPwd;
 	
 	public LdapConfPage(LiderSetupConfig config) {
 		super(LdapConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -103,6 +106,18 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		GUIHelper.createLabel(lineCont, "Admin CN Password");
 		adminCnPwd = GUIHelper.createText(lineCont);
 		adminCnPwd.setText("secret");
+		
+		GUIHelper.createLabel(lineCont, "Lider IP address");
+		liderIp = GUIHelper.createText(lineCont);
+		liderIp.setText("lider.mys.pardus.org.tr");
+		
+		GUIHelper.createLabel(lineCont, "Lider Console User Password");
+		liderConsoleUserPwd = GUIHelper.createText(lineCont);
+		liderConsoleUserPwd.setText("p@ssw0rd");
+		
+		GUIHelper.createLabel(lineCont, "Lider Console User");
+		liderConsoleUser = GUIHelper.createText(lineCont);
+		liderConsoleUser.setText("lider_console");
 		
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
 		
@@ -209,6 +224,9 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		map.put("#ADMINPASSWD", adminCnPwd.getText());
 		map.put("#CNCONFIGADMINDN", configAdminDn.getText());
 		map.put("#CNCONFIGADMINPASSWD", configAdminDnPwd.getText());
+		map.put("#LIDERIP", liderIp.getText());
+		map.put("#LIDERCONSOLEUSER", liderConsoleUser.getText());
+		map.put("#LIDERCONSOLEPWD", liderConsoleUserPwd.getText());
 		
 		text = SetupUtils.replace(map, text);
 		config.setLdapConfContent(text);
