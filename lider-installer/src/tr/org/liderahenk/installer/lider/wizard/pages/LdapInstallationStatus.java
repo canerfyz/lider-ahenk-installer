@@ -76,6 +76,8 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 				@Override
 				public void run() {
 
+					setPageCompleteAsync(isInstallationFinished);
+					
 					printMessage("Initializing installation...");
 					setProgressBar(10);
 
