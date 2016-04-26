@@ -81,20 +81,15 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		GUIHelper.createLabel(lineCont, "LDAP Sunucu");
 		ldapServer = GUIHelper.createText(lineCont);
-		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
 
 		GUIHelper.createLabel(lineCont, "LDAP Admin");
 		ldapRootDn = GUIHelper.createText(lineCont);
-		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null
-				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
 
 		GUIHelper.createLabel(lineCont, "LDAP Admin Parola");
 		ldapPassword = GUIHelper.createText(lineCont);
-		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
 
 		GUIHelper.createLabel(lineCont, "LDAP Arama Kökü");
 		ldapBase = GUIHelper.createText(lineCont);
-		ldapBase.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
 
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
 
@@ -132,6 +127,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		liderUserTxt = GUIHelper.createText(liderContainer);
 		liderUserTxt.setLayoutData(gdForTxt);
+		liderUserTxt.setText("lider_sunucu");
 		liderUserTxt.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
@@ -243,7 +239,10 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-
+		
+		// Set default or predefined values to inputs
+		setInputValues();
+		
 		// Set config variables before going to next page
 		config.setXmppConfContent(st.getText());
 		config.setXmppHostname(host.getText());
@@ -267,6 +266,14 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		config.setXmppAbsPathConfFile(writeToFile(text, "ejabberd.yml"));
 
 		return super.getNextPage();
+	}
+
+	private void setInputValues() {
+		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
+		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null
+				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
+		ldapBase.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
 	}
 
 	/**
