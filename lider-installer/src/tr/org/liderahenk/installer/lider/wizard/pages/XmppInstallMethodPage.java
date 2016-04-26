@@ -37,7 +37,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;
 
-//	private Button btnAptGet;
+	// private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Text txtFileName;
@@ -272,6 +272,15 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 		}
 
 		return super.getPreviousPage();
+	}
+
+	@Override
+	public IWizardPage getNextPage() {
+		// I don't know why but XmppConfPage's getNextPage method is not
+		// triggered automatically. So I did it manually.
+		XmppConfPage confPage = (XmppConfPage) super.getNextPage();
+		confPage.getNextPage();
+		return confPage;
 	}
 
 }
