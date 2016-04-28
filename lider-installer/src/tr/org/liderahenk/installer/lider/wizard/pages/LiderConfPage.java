@@ -326,13 +326,13 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 
 	private void setInputValues() {
 		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
-		ldapPort.setText(config.getLdapPort() != null ? config.getLdapPort() + "" : "389");
+		ldapPort.setText("389");
 		ldapUsername.setText(config.getLdapAdminCn() != null && config.getLdapBaseDn() != null
 				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
 		ldapRootDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
 		xmppHost.setText(config.getXmppIp() != null ? config.getXmppIp() : "im.mys.pardus.org.tr");
-		xmppPort.setText(config.getXmppPort() != null ? config.getXmppPort() + "" : "5222");
+		xmppPort.setText("5222");
 		xmppUsername.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
 		xmppPassword.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "asddsa123");
 		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im.mys.pardus.org.tr");
@@ -341,16 +341,16 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 		xmppPingTimeout.setText("3000");
 		xmppFilePath.setText("/tmp/xmpp-files/");
 		dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db.mys.pardus.org.tr");
-		dbPort.setText(config.getDatabasePort() != null ? config.getDatabasePort() + "" : "3306");
+		dbPort.setText("3306");
 		dbDatabase.setText("liderdb");
 		dbUsername.setText("root");
 		dbPassword.setText(config.getDatabaseRootPassword() != null && !config.getDatabaseRootPassword().isEmpty()
 				? config.getDatabaseRootPassword() : "qwert123");
-		agentLdapBaseDn.setText("ou=Uncategorized,dc=mys,dc=pardus,dc=org");
+		agentLdapBaseDn.setText(config.getLdapBaseDn() != null ? "ou=Uncategorized," + config.getLdapBaseDn() : "ou=Uncategorized,dc=mys,dc=pardus,dc=org");
 		agentLdapIdAttribute.setText("cn");
 		agentLdapJidAttribute.setText("uid");
 		agentLdapObjectClasses.setText("pardusDevice,device");
-		userLdapBaseDn.setText("dc=mys,dc=pardus,dc=org");
+		userLdapBaseDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
 		userLdapUidAttribute.setText("uid");
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
 		userLdapObjectClasses.setText("pardusLider");
