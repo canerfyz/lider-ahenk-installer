@@ -109,7 +109,6 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		
 		GUIHelper.createLabel(lineCont, "Lider IP address");
 		liderIp = GUIHelper.createText(lineCont);
-		liderIp.setText("lider.mys.pardus.org.tr");
 		
 		GUIHelper.createLabel(lineCont, "Lider Console User Password");
 		liderConsoleUserPwd = GUIHelper.createText(lineCont);
@@ -213,6 +212,9 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	@Override
 	public IWizardPage getNextPage() {
 
+		// Set default or predefined values to inputs
+		liderIp.setText(config.isInstallLider() ? config.getLiderIp() : "lider.mys.pardus.org.tr");
+		
 		// Set config variables before going to next page
 		String text = st.getText();
 		Map<String, String> map = new HashMap<>();
