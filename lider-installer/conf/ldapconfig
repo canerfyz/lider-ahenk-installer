@@ -147,7 +147,7 @@ objectClass: organizationalRole
 cn: $ADMINCN
 description: $ORGANIZATION Directory Manager
 
-dn: ou=Uncategorized,dc=mys,dc=pardus,dc=org
+dn: ou=Uncategorized,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
 ou: Uncategorized
