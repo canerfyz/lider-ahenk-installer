@@ -88,8 +88,8 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		// Copy mariadb.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader()
-				.getResourceAsStream("mariadb-server_default_10_0_24.deb");
-		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server_default_10_0_24.deb");
+				.getResourceAsStream("mariadb-server_default_10_0_23.deb");
+		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server_default_10_0_23.deb");
 		txtFileName.setText(mariadbDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes
