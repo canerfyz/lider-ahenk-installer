@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -53,6 +54,8 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	private Text ldapBase;
 
 	private StyledText st;
+	
+	private NextPageEventType nextPageEventType;
 
 	public XmppConfPage(LiderSetupConfig config) {
 		super(XmppConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -240,8 +243,11 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	@Override
 	public IWizardPage getNextPage() {
 		
-		// Set default or predefined values to inputs
-		setInputValues();
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			// Set default or predefined values to inputs
+			setInputValues();
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+		}
 		
 		// Set config variables before going to next page
 		config.setXmppConfContent(st.getText());
@@ -349,5 +355,13 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		}
 
 		return absPath;
+	}
+
+	public NextPageEventType getNextPageEventType() {
+		return nextPageEventType;
+	}
+
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 }

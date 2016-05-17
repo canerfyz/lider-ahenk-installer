@@ -276,9 +276,11 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 	@Override
 	public IWizardPage getNextPage() {
+		
 		// I don't know why but XmppConfPage's getNextPage method is not
 		// triggered automatically. So I did it manually.
 		XmppConfPage confPage = (XmppConfPage) super.getNextPage();
+		confPage.setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 		confPage.getNextPage();
 		return confPage;
 	}
