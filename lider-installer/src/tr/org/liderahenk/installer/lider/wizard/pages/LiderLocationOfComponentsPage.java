@@ -127,7 +127,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeFields();
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 
 			@Override
@@ -140,7 +140,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeFields();
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 
 			@Override
@@ -153,7 +153,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeInnerFields();
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 
 			@Override
@@ -166,7 +166,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeInnerFields();
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 
 			@Override
@@ -179,7 +179,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 		});
 
@@ -187,7 +187,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 		});
 
@@ -195,7 +195,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 		});
 
@@ -203,7 +203,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 		});
 
@@ -211,7 +211,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			@Override
 			public void modifyText(ModifyEvent e) {
-				updatePageCompleteStatus();
+				updatePageStatus(true);
 			}
 		});
 
@@ -222,7 +222,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// This method sets fields enable/disable
 		// according to user's radio button choices
 		organizeFields();
-		updatePageCompleteStatus();
+		updatePageStatus(false);
 	}
 
 	// This method organizes button, fields etc.
@@ -286,17 +286,21 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	}
 
 	// This method decides to next button's status.
-	private void updatePageCompleteStatus() {
-		if (btnInstallCentral.getSelection()) {
-			if (btnLocal.getSelection()) {
-				setPageComplete(true);
-			} else if (btnRemote.getSelection() && NetworkUtils.isIpValid(txtRemoteIp.getText())) {
-				setPageComplete(true);
-			} else {
-				setPageComplete(false);
+	private void updatePageStatus(boolean check) {
+		if (!check) {
+			setPageComplete(check);
+		} else {
+			if (btnInstallCentral.getSelection()) {
+				if (btnLocal.getSelection()) {
+					setPageComplete(true);
+				} else if (btnRemote.getSelection() && NetworkUtils.isIpValid(txtRemoteIp.getText())) {
+					setPageComplete(true);
+				} else {
+					setPageComplete(false);
+				}
+			} else { // btnInstallDistributed
+				setPageComplete(checkRequiredIps());
 			}
-		} else { // btnInstallDistributed
-			setPageComplete(checkRequiredIps());
 		}
 	}
 
@@ -307,7 +311,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		boolean liderIpEntered = false; 
 		
 		if (config.isInstallDatabase()) {
-			if (NetworkUtils.isIpValid(txtDatabaseIp.getText())) {
+			if (!txtDatabaseIp.getText().isEmpty() && NetworkUtils.isIpValid(txtDatabaseIp.getText())) {
 				databaseIpEntered = true;
 			} else {
 				databaseIpEntered = false;
@@ -316,7 +320,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			databaseIpEntered = true;
 		}
 		if (config.isInstallLdap()) {
-			if (NetworkUtils.isIpValid(txtLdapIp.getText())) {
+			if (!txtLdapIp.getText().isEmpty() && NetworkUtils.isIpValid(txtLdapIp.getText())) {
 				ldapIpEntered = true;
 			} else {
 				ldapIpEntered = false;
@@ -326,7 +330,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			ldapIpEntered = true;
 		}
 		if (config.isInstallXmpp()) {
-			if (NetworkUtils.isIpValid(txtXmppIp.getText())) {
+			if (!txtXmppIp.getText().isEmpty() && NetworkUtils.isIpValid(txtXmppIp.getText())) {
 				xmppIpEntered = true;
 			} else {
 				xmppIpEntered = false;
@@ -336,7 +340,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			xmppIpEntered = true;
 		}
 		if (config.isInstallLider()) {
-			if (NetworkUtils.isIpValid(txtLiderIp.getText())) {
+			if (!txtLiderIp.getText().isEmpty() && NetworkUtils.isIpValid(txtLiderIp.getText())) {
 				liderIpEntered = true;
 			} else {
 				liderIpEntered = false;
@@ -478,7 +482,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 		((ControlNextEvent) selectNextPage()).setNextPageEventType(
 				NextPageEventType.CLICK_FROM_PREV_PAGE);
-
+		
 		return selectNextPage();
 	}
 
