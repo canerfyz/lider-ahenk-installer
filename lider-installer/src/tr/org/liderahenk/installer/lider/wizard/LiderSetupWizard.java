@@ -25,6 +25,7 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderOrganizationPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
@@ -54,6 +55,7 @@ public class LiderSetupWizard extends Wizard {
 	 * Other pages will be added dynamically according to user action!
 	 */
 	LiderComponentSelectionPage compSelect = new LiderComponentSelectionPage(config);
+	LiderOrganizationPage organization = new LiderOrganizationPage(config);
 	LiderLocationOfComponentsPage locatOfComps = new LiderLocationOfComponentsPage(config);
 
 	DatabaseAccessPage dbAccess = new DatabaseAccessPage(config);
@@ -83,6 +85,7 @@ public class LiderSetupWizard extends Wizard {
 	public void addPages() {
 		// Add first page as default, so the wizard can show it on startup
 		addPage(compSelect);
+		addPage(organization);
 		addPage(locatOfComps);
 
 		// Database configuration
