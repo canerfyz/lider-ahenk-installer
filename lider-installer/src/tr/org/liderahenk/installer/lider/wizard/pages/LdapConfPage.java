@@ -211,9 +211,10 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-
+		
+		// TODO Önceki sayfadan belirteç koy ona göre çalıştır ki sonraki sayfadan back'e basınca tekrar değişmesin
 		// Set default or predefined values to inputs
-		liderIp.setText(config.isInstallLider() ? config.getLiderIp() : "lider.mys.pardus.org.tr");
+		setInputValues();
 		
 		// Set config variables before going to next page
 		String text = st.getText();
@@ -241,6 +242,19 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		return super.getNextPage();
 	}
 	
+	private void setInputValues() {
+		// Set default or predefined values to inputs from Organization CN
+		organization.setText(config.getLdapOrgName() != null ? config.getLdapOrgName() : "Pardus MYS");
+		cname.setText(config.getLdapOrgCn() != null ? config.getLdapOrgCn() : "mys.pardus.org");
+		baseDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
+		baseCn.setText(config.getLdapBaseCn() != null ? config.getLdapBaseCn() : "mys");
+		if (config.isInstallLider()) {
+			liderIp.setText(config.getLiderIp());
+		} else {
+			liderIp.setText(config.getLdapOrgCn() != null ? "lider." + config.getLdapOrgCn() : "lider.mys.pardus.org.tr");
+		}
+	}
+
 	/**
 	 * Reads file from classpath location for current project and sets it to a
 	 * text in a GUI.
