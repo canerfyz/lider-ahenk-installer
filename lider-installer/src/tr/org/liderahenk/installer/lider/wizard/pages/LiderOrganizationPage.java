@@ -1,11 +1,18 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -30,7 +37,7 @@ public class LiderOrganizationPage extends WizardPage {
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 		setControl(mainContainer);
 
-		GUIHelper.createLabel(mainContainer, Messages.getString("ORGANIZATION_CN_DESCRIPTION"));
+		GUIHelper.createLabel(mainContainer, Messages.getString("ORGANIZATION_PAGE_DESCRIPTION"));
 
 		Composite cmpOrgCn = GUIHelper.createComposite(mainContainer, new GridLayout(2, false),
 				new GridData(SWT.LEFT, SWT.CENTER, false, false));
@@ -39,15 +46,77 @@ public class LiderOrganizationPage extends WizardPage {
 		
 		GridData gd = new GridData();
 		gd.widthHint = 250;
+		gd.horizontalIndent = 10;
 		
 		txtOrgName = GUIHelper.createText(cmpOrgCn);
 		txtOrgName.setLayoutData(gd);
+		txtOrgName.setMessage(Messages.getString("EG_ORG_NAME"));
+		txtOrgName.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
+		txtOrgName.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// Validate inputs for letter and dot only
+				char c = e.character;
+				if (!Character.isLetter(c) && !(c == SWT.DEL || c == SWT.ARROW_LEFT || c == SWT.ARROW_RIGHT
+						|| c == SWT.BS || c == ".".hashCode())) {
+					e.doit = false;
+					return;
+				} else {
+					e.doit = true;
+					return;
+				}
+			}
+		});
+		final ControlDecoration decOrgName = new ControlDecoration(txtOrgName, SWT.TOP | SWT.LEFT);
+		// TODO change icon
+		decOrgName.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
+		decOrgName.setDescriptionText(Messages.getString("ORG_NAME_DESC"));
 
 		GUIHelper.createLabel(cmpOrgCn, Messages.getString("ORGANIZATION_CN"));
 
 		txtOrgCn = GUIHelper.createText(cmpOrgCn);
 		txtOrgCn.setLayoutData(gd);
-		// TODO add validation from User privilege plugin
+		txtOrgCn.setMessage(Messages.getString("EG_ORG_CN"));
+		txtOrgCn.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
+		txtOrgCn.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				// Validate inputs for letter and dot only
+				char c = e.character;
+				if (!Character.isLetter(c) && !(c == SWT.DEL || c == SWT.ARROW_LEFT || c == SWT.ARROW_RIGHT
+						|| c == SWT.BS || c == ".".hashCode())) {
+					e.doit = false;
+					return;
+				} else {
+					e.doit = true;
+					return;
+				}
+			}
+		});
+		final ControlDecoration decOrgCn = new ControlDecoration(txtOrgCn, SWT.TOP | SWT.LEFT);
+		// TODO change icon
+		decOrgCn.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
+		decOrgCn.setDescriptionText(Messages.getString("ORG_CN_DESC"));
+		
+		updatePageCompleteStatus();
 	}
 
 	@Override
@@ -62,6 +131,14 @@ public class LiderOrganizationPage extends WizardPage {
 		}
 		
 		return super.getNextPage();
+	}
+	
+	private void updatePageCompleteStatus() {
+		if (!txtOrgName.getText().isEmpty() && !txtOrgCn.getText().isEmpty()) { 
+			setPageComplete(true);
+		} else {
+			setPageComplete(false);
+		}
 	}
 	
 	private void prepareDefaults(String orgName, String orgCn) {
