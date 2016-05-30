@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -55,6 +56,8 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	private Text liderConsoleUser;
 	private Text liderConsoleUserPwd;
 	
+	private NextPageEventType nextPageEventType;
+	
 	public LdapConfPage(LiderSetupConfig config) {
 		super(LdapConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("LDAP_CONF"));
@@ -77,19 +80,15 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		
 		GUIHelper.createLabel(lineCont, "Organization");
 		organization = GUIHelper.createText(lineCont);
-		organization.setText("Pardus MYS");
 
 		GUIHelper.createLabel(lineCont, "Organization CN");
 		cname = GUIHelper.createText(lineCont);
-		cname.setText("mys.pardus.org");
 
 		GUIHelper.createLabel(lineCont, "Base DN");
 		baseDn = GUIHelper.createText(lineCont);
-		baseDn.setText("dc=mys,dc=pardus,dc=org");
 
 		GUIHelper.createLabel(lineCont, "Base CN");
 		baseCn = GUIHelper.createText(lineCont);
-		baseCn.setText("mys");
 
 		GUIHelper.createLabel(lineCont, "Config Admin DN");
 		configAdminDn = GUIHelper.createText(lineCont);
@@ -212,9 +211,11 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	@Override
 	public IWizardPage getNextPage() {
 		
-		// TODO Önceki sayfadan belirteç koy ona göre çalıştır ki sonraki sayfadan back'e basınca tekrar değişmesin
-		// Set default or predefined values to inputs
-		setInputValues();
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			// Set default or predefined values to inputs
+			setInputValues();
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+		}
 		
 		// Set config variables before going to next page
 		String text = st.getText();
@@ -328,6 +329,14 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 		}
 
 		return absPath;
+	}
+	
+	public NextPageEventType getNextPageEventType() {
+		return nextPageEventType;
+	}
+
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 	
 }
