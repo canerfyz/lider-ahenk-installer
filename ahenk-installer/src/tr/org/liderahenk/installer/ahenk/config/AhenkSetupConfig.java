@@ -54,6 +54,7 @@ public class AhenkSetupConfig {
 	 */
 	private InstallMethod ahenkInstallMethod;
 	private String debFileAbsPath;
+	private String ahenkLogConfAbsPath;
 
 	/**
 	 * This variable is used to enable/disable finish button
@@ -243,6 +244,14 @@ public class AhenkSetupConfig {
 
 	public void setAhenkAbsPathConfFile(String ahenkAbsPathConfFile) {
 		this.ahenkAbsPathConfFile = ahenkAbsPathConfFile;
+	}
+
+	public String getAhenkLogConfAbsPath() {
+		return ahenkLogConfAbsPath;
+	}
+
+	public void setAhenkLogConfAbsPath(String ahenkLogConfAbsPath) {
+		this.ahenkLogConfAbsPath = ahenkLogConfAbsPath;
 	}
 
 }
