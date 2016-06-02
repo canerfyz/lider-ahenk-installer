@@ -41,13 +41,13 @@ public class LiderOrganizationPage extends WizardPage {
 
 		Composite cmpOrgCn = GUIHelper.createComposite(mainContainer, new GridLayout(2, false),
 				new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		
+
 		GUIHelper.createLabel(cmpOrgCn, Messages.getString("ORGANIZATION_NAME"));
-		
+
 		GridData gd = new GridData();
 		gd.widthHint = 250;
 		gd.horizontalIndent = 10;
-		
+
 		txtOrgName = GUIHelper.createText(cmpOrgCn);
 		txtOrgName.setLayoutData(gd);
 		txtOrgName.setMessage(Messages.getString("EG_ORG_NAME"));
@@ -66,8 +66,8 @@ public class LiderOrganizationPage extends WizardPage {
 			public void keyPressed(KeyEvent e) {
 				// Validate inputs for letter and dot only
 				char c = e.character;
-				if (!Character.isLetter(c) && !(c == SWT.DEL || c == SWT.ARROW_LEFT || c == SWT.ARROW_RIGHT
-						|| c == SWT.BS || c == ".".hashCode())) {
+				if (!Character.isLetter(c) && !(c == SWT.DEL || e.keyCode == SWT.ARROW_LEFT
+						|| e.keyCode == SWT.ARROW_RIGHT || c == SWT.BS || c == ".".hashCode())) {
 					e.doit = false;
 					return;
 				} else {
@@ -101,8 +101,8 @@ public class LiderOrganizationPage extends WizardPage {
 			public void keyPressed(KeyEvent e) {
 				// Validate inputs for letter and dot only
 				char c = e.character;
-				if (!Character.isLetter(c) && !(c == SWT.DEL || c == SWT.ARROW_LEFT || c == SWT.ARROW_RIGHT
-						|| c == SWT.BS || c == ".".hashCode())) {
+				if (!Character.isLetter(c) && !(c == SWT.DEL || e.keyCode == SWT.ARROW_LEFT
+						|| e.keyCode == SWT.ARROW_RIGHT || c == SWT.BS || c == ".".hashCode())) {
 					e.doit = false;
 					return;
 				} else {
@@ -115,35 +115,35 @@ public class LiderOrganizationPage extends WizardPage {
 		// TODO change icon
 		decOrgCn.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
 		decOrgCn.setDescriptionText(Messages.getString("ORG_CN_DESC"));
-		
+
 		updatePageCompleteStatus();
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		
+
 		prepareDefaults(txtOrgName.getText(), txtOrgCn.getText());
-		
+
 		// Update next page according to selections of this page
 		IWizardPage nextPage = super.getNextPage();
 		if (nextPage instanceof LiderLocationOfComponentsPage) {
 			((LiderLocationOfComponentsPage) nextPage).updatePage();
 		}
-		
+
 		return super.getNextPage();
 	}
-	
+
 	private void updatePageCompleteStatus() {
-		if (!txtOrgName.getText().isEmpty() && !txtOrgCn.getText().isEmpty()) { 
+		if (!txtOrgName.getText().isEmpty() && !txtOrgCn.getText().isEmpty()) {
 			setPageComplete(true);
 		} else {
 			setPageComplete(false);
 		}
 	}
-	
+
 	private void prepareDefaults(String orgName, String orgCn) {
 		String[] organizationArr = orgCn.split("\\.");
-		
+
 		String orgBaseDn = "";
 		String orgBaseCn = "";
 		if (organizationArr.length > 0) {
@@ -156,7 +156,7 @@ public class LiderOrganizationPage extends WizardPage {
 				}
 			}
 		}
-		
+
 		config.setLdapOrgName(orgName);
 		config.setLdapBaseDn(orgBaseDn);
 		config.setLdapOrgCn(orgCn);
