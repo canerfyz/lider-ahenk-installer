@@ -149,11 +149,11 @@ public class AhenkInstallationMethodPage extends WizardPage {
 			}
 		});
 
-		// Copy mariadb.deb to /tmp and bring it as default deb in page
+		// Copy ahenk.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ahenk_1.0_amd64.deb");
 		File ahenkDeb = SetupUtils.streamToFile(inputStream, "ahenk_1.0_amd64.deb");
 		fileDialogText.setText(ahenkDeb.getAbsolutePath());
-		
+
 		// Set file to config as array of bytes
 		debContent = new byte[(int) ahenkDeb.length()];
 		
@@ -174,6 +174,30 @@ public class AhenkInstallationMethodPage extends WizardPage {
 		}
 		
 		config.setDebFileAbsPath(fileDialogText.getText());
+		
+		InputStream input = this.getClass().getClassLoader().getResourceAsStream("log.conf");
+		File logConf = SetupUtils.streamToFile(input, "log.conf");
+		
+		// Set file to config as array of bytes
+		debContent = new byte[(int) logConf.length()];
+		
+		FileInputStream inStream = null;
+		try {
+			inStream = new FileInputStream(logConf);
+			inStream.read(debContent);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} finally {
+			try {
+				inStream.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		config.setAhenkLogConfAbsPath(logConf.getAbsolutePath());
 		
 		// Upload Ahenk .deb push button
 		fileDialogBtn = new Button(fileDialogContainer, SWT.PUSH);

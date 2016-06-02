@@ -208,6 +208,8 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 						
 						final File fileConf = new File(writeToFile(config.getAhenkConfContent(),"ahenk.conf"));
 
+						final File logConf = new File(config.getAhenkLogConfAbsPath());
+						
 						for (final String ip : config.getIpList()) {
 
 							// Execute each installation in a new runnable.
@@ -264,6 +266,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													fileConf, "/etc/ahenk/");
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													logConf, "/etc/ahenk/");
+											
 											
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"sudo systemctl start ahenk.service");
