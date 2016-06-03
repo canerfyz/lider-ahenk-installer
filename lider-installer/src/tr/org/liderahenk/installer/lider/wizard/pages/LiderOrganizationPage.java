@@ -39,6 +39,8 @@ public class LiderOrganizationPage extends WizardPage {
 
 		GUIHelper.createLabel(mainContainer, Messages.getString("ORGANIZATION_PAGE_DESCRIPTION"));
 
+		GUIHelper.createLabel(mainContainer, Messages.getString("EG_ORG_DESC"));
+
 		Composite cmpOrgCn = GUIHelper.createComposite(mainContainer, new GridLayout(2, false),
 				new GridData(SWT.LEFT, SWT.CENTER, false, false));
 
