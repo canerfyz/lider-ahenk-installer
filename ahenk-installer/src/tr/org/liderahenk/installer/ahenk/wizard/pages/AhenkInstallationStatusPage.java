@@ -251,7 +251,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											}
 											
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"rm -rf /etc/ahenk");
+													"rm -rf /etc/ahenk/ahenk.db");
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"rm -rf /opt/ahenk");
 											
@@ -259,7 +259,6 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.GDEBI);
 
-											setProgressBar(increment, display);
 											
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"sudo systemctl stop ahenk.service");
@@ -269,12 +268,12 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													logConf, "/etc/ahenk/");
 											
-											
 											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"sudo systemctl start ahenk.service");
 				
-
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
+
+											setProgressBar(increment, display);
 
 										} else {
 											printMessage(
