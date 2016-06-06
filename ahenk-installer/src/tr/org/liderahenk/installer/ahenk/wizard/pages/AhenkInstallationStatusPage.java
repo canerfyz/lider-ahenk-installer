@@ -33,7 +33,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
- * @author Volkan Şahin <bm.volkansahin@gmail.com> 
+ * @author Volkan Şahin <bm.volkansahin@gmail.com>
  */
 
 public class AhenkInstallationStatusPage extends WizardPage implements ControlNextEvent, InstallationStatusPage {
@@ -54,7 +54,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	boolean canGoBack = false;
 
 	private int progressBarPercent;
-	
+
 	private final static String MAKE_DIR_UNDER_TMP = "mkdir /tmp/{0}";
 
 	// Status variable for the possible errors on this page
@@ -204,12 +204,11 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 						// Calculate progress bar increment size
 						final Integer increment = (Integer) (90 / config.getIpList().size());
-						
-						
-						final File fileConf = new File(writeToFile(config.getAhenkConfContent(),"ahenk.conf"));
+
+						final File fileConf = new File(writeToFile(config.getAhenkConfContent(), "ahenk.conf"));
 
 						final File logConf = new File(config.getAhenkLogConfAbsPath());
-						
+
 						for (final String ip : config.getIpList()) {
 
 							// Execute each installation in a new runnable.
@@ -230,47 +229,72 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										if (canConnect) {
 											printMessage("Successfully connected to: " + ip, display);
 
-											printMessage("Ahenk is being installed to: " + ip + " from provided DEB file.",display);
+											printMessage(
+													"Ahenk is being installed to: " + ip + " from provided DEB file.",
+													display);
 
 											File debPackage = new File(config.getDebFileAbsPath());
-											
-											InputStream stream = this.getClass().getResourceAsStream("/conf/liderahenk.list");
-											File file = SetupUtils.streamToFile(stream,"liderahenk.list");
-											
-											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													file, "/etc/apt/sources.list.d/");
-											
+
+											InputStream stream = this.getClass()
+													.getResourceAsStream("/conf/liderahenk.list");
+											File file = SetupUtils.streamToFile(stream, "liderahenk.list");
+
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
+													config.getPort(), config.getPrivateKeyAbsPath(),
+													config.getPassphrase(), file, "/etc/apt/sources.list.d/");
+
 											try {
-												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+												SetupUtils.executeCommand(ip, config.getUsernameCm(),
+														config.getPasswordCm(), config.getPort(),
+														config.getPrivateKeyAbsPath(), config.getPassphrase(),
 														"wget -qO - http://ftp.pardus.org.tr/Release.pub | apt-key add -");
-												SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+												SetupUtils.executeCommand(ip, config.getUsernameCm(),
+														config.getPasswordCm(), config.getPort(),
+														config.getPrivateKeyAbsPath(), config.getPassphrase(),
 														"apt-get update");
-												
+
 											} catch (Exception e) {
 												System.out.println("EXCEPTION about adding new repo");
 											}
-											
-											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"rm -rf /etc/ahenk/ahenk.db");
-											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"rm -rf /opt/ahenk");
-											
-											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage, PackageInstaller.GDEBI);
 
-											
-											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"rm -rf /etc/ahenk/ahenk.db");
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"rm -rf /opt/ahenk");
+
+											// TODO add --force-overwrite
+//											SetupUtils.installPackage(ip, config.getUsernameCm(),
+//													config.getPasswordCm(), config.getPort(),
+//													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
+//													PackageInstaller.GDEBI);
+											// Adding "--force-overwrite" option, because if files under /etc/ahenk has been removed
+											// manually before this installation, DPKG will not create them again.
+											SetupUtils.installPackageGdebiWithOpts(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
+													"Dpkg::Options::='--force-overwrite'");
+
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"sudo systemctl stop ahenk.service");
-											
-											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													fileConf, "/etc/ahenk/");
-											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													logConf, "/etc/ahenk/");
-											
-											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
+													config.getPort(), config.getPrivateKeyAbsPath(),
+													config.getPassphrase(), fileConf, "/etc/ahenk/");
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
+													config.getPort(), config.getPrivateKeyAbsPath(),
+													config.getPassphrase(), logConf, "/etc/ahenk/");
+
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"sudo systemctl start ahenk.service");
-				
+
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
 
 											setProgressBar(increment, display);
@@ -344,32 +368,40 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// If we can connect to machine install
 										// Ahenk
 										if (canConnect) {
-											
+
 											printMessage("Successfully connected to: " + ip, display);
 
 											printMessage("Creating directory under /tmp", display);
 
-											// In case of folder name clash use current time as postfix
+											// In case of folder name clash use
+											// current time as postfix
 											Date date = new Date();
 											SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
 											String timestamp = dateFormat.format(date);
-											
-											SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), MAKE_DIR_UNDER_TMP.replace("{0}", "ahenkTmpDir" + timestamp));
-											
+
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													MAKE_DIR_UNDER_TMP.replace("{0}", "ahenkTmpDir" + timestamp));
+
 											printMessage("Downloading Ahenk .deb package from: "
 													+ config.getAhenkDownloadUrl(), display);
 
-											SetupUtils.downloadPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb", config.getAhenkDownloadUrl());
+											SetupUtils.downloadPackage(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"ahenkTmpDir" + timestamp, "ahenk.deb",
+													config.getAhenkDownloadUrl());
 
 											printMessage("Successfully downloaded file", display);
 
 											printMessage("Ahenk is being installed to: " + ip
 													+ " from downloaded .deb file.", display);
 
-											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenkTmpDir" + timestamp, "ahenk.deb", PackageInstaller.DPKG);
+											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"ahenkTmpDir" + timestamp, "ahenk.deb", PackageInstaller.DPKG);
 
 											setProgressBar(increment, display);
 
@@ -435,7 +467,6 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 						printMessage("Invalid installation method. Installation cancelled.", Display.getCurrent());
 					}
-
 
 					try {
 						executor.shutdown();
@@ -540,7 +571,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
-	
+
 	/**
 	 * Creates file under temporary file directory and writes configuration to
 	 * it. Returns absolute path of created temp file.
