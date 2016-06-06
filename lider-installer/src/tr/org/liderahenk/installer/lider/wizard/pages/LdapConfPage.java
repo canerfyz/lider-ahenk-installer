@@ -38,7 +38,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LdapConfPage extends WizardPage implements ILdapPage {
+public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -245,14 +245,14 @@ public class LdapConfPage extends WizardPage implements ILdapPage {
 	
 	private void setInputValues() {
 		// Set default or predefined values to inputs from Organization CN
-		organization.setText(config.getLdapOrgName() != null ? config.getLdapOrgName() : "Pardus MYS");
-		cname.setText(config.getLdapOrgCn() != null ? config.getLdapOrgCn() : "mys.pardus.org");
-		baseDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
-		baseCn.setText(config.getLdapBaseCn() != null ? config.getLdapBaseCn() : "mys");
+		organization.setText(config.getLdapOrgName());
+		cname.setText(config.getLdapOrgCn());
+		baseDn.setText(config.getLdapBaseDn());
+		baseCn.setText(config.getLdapBaseCn());
 		if (config.isInstallLider()) {
 			liderIp.setText(config.getLiderIp());
 		} else {
-			liderIp.setText(config.getLdapOrgCn() != null ? "lider." + config.getLdapOrgCn() : "lider.mys.pardus.org.tr");
+			liderIp.setText("lider." + config.getLdapOrgCn());
 		}
 	}
 
