@@ -78,7 +78,7 @@ public class SetupUtils {
 	 * Downloaded file will be in /tmp/{0} folder.
 	 */
 	private static final String DOWNLOAD_PACKAGE = "wget ‐‐directory-prefix=/tmp/{0}/ {1}";
-	
+
 	/**
 	 * Update package list before installing anything
 	 */
@@ -91,6 +91,8 @@ public class SetupUtils {
 	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget --output-document=/tmp/{0}/{1} {2}";
 
 	private static final String INSTALL_PACKAGE_GDEBI = "gdebi -n {0}";
+
+	private static final String INSTALL_PACKAGE_GDEBI_WITH_OPTS = "gdebi -n -o {0} {1}";
 
 	private static final String EXTRACT_FILE = "tar -xzvf {0} --directory {1}";
 
@@ -269,7 +271,7 @@ public class SetupUtils {
 			final String privateKey, final String passphrase, final String packageName, final String version)
 					throws SSHConnectionException, CommandExecutionException {
 		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
-		
+
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
@@ -311,7 +313,7 @@ public class SetupUtils {
 	public static void installPackageNoninteractively(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName,
 			final String version, final String[] debconfValues) throws Exception {
-		
+
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
@@ -348,6 +350,7 @@ public class SetupUtils {
 	 * @param privateKey
 	 * @param passphrase
 	 * @param debPackage
+	 * @param packageInstaller
 	 * @throws SSHConnectionException
 	 * @throws CommandExecutionException
 	 */
@@ -356,14 +359,14 @@ public class SetupUtils {
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 
 		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
-		
+
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
 
 		copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
 
 		String command;
-		
+
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 
@@ -375,7 +378,51 @@ public class SetupUtils {
 			command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + debPackage.getName());
 			manager.execCommand(INSTALL_GDEBI, new Object[] {});
 		}
+
+		manager.execCommand(command, new Object[] {});
+		manager.disconnect();
+
+		logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
+	}
+
+	/**
+	 * Installs a deb package file via Gdebi non-interactively by using given
+	 * DPKG or APT options. This can be used when a specified deb package is
+	 * already provided
+	 * 
+	 * @param ip
+	 * @param username
+	 * @param password
+	 * @param port
+	 * @param privateKey
+	 * @param passphrase
+	 * @param debPackage
+	 * @param dpkgOpts
+	 * @throws SSHConnectionException
+	 * @throws CommandExecutionException
+	 */
+	public static void installPackageGdebiWithOpts(final String ip, final String username, final String password,
+			final Integer port, final String privateKey, final String passphrase, final File debPackage,
+			final String dpkgOpts) throws SSHConnectionException, CommandExecutionException {
+
+		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+
+		// Update package list first!
+		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
+
+		copyFile(ip, username, password, port, privateKey, passphrase, debPackage, "/tmp/");
+
+		String command;
+
+		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
+				passphrase);
+
+		manager.connect();
 		
+		// Add given options and deb package.
+		command = INSTALL_PACKAGE_GDEBI_WITH_OPTS.replace("{0}", dpkgOpts).replace("{1}", "/tmp/" + debPackage.getName());
+		manager.execCommand(INSTALL_GDEBI, new Object[] {});
+
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
@@ -402,7 +449,7 @@ public class SetupUtils {
 			final String[] debconfValues, final PackageInstaller packageInstaller) throws Exception {
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
-		
+
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
@@ -579,11 +626,11 @@ public class SetupUtils {
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
-		
+
 		manager.connect();
 
 		String command;
-		
+
 		if (packageInstaller == PackageInstaller.DPKG) {
 			// Prepare command
 			if (!"".equals(filename)) {
@@ -599,7 +646,7 @@ public class SetupUtils {
 			}
 			manager.execCommand(INSTALL_GDEBI, new Object[] {});
 		}
-		
+
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
