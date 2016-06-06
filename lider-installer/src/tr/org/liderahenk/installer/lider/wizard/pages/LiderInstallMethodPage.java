@@ -37,7 +37,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 
-//	private Button btnAptGet;
+	// private Button btnAptGet;
 	private Button btnDebPackage;
 	private Button btnWget;
 	private Button btnTar;
@@ -70,20 +70,21 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 		// Ask user if Karaf will be installed from a .deb package or via
 		// apt-get
-//		btnAptGet = GUIHelper.createButton(subcontainer, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_APT_GET"));
-//		btnAptGet.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				downloadUrlTxt.setEnabled(false);
-//				updateConfig();
-//				updatePageCompleteStatus();
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-//		});
-//		btnAptGet.setSelection(true);
+		// btnAptGet = GUIHelper.createButton(subcontainer, SWT.RADIO,
+		// Messages.getString("LIDER_SETUP_METHOD_APT_GET"));
+		// btnAptGet.addSelectionListener(new SelectionListener() {
+		// @Override
+		// public void widgetSelected(SelectionEvent e) {
+		// downloadUrlTxt.setEnabled(false);
+		// updateConfig();
+		// updatePageCompleteStatus();
+		// }
+		//
+		// @Override
+		// public void widgetDefaultSelected(SelectionEvent e) {
+		// }
+		// });
+		// btnAptGet.setSelection(true);
 
 		btnDebPackage = GUIHelper.createButton(subcontainer, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_DEB"));
 		btnDebPackage.addSelectionListener(new SelectionListener() {
@@ -180,12 +181,12 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 		// Copy ejabberd.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("lider_default_1_0_0.tar.gz");
-		File liderTar= SetupUtils.streamToFile(inputStream, "lider_default_1_0_0.tar.gz");
+		File liderTar = SetupUtils.streamToFile(inputStream, "lider_default_1_0_0.tar.gz");
 		txtTarFileName.setText(liderTar.getAbsolutePath());
-		
+
 		// Set file to config as array of bytes
 		debContent = new byte[(int) liderTar.length()];
-		
+
 		FileInputStream stream = null;
 		try {
 			stream = new FileInputStream(liderTar);
@@ -202,10 +203,10 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		config.setLiderTarFileContent(debContent);
 		config.setLiderTarFileName(liderTar.getAbsolutePath());
-		
+
 		// Upload deb package if necessary
 		btnTarFileSelect = GUIHelper.createButton(grpTar, SWT.NONE, Messages.getString("SELECT_FILE"));
 		btnTarFileSelect.addSelectionListener(new SelectionListener() {
@@ -292,20 +293,22 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		});
 
 		Composite warningComp = GUIHelper.createComposite(downloadUrlContainer, 1);
-		
-		Label label1 = GUIHelper.createLabel(warningComp, "Kuruluma uygun tar.gz dosyası varsayılan olarak getirilmiştir.");
-		Label label2 = GUIHelper.createLabel(warningComp, "Hazır getirilen tar.gz dosyasıyla kuruluma devam edebilirsiniz.");
+
+		Label label1 = GUIHelper.createLabel(warningComp,
+				"Kuruluma uygun tar.gz dosyası varsayılan olarak getirilmiştir.");
+		Label label2 = GUIHelper.createLabel(warningComp,
+				"Hazır getirilen tar.gz dosyasıyla kuruluma devam edebilirsiniz.");
 		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		label2.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
-		
+
 		updateConfig();
 		updatePageCompleteStatus();
 	}
 
 	private void updatePageCompleteStatus() {
-//		if (btnAptGet.getSelection()) {
-//			setPageComplete(true);
-//		} 
+		// if (btnAptGet.getSelection()) {
+		// setPageComplete(true);
+		// }
 		if (btnDebPackage.getSelection()) {
 			setPageComplete(checkDebFile());
 		} else if (btnTar.getSelection()) {
@@ -313,7 +316,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		} else {
 			setPageComplete(!"".equals(downloadUrlTxt.getText()));
 		}
-		
+
 	}
 
 	private boolean checkDebFile() {
@@ -328,11 +331,11 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		if (btnDebPackage.getSelection()) {
 			config.setLiderInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setLiderPackageName(null);
-		} 
-//		else if (btnAptGet.getSelection()) {
-//			config.setLiderInstallMethod(InstallMethod.APT_GET);
-//			config.setLiderPackageName(PropertyReader.property("lider.package.name"));
-//		} 
+		}
+		// else if (btnAptGet.getSelection()) {
+		// config.setLiderInstallMethod(InstallMethod.APT_GET);
+		// config.setLiderPackageName(PropertyReader.property("lider.package.name"));
+		// }
 		else if (btnTar.getSelection()) {
 			config.setLiderInstallMethod(InstallMethod.TAR_GZ);
 			config.setLiderPackageName(null);
@@ -344,6 +347,9 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	@Override
 	public IWizardPage getNextPage() {
+
+		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+
 		return super.getNextPage();
 	}
 
