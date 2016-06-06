@@ -69,7 +69,8 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 
 		setControl(mainContainer);
-
+		
+		// TODO messages
 		Label label = GUIHelper.createLabel(mainContainer,
 				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
@@ -80,7 +81,6 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		GUIHelper.createLabel(lineCont, "Servis Adı");
 		host = GUIHelper.createText(lineCont);
-		host.setText("im.mys.pardus.org.tr");
 
 		GUIHelper.createLabel(lineCont, "LDAP Sunucu");
 		ldapServer = GUIHelper.createText(lineCont);
@@ -275,11 +275,12 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	}
 
 	private void setInputValues() {
-		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
-		ldapRootDn.setText(config.getLdapBaseDn() != null && config.getLdapAdminCn() != null
-				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+		host.setText("im." + config.getLdapOrgCn());
+		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
+		ldapRootDn.setText(config.getLdapAdminCn() != null
+				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin," + config.getLdapBaseDn());
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
-		ldapBase.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
+		ldapBase.setText(config.getLdapBaseDn());
 	}
 
 	/**
