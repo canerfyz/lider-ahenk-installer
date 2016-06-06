@@ -59,25 +59,7 @@ public class LiderOrganizationPage extends WizardPage {
 				updatePageCompleteStatus();
 			}
 		});
-		txtOrgName.addKeyListener(new KeyListener() {
-			@Override
-			public void keyReleased(KeyEvent e) {
-			}
-
-			@Override
-			public void keyPressed(KeyEvent e) {
-				// Validate inputs for letter and dot only
-				char c = e.character;
-				if (!Character.isLetter(c) && !(c == SWT.DEL || e.keyCode == SWT.ARROW_LEFT
-						|| e.keyCode == SWT.ARROW_RIGHT || c == SWT.BS || c == ".".hashCode())) {
-					e.doit = false;
-					return;
-				} else {
-					e.doit = true;
-					return;
-				}
-			}
-		});
+		
 		final ControlDecoration decOrgName = new ControlDecoration(txtOrgName, SWT.TOP | SWT.LEFT);
 		// TODO change icon
 		decOrgName.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
