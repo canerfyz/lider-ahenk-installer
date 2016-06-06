@@ -28,19 +28,22 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  */
-public class LiderConfPage extends WizardPage implements ILiderPage {
+public class LiderConfPage extends WizardPage implements ILiderPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
 	private StyledText stMainConfig;
 	private StyledText stDatasourceConfig;
 
+	private NextPageEventType nextPageEventType;
+	
 	// LDAP configuration
 	private Text ldapServer;
 	private Text ldapPort;
@@ -270,8 +273,11 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 	@Override
 	public IWizardPage getNextPage() {
 
-		// Set default or predefined values to inputs
-		setInputValues();
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			// Set default or predefined values to inputs
+			setInputValues();
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+		}
 		
 		// Set config variables before going to next page
 		String text = stMainConfig.getText();
@@ -325,32 +331,33 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 	}
 
 	private void setInputValues() {
-		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap.mys.pardus.org.tr");
+		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
 		ldapPort.setText("389");
-		ldapUsername.setText(config.getLdapAdminCn() != null && config.getLdapBaseDn() != null
-				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin,dc=mys,dc=pardus,dc=org");
+		ldapUsername.setText(
+				config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
+						: "cn=admin," + config.getLdapBaseDn());
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
-		ldapRootDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
-		xmppHost.setText(config.getXmppIp() != null ? config.getXmppIp() : "im.mys.pardus.org.tr");
+		ldapRootDn.setText(config.getLdapBaseDn());
+		xmppHost.setText(config.getXmppIp() != null ? config.getXmppIp() : "im." + config.getLdapOrgCn());
 		xmppPort.setText("5222");
 		xmppUsername.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
 		xmppPassword.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "asddsa123");
-		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im.mys.pardus.org.tr");
+		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im." + config.getLdapOrgCn());
 		xmppMaxRetryConnCount.setText("5");
 		xmppPacketReplyTimeout.setText("10000");
 		xmppPingTimeout.setText("3000");
 		xmppFilePath.setText("/tmp/xmpp-files/");
-		dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db.mys.pardus.org.tr");
+		dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
 		dbPort.setText("3306");
 		dbDatabase.setText("liderdb");
 		dbUsername.setText("root");
 		dbPassword.setText(config.getDatabaseRootPassword() != null && !config.getDatabaseRootPassword().isEmpty()
 				? config.getDatabaseRootPassword() : "qwert123");
-		agentLdapBaseDn.setText(config.getLdapBaseDn() != null ? "ou=Uncategorized," + config.getLdapBaseDn() : "ou=Uncategorized,dc=mys,dc=pardus,dc=org");
+		agentLdapBaseDn.setText("ou=Uncategorized," + config.getLdapBaseDn());
 		agentLdapIdAttribute.setText("cn");
 		agentLdapJidAttribute.setText("uid");
 		agentLdapObjectClasses.setText("pardusDevice,device");
-		userLdapBaseDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
+		userLdapBaseDn.setText(config.getLdapBaseDn());
 		userLdapUidAttribute.setText("uid");
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
 		userLdapObjectClasses.setText("pardusLider");
@@ -430,6 +437,16 @@ public class LiderConfPage extends WizardPage implements ILiderPage {
 		}
 
 		return absPath;
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }
