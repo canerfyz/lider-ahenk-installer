@@ -229,7 +229,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), setEnvFile, "/opt/" + PropertyReader.property("lider.package.name") + "/bin/");
 						
 						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
-						System.out.println("Command --> " + command);
+
 						SSHManager.USE_PTY = false;
 						// Start Karaf
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
