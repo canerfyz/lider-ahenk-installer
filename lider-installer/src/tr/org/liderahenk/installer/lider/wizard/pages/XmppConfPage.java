@@ -277,8 +277,12 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	private void setInputValues() {
 		host.setText("im." + config.getLdapOrgCn());
 		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
-		ldapRootDn.setText(config.getLdapAdminCn() != null
-				? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin," + config.getLdapBaseDn());
+		if (config.isLdapUpdate()) {
+			ldapRootDn.setText(config.getLdapAdminDn());
+		} else {
+			ldapRootDn.setText(config.getLdapAdminCn() != null
+					? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin," + config.getLdapBaseDn());
+		}
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
 		ldapBase.setText(config.getLdapBaseDn());
 	}
