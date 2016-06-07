@@ -184,6 +184,12 @@ public class LiderSetupConfig {
 	
 	private String ldapBaseCn;
 	
+	private String ldapAdminDn;
+
+	private String ldapAdminDnPwd;
+	
+	private boolean ldapUpdate;
+	
 	/**
 	 * Absolute path of LDAP configuration file.
 	 */
@@ -997,6 +1003,30 @@ public class LiderSetupConfig {
 
 	public void setLdapBaseCn(String ldapBaseCn) {
 		this.ldapBaseCn = ldapBaseCn;
+	}
+
+	public String getLdapAdminDn() {
+		return ldapAdminDn;
+	}
+
+	public void setLdapAdminDn(String ldapAdminDn) {
+		this.ldapAdminDn = ldapAdminDn;
+	}
+
+	public boolean isLdapUpdate() {
+		return ldapUpdate;
+	}
+
+	public void setLdapUpdate(boolean ldapUpdate) {
+		this.ldapUpdate = ldapUpdate;
+	}
+
+	public String getLdapAdminDnPwd() {
+		return ldapAdminDnPwd;
+	}
+
+	public void setLdapAdminDnPwd(String ldapAdminDnPwd) {
+		this.ldapAdminDnPwd = ldapAdminDnPwd;
 	}
 
 }
