@@ -217,7 +217,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
 		}
 		
-		// Set config variables before going to next page
+		// Set configuration file's variables
 		String text = st.getText();
 		Map<String, String> map = new HashMap<>();
 		map.put("#CNAME", cname.getText());
@@ -233,6 +233,8 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 		map.put("#LIDERCONSOLEPWD", liderConsoleUserPwd.getText());
 		
 		text = SetupUtils.replace(map, text);
+
+		// Set config variables before going to next page
 		config.setLdapConfContent(text);
 		config.setLdapAbsPathConfFile(writeToFile(text, "ldapconfig"));
 		
