@@ -1,11 +1,17 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -25,9 +31,11 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
-public class LdapUpdateConfPage extends WizardPage implements ILdapPage {
+public class LdapUpdateConfPage extends WizardPage implements ILdapPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -48,6 +56,8 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage {
 	private Text txtLiderAdminPwd;
 
 	private StyledText st;
+	
+	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 
 	public LdapUpdateConfPage(LiderSetupConfig config) {
 		super(LdapUpdateConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -226,6 +236,91 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public IWizardPage getNextPage() {
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			setInputValues();
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+		}
+		
+		setConfigVariables();
+		
+		createConfFile();
+
+		return super.getNextPage();
+	}
+
+	private void createConfFile() {
+		String text = st.getText();
+		Map<String, String> map = new HashMap<>();
+		map.put("#UPDATE_CONFIG_USER", btnUpdateConfigUser.getSelection() ? "1" : "0" );
+		map.put("#CN_CONFIG_ADMIN_DN", txtCnConfigDn.getText());
+		map.put("#CN_CONFIG_ADMIN_PWD", txtCnConfigPwd.getText());
+		map.put("#BASE_DN", txtBaseDn.getText());
+		map.put("#LDAP_DB_ADMIN_DN", txtLdapDbAdminDn.getText());
+		map.put("#LDAP_DB_ADMIN_PWD", txtLdapDbAdminPwd.getText());
+		map.put("#LIDER_SERVER_ADDR", txtLiderIp.getText());
+		map.put("#LADMIN_PWD", txtLiderAdminPwd.getText());
+		
+		text = SetupUtils.replace(map, text);
+
+		// Set config variables before going to next page
+		config.setLdapConfContent(text);
+		config.setLdapAbsPathConfFile(writeToFile(text, "update_ldap"));
+	}
+	
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param fileName
+	 * @return absolute path of created temp file
+	 */
+	private String writeToFile(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return absPath;
+	}
+
+	private void setConfigVariables() {
+		config.setLdapBaseDn(txtBaseDn.getText());
+		config.setLdapAdminDn(txtLdapDbAdminDn.getText());
+		config.setLdapAdminDnPwd(txtLdapDbAdminPwd.getText());
+	}
+
+	private void setInputValues() {
+		txtBaseDn.setText(config.getLdapBaseDn());
+		txtLdapDbAdminDn.setText("cn=admin," + config.getLdapBaseDn());
+		txtLiderIp.setText(config.getLiderIp() != null ? config.getLiderIp() : "lider." + config.getLdapOrgCn());
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }
