@@ -333,9 +333,13 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 	private void setInputValues() {
 		ldapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
 		ldapPort.setText("389");
-		ldapUsername.setText(
-				config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
-						: "cn=admin," + config.getLdapBaseDn());
+		if (config.isLdapUpdate()) { 
+			ldapUsername.setText(config.getLdapAdminDn());
+		} else {
+			ldapUsername.setText(
+					config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
+					: "cn=admin," + config.getLdapBaseDn());
+		}
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
 		ldapRootDn.setText(config.getLdapBaseDn());
 		xmppHost.setText(config.getXmppIp() != null ? config.getXmppIp() : "im." + config.getLdapOrgCn());
