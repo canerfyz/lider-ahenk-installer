@@ -254,7 +254,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 														"apt-get update");
 
 											} catch (Exception e) {
-												System.out.println("EXCEPTION about adding new repo");
+												printMessage("EXCEPTION about adding new repo", display);
 											}
 
 											SetupUtils.executeCommand(ip, config.getUsernameCm(),
