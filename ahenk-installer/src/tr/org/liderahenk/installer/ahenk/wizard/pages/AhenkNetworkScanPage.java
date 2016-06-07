@@ -244,7 +244,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 				// Start a new scan!
 				// if (executor == null || executor.isShutdown() ||
 				// executor.isTerminated()) {
-				System.out.println(executor != null ? executor.getActiveCount() : "executor is null");
 				if (executor == null || executor.getActiveCount() == 0) {
 
 					Display.getCurrent().asyncExec(new Runnable() {
