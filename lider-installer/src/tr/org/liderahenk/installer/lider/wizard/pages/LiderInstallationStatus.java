@@ -145,7 +145,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 							setProgressBar(90);
 							isInstallationFinished = true;
 							printMessage("Successfully extracted package: " + tar.getName());
-							printMessage("Installation completed.");
+							
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							canGoBack = false;
@@ -213,16 +213,19 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 								.getResourceAsStream("setenv");
 						setEnvFile = SetupUtils.streamToFile(inputStream, "setenv");
 						
+						printMessage("Sending Lider config file");
 						// Copy tr.org.liderahenk.cfg
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 										config.getLiderAccessPasswd(), config.getLiderPort(),
 										config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), liderConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
 						
+						printMessage("Sending Lider datasource config file");
 						// Copy tr.org.liderahenk.datasource.cfg
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(),
 								config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), datasourceConfigFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
 						
+						printMessage("Sending Karaf environment config file");
 						// Copy setenv file
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(),
@@ -230,6 +233,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						
 						String command = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
 
+						printMessage("Starting Lider");
 						SSHManager.USE_PTY = false;
 						// Start Karaf
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
@@ -242,6 +246,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						});
 						SSHManager.USE_PTY = true;
 						
+						printMessage("Installation completed.");
 						isInstallationFinished = true;
 						
 					} catch (SSHConnectionException e) {
