@@ -29,13 +29,14 @@ import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Volkan Şahin <bm.volkansahin@gmail.com> 
  */
-public class AhenkConfPage extends WizardPage {
+public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 
 	private AhenkSetupConfig config;
 
@@ -45,8 +46,9 @@ public class AhenkConfPage extends WizardPage {
 	private Text xmppHost;
 	private Text xmppServiceName;
 	private Text liderJid;
-
-
+	
+	private NextPageEventType nextPageEventType;
+	
 	public AhenkConfPage(AhenkSetupConfig config) {
 		super(AhenkConfPage.class.getName(), Messages.getString("AHENK_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("AHENK_CONF"));
@@ -72,14 +74,35 @@ public class AhenkConfPage extends WizardPage {
 		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_SERVER_HOST_ADDRESS"));
 		xmppHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppHost.setText(config.getHost() != null ? config.getHost() : "");
+		xmppHost.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		xmppHost.setMessage(Messages.getString("EG_XMPP_HOST"));
 		
 		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_SERVER_SERVICE_NAME"));
 		xmppServiceName = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppServiceName.setText(config.getServiceName() != null ? config.getServiceName() : "");
+		xmppServiceName.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		xmppServiceName.setMessage(Messages.getString("EG_XMPP_SERVICE_NAME"));
 		
 		GUIHelper.createLabel(lineCont, Messages.getString("LIDER_XMPP_USERNAME"));
 		liderJid = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		liderJid.setText(config.getLiderJid() != null ? config.getLiderJid() : "");
+		liderJid.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		liderJid.setMessage(Messages.getString("EG_LIDER_JID"));
 		
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
 		GUIHelper.createLabel(infoComposite, Messages.getString("AHENK_INSTALLATION_XMPP_CONF_HINT"));
@@ -116,12 +139,17 @@ public class AhenkConfPage extends WizardPage {
 		((ScrolledComposite) container).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		
 		setPageComplete(false);
+		updatePageCompleteStatus();
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 
-
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+			updatePageCompleteStatus();
+		}
+		
 		AhenkConfirmPage confPage = (AhenkConfirmPage) super.getNextPage();
 
 		// Set config variables and confirm page labels.
@@ -227,6 +255,24 @@ public class AhenkConfPage extends WizardPage {
 		}
 
 		return absPath;
+	}
+	
+	private void updatePageCompleteStatus() {
+		if (!xmppHost.getText().isEmpty() && !xmppServiceName.getText().isEmpty() && !liderJid.getText().isEmpty()) {
+			setPageComplete(true);
+		} else {
+			setPageComplete(false);
+		}
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return this.nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }
