@@ -62,11 +62,10 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 	private StyledText st;
 	
 	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
-
+	
 	public LdapUpdateConfPage(LiderSetupConfig config) {
 		super(LdapUpdateConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("3.2 " + Messages.getString("LDAP_UPDATE_OR_INSTALL") + " - "
-				+ Messages.getString("LDAP_UPDATE_OR_INSTALL_DESC"));
+		setDescription("3.2 " + Messages.getString("LDAP_UPDATE_CONF_INFO"));
 		this.config = config;
 	}
 
@@ -94,31 +93,73 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		
 		GUIHelper.createLabel(compChild, Messages.getString("CN_CONFIG_ADMIN_DN"));
 		txtCnConfigDn = GUIHelper.createText(compChild);
-		txtCnConfigDn.setMessage("EG_CN_CONFIG_DN");
+		txtCnConfigDn.setMessage(Messages.getString("EG_CN_CONFIG_ADMIN_DN"));
+		txtCnConfigDn.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("CN_CONFIG_ADMIN_PWD"));
 		txtCnConfigPwd = GUIHelper.createText(compChild);
-		txtCnConfigPwd.setMessage("EG_CN_CONFIG_DN_PWD");
+		txtCnConfigPwd.setMessage(Messages.getString("EG_CN_CONFIG_ADMIN_PWD"));
+		txtCnConfigPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("BASE_DN"));
 		txtBaseDn = GUIHelper.createText(compChild);
-		txtBaseDn.setMessage("EG_BASE_DN");
+		txtBaseDn.setMessage(Messages.getString("EG_BASE_DN"));
+		txtBaseDn.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("LDAP_DB_ADMIN_DN"));
 		txtLdapDbAdminDn = GUIHelper.createText(compChild);
-		txtLdapDbAdminDn.setMessage("EG_LDAP_DB_ADMIN_DN");
+		txtLdapDbAdminDn.setMessage(Messages.getString("EG_LDAP_DB_ADMIN_DN"));
+		txtLdapDbAdminDn.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("LDAP_DB_ADMIN_PWD"));
 		txtLdapDbAdminPwd = GUIHelper.createText(compChild);
-		txtLdapDbAdminPwd.setMessage("EG_LDAP_DB_ADMIN_PWD");
+		txtLdapDbAdminPwd.setMessage(Messages.getString("EG_LDAP_DB_ADMIN_PWD"));
+		txtLdapDbAdminPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("LIDER_SERVER_ADDRESS"));
 		txtLiderIp = GUIHelper.createText(compChild);
-		txtLiderIp.setMessage("EG_LIDER_SERVER_ADDRESS");
+		txtLiderIp.setMessage(Messages.getString("EG_LIDER_SERVER_ADDRESS"));
+		txtLiderIp.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		GUIHelper.createLabel(compChild, Messages.getString("LIDER_ADMIN_PWD"));
 		txtLiderAdminPwd = GUIHelper.createText(compChild);
-		txtLiderAdminPwd.setMessage("EG_LIDER_ADMIN_PWD");
+		txtLiderAdminPwd.setMessage(Messages.getString("EG_LIDER_ADMIN_PWD"));
+		txtLiderAdminPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent arg0) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		// Add a text area for configuration.
 		st = new StyledText(compMain, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
@@ -315,6 +356,20 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		return absPath;
 	}
 
+	public void updatePageCompleteStatus() {
+		if (!txtCnConfigDn.getText().isEmpty() &&
+				!txtCnConfigPwd.getText().isEmpty() &&
+				!txtBaseDn.getText().isEmpty() &&
+				!txtLdapDbAdminDn.getText().isEmpty() &&
+				!txtLdapDbAdminPwd.getText().isEmpty() &&
+				!txtLiderIp.getText().isEmpty() &&
+				!txtLiderAdminPwd.getText().isEmpty()) {
+			setPageComplete(true);
+		} else {
+			setPageComplete(false);
+		}
+	}
+	
 	private void setConfigVariables() {
 		config.setLdapBaseDn(txtBaseDn.getText());
 		config.setLdapAdminDn(txtLdapDbAdminDn.getText());
