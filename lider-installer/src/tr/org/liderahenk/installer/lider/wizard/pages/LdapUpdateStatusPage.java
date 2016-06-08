@@ -133,6 +133,8 @@ public class LdapUpdateStatusPage extends WizardPage implements ILdapPage, Insta
 					
 					setProgressBar(100);
 
+					isInstallationFinished = true;
+					
 					config.setInstallationFinished(isInstallationFinished);
 
 					setPageCompleteAsync(isInstallationFinished);
