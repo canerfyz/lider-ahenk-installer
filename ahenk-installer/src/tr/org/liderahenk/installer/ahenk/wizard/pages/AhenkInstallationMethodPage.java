@@ -27,6 +27,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
@@ -326,7 +327,13 @@ public class AhenkInstallationMethodPage extends WizardPage {
 			config.setAhenkDownloadUrl(downloadUrlTxt.getText());
 		}
 		
-		return super.getNextPage();
+		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+
+		AhenkConfPage confPage = ((AhenkConfPage) super.getNextPage());
+		confPage.getNextPage();
+		confPage.setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+		
+		return confPage;
 	}
 
 }
