@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -19,6 +20,7 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -40,6 +42,8 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 	private LiderSetupConfig config;
 
 	private Button btnUpdateConfigUser;
+
+	private Button btnDoNotUpdateConfigUser;
 
 	private Text txtCnConfigDn;
 
@@ -76,8 +80,18 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 
 		btnUpdateConfigUser = GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("UPDATE_CONFIG_USER"));
 		btnUpdateConfigUser.setSelection(true);
-		GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("DO_NOT_UPDATE_CONFIG_USER"));
+		final ControlDecoration decUpdate= new ControlDecoration(btnUpdateConfigUser, SWT.TOP | SWT.RIGHT);
+		// TODO change icon
+		decUpdate.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
+		decUpdate.setDescriptionText(Messages.getString("UPDATE_DESC"));
 
+		btnDoNotUpdateConfigUser = GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("DO_NOT_UPDATE_CONFIG_USER"));
+		final ControlDecoration decDoNotUpdate = new ControlDecoration(btnDoNotUpdateConfigUser, SWT.TOP | SWT.RIGHT);
+		// TODO change icon
+		decDoNotUpdate.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/info.png")));
+		decDoNotUpdate.setDescriptionText(Messages.getString("DO_NOT_UPDATE_DESC"));
+		
+		
 		GUIHelper.createLabel(compChild, Messages.getString("CN_CONFIG_ADMIN_DN"));
 		txtCnConfigDn = GUIHelper.createText(compChild);
 		txtCnConfigDn.setMessage("EG_CN_CONFIG_DN");
