@@ -11,14 +11,12 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
-public class LdapUpdateExistingPage extends WizardPage implements ILdapPage, ControlNextEvent {
+public class LdapUpdateExistingPage extends WizardPage implements ILdapPage {
 
 	private LiderSetupConfig config;
 
 	private Button btnInstallLdap;
 	
-	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
-
 	public LdapUpdateExistingPage(LiderSetupConfig config) {
 		super(LdapUpdateExistingPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("3.2 " + Messages.getString("LDAP_UPDATE_OR_INSTALL") + " - "
@@ -49,7 +47,7 @@ public class LdapUpdateExistingPage extends WizardPage implements ILdapPage, Con
 		} else {
 			config.setLdapUpdate(true);
 			LdapUpdateConfPage updateConfPage = (LdapUpdateConfPage) getWizard().getPage(LdapUpdateConfPage.class.getName());
-
+			updateConfPage.setInputValues();
 			return updateConfPage;
 		}
 	}
@@ -60,16 +58,6 @@ public class LdapUpdateExistingPage extends WizardPage implements ILdapPage, Con
 		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 
 		return super.getPreviousPage();
-	}
-
-	@Override
-	public NextPageEventType getNextPageEventType() {
-		return this.nextPageEventType;
-	}
-
-	@Override
-	public void setNextPageEventType(NextPageEventType nextPageEventType) {
-		this.nextPageEventType = nextPageEventType;
 	}
 
 }

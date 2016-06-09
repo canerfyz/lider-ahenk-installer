@@ -94,6 +94,7 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		GUIHelper.createLabel(compChild, Messages.getString("CN_CONFIG_ADMIN_DN"));
 		txtCnConfigDn = GUIHelper.createText(compChild);
 		txtCnConfigDn.setMessage(Messages.getString("EG_CN_CONFIG_ADMIN_DN"));
+		txtCnConfigDn.setText("cn=admin,cn=config");
 		txtCnConfigDn.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -104,6 +105,7 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		GUIHelper.createLabel(compChild, Messages.getString("CN_CONFIG_ADMIN_PWD"));
 		txtCnConfigPwd = GUIHelper.createText(compChild);
 		txtCnConfigPwd.setMessage(Messages.getString("EG_CN_CONFIG_ADMIN_PWD"));
+		txtCnConfigPwd.setText("secret");
 		txtCnConfigPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -134,6 +136,7 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		GUIHelper.createLabel(compChild, Messages.getString("LDAP_DB_ADMIN_PWD"));
 		txtLdapDbAdminPwd = GUIHelper.createText(compChild);
 		txtLdapDbAdminPwd.setMessage(Messages.getString("EG_LDAP_DB_ADMIN_PWD"));
+		txtLdapDbAdminPwd.setText("secret");
 		txtLdapDbAdminPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -154,6 +157,7 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		GUIHelper.createLabel(compChild, Messages.getString("LIDER_ADMIN_PWD"));
 		txtLiderAdminPwd = GUIHelper.createText(compChild);
 		txtLiderAdminPwd.setMessage(Messages.getString("EG_LIDER_ADMIN_PWD"));
+		txtLiderAdminPwd.setText("secret");
 		txtLiderAdminPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent arg0) {
@@ -298,6 +302,7 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 			setInputValues();
 			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+			updatePageCompleteStatus();
 		}
 		
 		setConfigVariables();
@@ -376,10 +381,13 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		config.setLdapAdminDnPwd(txtLdapDbAdminPwd.getText());
 	}
 
-	private void setInputValues() {
-		txtBaseDn.setText(config.getLdapBaseDn());
-		txtLdapDbAdminDn.setText("cn=admin," + config.getLdapBaseDn());
-		txtLiderIp.setText(config.getLiderIp() != null ? config.getLiderIp() : "lider." + config.getLdapOrgCn());
+	public void setInputValues() {
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			txtBaseDn.setText(config.getLdapBaseDn());
+			txtLdapDbAdminDn.setText("cn=admin," + config.getLdapBaseDn());
+			txtLiderIp.setText(config.getLiderIp() != null ? config.getLiderIp() : "lider." + config.getLdapOrgCn());
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+		}
 	}
 
 	@Override
