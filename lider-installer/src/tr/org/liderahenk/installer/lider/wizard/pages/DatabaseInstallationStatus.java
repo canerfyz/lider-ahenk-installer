@@ -11,13 +11,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
-import tr.org.liderahenk.installer.lider.wizard.dialogs.DatabaseWarningDialog;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
@@ -85,7 +83,6 @@ public class DatabaseInstallationStatus extends WizardPage
 				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
 			final Display display = Display.getCurrent();
-			final Shell shell = display.getActiveShell();
 
 			canGoBack = false;
 
@@ -239,23 +236,6 @@ public class DatabaseInstallationStatus extends WizardPage
 
 					setPageCompleteAsync(isInstallationFinished);
 
-					if (!config.getDatabaseIp().equals(config.getLiderIp())) {
-						openWarningDialog();
-					}
-
-				}
-
-				private void openWarningDialog() {
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							// Create a dialog
-							DatabaseWarningDialog warningDialog = new DatabaseWarningDialog(shell);
-
-							// Open it
-							warningDialog.open();
-						}
-					});
 				}
 
 				/**

@@ -290,4 +290,15 @@ public class LdapAccessPage extends WizardPage implements ILdapPage, ControlNext
 		this.nextPageEventType = nextPageEventType;
 	}
 
+	@Override
+	public IWizardPage getPreviousPage() {
+		if (config.isInstallDatabase() && super.getPreviousPage() instanceof DatabaseInstallationStatus) {
+			return null;
+			
+		} else {
+			return super.getPreviousPage();
+		}
+		
+	}
+
 }
