@@ -43,8 +43,9 @@ public class LiderConfirmPage extends WizardPage implements ILiderPage {
 				"- " + Messages.getString(config.getLiderAccessMethod() == AccessMethod.PRIVATE_KEY
 						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 
-		GUIHelper.createLabel(container, "- " + Messages.getString(
-				config.getLiderInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+		if (config.getLiderInstallMethod() == InstallMethod.TAR_GZ) {
+			GUIHelper.createLabel(container, "- " + Messages.getString("USE_TAR_GZ"));
+		}
 
 		GUIHelper.createLabel(container, Messages.getString("LIDER_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
