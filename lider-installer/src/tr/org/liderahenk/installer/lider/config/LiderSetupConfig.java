@@ -88,6 +88,8 @@ public class LiderSetupConfig {
 	private byte[] databaseDebFileContent;
 
 	private String databaseDownloadUrl;
+	
+	private boolean databaseCluster;
 
 	/**
 	 * ###################################
@@ -1027,6 +1029,14 @@ public class LiderSetupConfig {
 
 	public void setLdapAdminDnPwd(String ldapAdminDnPwd) {
 		this.ldapAdminDnPwd = ldapAdminDnPwd;
+	}
+
+	public boolean isDatabaseCluster() {
+		return databaseCluster;
+	}
+
+	public void setDatabaseCluster(boolean databaseCluster) {
+		this.databaseCluster = databaseCluster;
 	}
 
 }
