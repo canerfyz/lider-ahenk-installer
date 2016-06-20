@@ -90,6 +90,8 @@ public class LiderSetupConfig {
 	private String databaseDownloadUrl;
 	
 	private boolean databaseCluster;
+	
+	private String databaseClusterAddress;
 
 	/**
 	 * ###################################
@@ -1037,6 +1039,14 @@ public class LiderSetupConfig {
 
 	public void setDatabaseCluster(boolean databaseCluster) {
 		this.databaseCluster = databaseCluster;
+	}
+
+	public String getDatabaseClusterAddress() {
+		return databaseClusterAddress;
+	}
+
+	public void setDatabaseClusterAddress(String databaseClusterAddress) {
+		this.databaseClusterAddress = databaseClusterAddress;
 	}
 
 }
