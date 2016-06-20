@@ -1,5 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.util.List;
+
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -16,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.wizard.model.DatabaseClusterNodeModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.FontProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
@@ -35,10 +39,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private Text txtSstUsername;
 	private Text txtSstPwd;
 	
-	private Text txtNodeIp;
-	private Text txtNodeName;
-	private Text txtNodeRootPwd;
-	private Button btnNodeNewSetup;
+	private List<DatabaseClusterNodeModel> nodeList;
 	
 	public DatabaseClusterConfPage(LiderSetupConfig config) {
 		super(DatabaseClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -53,22 +54,32 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		setControl(cmpMain);
 		
 		// TODO add general info label
+		Label lblGeneralInfo = GUIHelper.createLabel(cmpMain, Messages.getString("MARIADB_CLUSTER_GENERAL_INFO"));
+		lblGeneralInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		
 		Composite cmpGeneralInfo = GUIHelper.createComposite(cmpMain, 2);
 		cmpGeneralInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 		
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("MARIA_DB_ROOT_PWD"));
-		txtDbRootPwd = GUIHelper.createText(cmpGeneralInfo); 
-
+		// General parameters' inputs
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("MARIA_CLUSTER_NAME"));
-		txtClusterName = GUIHelper.createText(cmpGeneralInfo); 
+		txtClusterName = GUIHelper.createText(cmpGeneralInfo);
+		txtClusterName.setText("MariaDB_Cluster");
+		txtClusterName.setMessage(Messages.getString("ENTER_NAME_FOR_CLUSTER"));
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("MARIA_DB_ROOT_PWD"));
+		txtDbRootPwd = GUIHelper.createText(cmpGeneralInfo);
+		txtDbRootPwd.setMessage(Messages.getString("ENTER_PWD_FOR_DB_ROOT_USER"));
 		
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("SST_AUTH_USERNAME"));
-		txtSstUsername = GUIHelper.createText(cmpGeneralInfo); 
+		txtSstUsername = GUIHelper.createText(cmpGeneralInfo);
+		txtSstUsername.setText("sst_user");
+		txtSstUsername.setMessage(Messages.getString("ENTER_USERNAME_FOR_SST_USER"));
 
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("SST_AUTH_PWD"));
 		txtSstPwd = GUIHelper.createText(cmpGeneralInfo); 
-		
+		txtSstPwd.setMessage(Messages.getString("ENTER_PWD_FOR_SST_USER"));
+
+		// Labels for headers
 		Composite cmpLabels = GUIHelper.createComposite(cmpMain, 4);
 		cmpLabels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		GridData gdLabels = new GridData();
@@ -82,8 +93,6 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_NEW_SETUP"));
 		lblNodeNewSetup.setLayoutData(gdLabels);
 		
-		// TODO add general parameters
-		// TODO add labels for headers
 		Composite cmpNodeList = GUIHelper.createComposite(cmpMain, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		
@@ -151,18 +160,30 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		GridData gd = new GridData();
 		gd.widthHint = 190;
 		
-		txtNodeIp = GUIHelper.createText(grpClusterNode);
+		DatabaseClusterNodeModel clusterNode = new DatabaseClusterNodeModel();
+		
+		Text txtNodeIp = GUIHelper.createText(grpClusterNode);
 		txtNodeIp.setLayoutData(gd);
+		txtNodeIp.setMessage(Messages.getString("ENTER_IP_FOR_THIS_NODE"));
+		clusterNode.setTxtNodeIp(txtNodeIp);
 		
-		txtNodeName = GUIHelper.createText(grpClusterNode);
+		Text txtNodeName = GUIHelper.createText(grpClusterNode);
 		txtNodeName.setLayoutData(gd);
+		txtNodeName.setMessage(Messages.getString("ENTER_NAME_FOR_THIS_NODE"));
+		clusterNode.setTxtNodeName(txtNodeName);
 		
-		txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
+		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
-
-		btnNodeNewSetup = new Button(grpClusterNode, SWT.CHECK | SWT.BORDER);
+		txtNodeRootPwd.setMessage("ENTER_ROOT_PWD_OF_THIS_NODE");
+		clusterNode.setTxtNodeRootPwd(txtNodeRootPwd);
+		
+		Button btnNodeNewSetup = new Button(grpClusterNode, SWT.CHECK | SWT.BORDER);
 		btnNodeNewSetup.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		btnNodeNewSetup.setSelection(true);
+		btnNodeNewSetup.setToolTipText(Messages.getString("UNCHECK_IF_THIS_NODE_IS_ALREADY_INSTALLED"));
+		clusterNode.setBtnNodeNewSetup(btnNodeNewSetup);
+		
+		nodeList.add(clusterNode);
 	}
 	
 	private void redraw() {
@@ -179,5 +200,35 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
 	}
+
+	@Override
+	public IWizardPage getNextPage() {
+		
+		setConfigVariables();
+		
+		return super.getNextPage();
+	}
+
+	private void setConfigVariables() {
+		
+		config.setDatabaseClusterAddress(createWsrepClusterAddress());
+	}
+
+	private String createWsrepClusterAddress() {
+		
+		String wsrepClusterAddress = "";
+		
+		for (DatabaseClusterNodeModel clusterNode : nodeList) {
+			wsrepClusterAddress += clusterNode.getTxtNodeIp().getText() + ",";
+		}
+
+		// Delete last comma
+		wsrepClusterAddress = wsrepClusterAddress.substring(0, wsrepClusterAddress.length()-1);
+
+		return wsrepClusterAddress;
+		
+	}
+	
+	
 	
 }
