@@ -1,5 +1,9 @@
 package tr.org.liderahenk.installer.lider.config;
 
+import java.util.List;
+import java.util.Map;
+
+import tr.org.liderahenk.installer.lider.wizard.model.DatabaseClusterNodeModel;import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
@@ -92,6 +96,14 @@ public class LiderSetupConfig {
 	private boolean databaseCluster;
 	
 	private String databaseClusterAddress;
+	
+	private String databaseClusterName;
+
+	private String databaseSstUsername;
+	
+	private String databaseSstPwd;
+	
+	private Map<Integer, DatabaseClusterNodeModel> databaseNodeMap; 
 
 	/**
 	 * ###################################
@@ -1047,6 +1059,38 @@ public class LiderSetupConfig {
 
 	public void setDatabaseClusterAddress(String databaseClusterAddress) {
 		this.databaseClusterAddress = databaseClusterAddress;
+	}
+
+	public String getDatabaseClusterName() {
+		return databaseClusterName;
+	}
+
+	public void setDatabaseClusterName(String databaseClusterName) {
+		this.databaseClusterName = databaseClusterName;
+	}
+
+	public String getDatabaseSstUsername() {
+		return databaseSstUsername;
+	}
+
+	public void setDatabaseSstUsername(String databaseSstUsername) {
+		this.databaseSstUsername = databaseSstUsername;
+	}
+
+	public String getDatabaseSstPwd() {
+		return databaseSstPwd;
+	}
+
+	public void setDatabaseSstPwd(String databaseSstPwd) {
+		this.databaseSstPwd = databaseSstPwd;
+	}
+
+	public Map<Integer, DatabaseClusterNodeModel> getDatabaseNodeMap() {
+		return databaseNodeMap;
+	}
+
+	public void setDatabaseNodeMap(Map<Integer, DatabaseClusterNodeModel> databaseNodeMap) {
+		this.databaseNodeMap = databaseNodeMap;
 	}
 
 }
