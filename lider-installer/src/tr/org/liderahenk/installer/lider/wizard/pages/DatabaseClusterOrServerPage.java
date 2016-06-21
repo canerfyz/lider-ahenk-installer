@@ -31,32 +31,22 @@ public class DatabaseClusterOrServerPage extends WizardPage implements IDatabase
 
 		Composite compChild = GUIHelper.createComposite(compMain, 1);
 
-		GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("INSTALL_SERVER"));
+		Button btnSetupServer = GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("INSTALL_SERVER"));
+		btnSetupServer.setSelection(true);
 
 		btnSetupCluster = GUIHelper.createButton(compChild, SWT.RADIO, Messages.getString("SETUP_CLUSTER"));
-		btnSetupCluster.setSelection(true);
 
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 
-		if (btnSetupCluster.getSelection()) {
+		if (!btnSetupCluster.getSelection()) {
 			return getWizard().getPage(DatabaseAccessPage.class.getName());
 		} else {
 			config.setDatabaseCluster(true);
-			DatabaseClusterConfPage dbClusterConfPage = (DatabaseClusterConfPage) getWizard().getPage(DatabaseClusterConfPage.class.getName());
-//			dbClusterConfPage.setInputValues();
-			return dbClusterConfPage;
+			return getWizard().getPage(DatabaseClusterConfPage.class.getName());
 		}
-	}
-
-	@Override
-	public IWizardPage getPreviousPage() {
-
-		((ControlNextEvent) super.getPreviousPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
-
-		return super.getPreviousPage();
 	}
 
 }
