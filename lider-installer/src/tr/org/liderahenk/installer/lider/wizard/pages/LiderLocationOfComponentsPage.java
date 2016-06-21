@@ -480,8 +480,8 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	public IWizardPage getNextPage() {
 		setConfigVariables();
 
-		((ControlNextEvent) selectNextPage()).setNextPageEventType(
-				NextPageEventType.CLICK_FROM_PREV_PAGE);
+//		((ControlNextEvent) selectNextPage()).setNextPageEventType(
+//				NextPageEventType.CLICK_FROM_PREV_PAGE);
 		
 		return selectNextPage();
 	}
