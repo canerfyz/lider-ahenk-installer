@@ -5,6 +5,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class DatabaseClusterNodeModel {
 	
+	private int nodeNumber;
 	private Text txtNodeIp;
 	private Text txtNodeName;
 	private Text txtNodeRootPwd;
@@ -33,6 +34,12 @@ public class DatabaseClusterNodeModel {
 	}
 	public void setBtnNodeNewSetup(Button btnNodeNewSetup) {
 		this.btnNodeNewSetup = btnNodeNewSetup;
+	}
+	public int getNodeNumber() {
+		return nodeNumber;
+	}
+	public void setNodeNumber(int nodeNumber) {
+		this.nodeNumber = nodeNumber;
 	}
 	
 	
