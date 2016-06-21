@@ -40,6 +40,8 @@ import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterOrServerPage;
 
 public class LiderSetupWizard extends Wizard {
 
@@ -64,7 +66,9 @@ public class LiderSetupWizard extends Wizard {
 	LiderLocationOfComponentsPage locatOfComps = new LiderLocationOfComponentsPage(config);
 
 	// TODO add cluster pages
-//	DatabaseClusterConfPage dbClusterConf = new DatabaseClusterConfPage(config);
+	DatabaseClusterOrServerPage dbChoice = new DatabaseClusterOrServerPage(config);
+	DatabaseClusterConfPage dbClusterConf = new DatabaseClusterConfPage(config);
+	DatabaseClusterConfirmPage dbClusterConfirm = new DatabaseClusterConfirmPage(config);
 	DatabaseAccessPage dbAccess = new DatabaseAccessPage(config);
 	DatabaseInstallMethodPage dbInstallMethod = new DatabaseInstallMethodPage(config);
 	DatabaseConfirmPage dbConfirm = new DatabaseConfirmPage(config);
@@ -100,7 +104,9 @@ public class LiderSetupWizard extends Wizard {
 		addPage(locatOfComps);
 
 		// Database configuration
-//		addPage(dbClusterConf);
+		addPage(dbChoice);
+		addPage(dbClusterConf);
+		addPage(dbClusterConfirm);
 		addPage(dbAccess);
 		addPage(dbInstallMethod);
 		addPage(dbConfirm);
