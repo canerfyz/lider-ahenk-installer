@@ -1,13 +1,13 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import java.io.File;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,19 +21,16 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 
+import tr.org.liderahenk.installer.lider.callables.DatabaseSetupClusterNodeCallable;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
-import tr.org.liderahenk.installer.lider.wizard.model.DatabaseClusterNodeModel;
-import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
-import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 public class DatabaseClusterInstallationStatus extends WizardPage
 		implements IDatabasePage, ControlNextEvent, InstallationStatusPage {
@@ -48,8 +45,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 	boolean isInstallationFinished = false;
 
 	boolean canGoBack = false;
-
-	private int progressBarPercent;
 
 	private static final Logger logger = Logger.getLogger(DatabaseClusterInstallationStatus.class.getName());
 
@@ -66,8 +61,9 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		txtLogConsole = GUIHelper.createText(container, new GridData(GridData.FILL_BOTH),
 				SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		txtLogConsole.setText("denemedenemedeneme");
 
-		progressBar = new ProgressBar(container, SWT.SMOOTH | SWT.HORIZONTAL);
+		progressBar = new ProgressBar(container, SWT.SMOOTH | SWT.INDETERMINATE);
 		progressBar.setSelection(0);
 		progressBar.setMaximum(100);
 		GridData progressGd = new GridData(GridData.FILL_HORIZONTAL);
@@ -93,13 +89,11 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 			clearLogConsole(display);
 
-			// Calculate progress bar increment size
-			final Integer increment = (Integer) (90 / config.getDatabaseNodeMap().size());
-
 			// Create a thread pool
-			final ExecutorService executor = Executors.newCachedThreadPool();
+			final ExecutorService executor = Executors.newFixedThreadPool(3);
 
-			setProgressBar(10, display);
+			// Create future list that will keep the results of callables.
+			final List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>();
 
 			printMessage("Initializing installation...", display);
 
@@ -109,30 +103,19 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
-
-					for (Iterator<Entry<Integer, DatabaseClusterNodeModel>> iterator = config.getDatabaseNodeMap()
+					for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config.getDatabaseNodeInfoMap()
 							.entrySet().iterator(); iterator.hasNext();) {
-						Entry<Integer, DatabaseClusterNodeModel> entry = iterator.next();
-						final DatabaseClusterNodeModel clusterNode = entry.getValue();
 
-						Runnable runnable = new Runnable() {
-							@Override
-							public void run() {
-								try {
-									SetupUtils.installDatabaseCluster(clusterNode.getTxtNodeIp().getText(), "root",
-											clusterNode.getTxtNodeRootPwd().getText(), 22, null, null, clusterNode);
-								} catch (SSHConnectionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (CommandExecutionException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
+						Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
+						final DatabaseNodeInfoModel clusterNode = entry.getValue();
 
-							}
-						};
-
-						executor.execute(runnable);
+						if (clusterNode.isNodeNewSetup()) {
+							Callable<Boolean> callable = new DatabaseSetupClusterNodeCallable(
+									clusterNode.getNodeIp(), clusterNode.getNodeRootPwd(),
+									clusterNode.getNodeName(), display, config, txtLogConsole);
+							Future<Boolean> result = executor.submit(callable);
+							resultList.add(result);
+						}
 					}
 
 					try {
@@ -142,6 +125,90 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						e.printStackTrace();
 					}
 
+					boolean allNodesSuccess = true;
+
+					for (Future<Boolean> future : resultList) {
+						try {
+							allNodesSuccess = future.get();
+						} catch (Exception e) {
+							e.printStackTrace();
+							allNodesSuccess = false;
+							break;
+						}
+					}
+
+					if (allNodesSuccess) {
+						// Get first node
+						DatabaseNodeInfoModel firstNode = config.getDatabaseNodeInfoMap().get("1");
+
+						try {
+
+							// Start first node
+							startFirstNode(firstNode, display);
+
+							// Copy debian.cnf of first node to all other nodes
+							// And start other nodes.
+							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
+									.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
+
+								Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
+								final DatabaseNodeInfoModel clusterNode = entry.getValue();
+
+								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
+									configureAndStartNode(firstNode, clusterNode, display);
+								}
+							}
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							isInstallationFinished = false;
+
+							// If any error occured user should be
+							// able to go back and change selections
+							// etc.
+							canGoBack = true;
+							display.asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									progressBar.setVisible(false);
+								}
+							});
+						}
+
+					} else {
+						printMessage(Messages.getString("INSTALLER_WONT_CONTINUE_BECAUSE_NO_OF_NODES_SETUP_FAILED"),
+								display);
+						isInstallationFinished = false;
+
+						// If any error occured user should be
+						// able to go back and change selections
+						// etc.
+						canGoBack = true;
+						display.asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								progressBar.setVisible(false);
+							}
+						});
+					}
+
+					canGoBack = false;
+
+					isInstallationFinished = true;
+
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							progressBar.setVisible(false);
+						}
+					});
+
+					printMessage("Installation finished.", display);
+
+					config.setInstallationFinished(isInstallationFinished);
+
+					// To enable finish button
+					setPageCompleteAsync(isInstallationFinished, display);
 				}
 			};
 			Thread thread = new Thread(mainRunnable);
@@ -150,6 +217,96 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
+	}
+
+	private void startFirstNode(DatabaseNodeInfoModel firstNode, Display display) throws Exception {
+
+		SSHManager manager = null;
+
+		try {
+			printMessage(Messages.getString("CONNECTING_TO") + " " + firstNode.getNodeIp(), display);
+			manager = new SSHManager(firstNode.getNodeIp(), "root",
+					firstNode.getNodeRootPwd(), 22, null, null);
+			manager.connect();
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
+
+			printMessage(Messages.getString("STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+					display);
+			manager.execCommand("galera_new_cluster", new Object[] {});
+			printMessage(
+					Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+					display);
+
+		} catch (SSHConnectionException e) {
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(),
+					display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT") + " "
+					+ firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE") + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
+			}
+		}
+	}
+
+	private void configureAndStartNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
+			Display display) throws Exception {
+
+		SSHManager manager = null;
+
+		try {
+			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
+			manager = new SSHManager(firstNode.getNodeIp(), "root",
+					firstNode.getNodeRootPwd(), 22, null, null);
+			manager.connect();
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
+
+			printMessage(Messages.getString("INSTALLING_SSHPASS_TO") + firstNode.getNodeIp(), display);
+			manager.execCommand("apt-get -y --force-yes install sshpass", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(),
+					display);
+
+			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
+					+ clusterNode.getNodeIp(), display);
+			manager.execCommand(
+					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
+					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + firstNode.getNodeIp()
+					+ " to " + clusterNode.getNodeIp(), display);
+			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
+					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
+
+			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand("service mysql start", new Object[] {});
+			printMessage(
+					Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(),
+					display);
+
+		} catch (SSHConnectionException e) {
+			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+					+ clusterNode.getNodeIp(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT") + " "
+					+ clusterNode.getNodeIp(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
+			}
+		}
 	}
 
 	/**
@@ -168,28 +325,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 				}
 				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 						? txtLogConsole.getText() + "\n" : "") + message);
-			}
-		});
-	}
-
-	/**
-	 * Sets progress bar selection (Increases progress bar percentage by
-	 * increment value.)
-	 * 
-	 * @param selection
-	 */
-	private void setProgressBar(final int increment, Display display) {
-		display.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				progressBarPercent += increment;
-
-				progressBar.setSelection(progressBarPercent);
 			}
 		});
 	}
@@ -244,197 +379,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 	@Override
 	public void setNextPageEventType(NextPageEventType nextPageEventType) {
 		this.nextPageEventType = nextPageEventType;
-	}
-
-	private void setupClusterNode(final String ip, final String username, final String password, final Integer port,
-			final String privateKey, final String passphrase, DatabaseClusterNodeModel clusterNode, Display display)
-					throws SSHConnectionException, CommandExecutionException {
-
-		SSHManager manager = null;
-
-		try {
-			// Check SSH connection
-			try {
-				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + ip, display);
-
-				manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
-						passphrase);
-				manager.connect();
-
-				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + ip, display);
-				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
-						new Object[] { ip, username });
-
-			} catch (SSHConnectionException e) {
-				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + ip, display);
-				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + ip), display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-			}
-
-			// Update package list
-			try {
-				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF") + " " + ip, display);
-				manager.execCommand("apt-get update", new Object[] {});
-
-				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF") + " " + ip, display);
-				logger.log(Level.INFO, "Successfully updated package list of {0}", new Object[] { ip });
-
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("COULD_NOT_UPDATE_PACKAGE_LIST_OF") + " " + ip, display);
-				printMessage(Messages.getString("CHECK_INTERNET_CONNECTION_OF") + " " + ip, display);
-				printMessage(Messages.getString("CHECK_REPOSITORY_LISTS_OF") + " " + ip, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				throw new Exception("INSTALLATION_FAILED_AT" + " " + ip);
-			}
-
-			// Install software-properties-common
-			// Add keyserver
-			// Add repository
-			try {
-				printMessage(Messages.getString("INSTALLING_PACKAGE") + " 'software-properties-common' to: " + ip,
-						display);
-				manager.execCommand("apt-get -y --force-yes install software-properties-common", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE") + " 'software-properties-common' to: "
-						+ ip, display);
-
-				printMessage(Messages.getString("ADDING_KEYSERVER_TO") + " " + ip, display);
-				manager.execCommand("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db",
-						new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO") + " " + ip, display);
-
-				printMessage(
-						Messages.getString("ADDING_REPOSITORY")
-								+ " 'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' to " + ip,
-						display);
-				manager.execCommand(
-						"add-apt-repository -y 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'",
-						new Object[] {});
-				printMessage(
-						Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY")
-								+ " 'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' to " + ip,
-						display);
-
-				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF") + " " + ip, display);
-				manager.execCommand("apt-get update", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF") + " " + ip, display);
-				logger.log(Level.INFO, "Successfully done prerequiste part at: {0}", new Object[] { ip });
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUSITES_AT") + " " + ip, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				throw new Exception("INSTALLATION_FAILED_AT" + " " + ip);
-			}
-
-			// Set frontend as noninteractive
-			// Set debconf values
-			try {
-				printMessage(Messages.getString("SETTING_DEBIAN_FRONTEND_AT") + " " + ip, display);
-				manager.execCommand("export DEBIAN_FRONTEND='noninteractive'", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_AT") + " " + ip, display);
-
-				final String[] debconfValues = generateDebconfValues();
-
-				printMessage(Messages.getString("SETTING_DEB_CONF_SELECTIONS_AT") + " " + ip, display);
-				for (String value : debconfValues) {
-					manager.execCommand("debconf-set-selections <<< '{0}'", new Object[] { value });
-				}
-				printMessage(Messages.getString("SUCCESSFULLY_SET_DEB_CONF_SELECTIONS_AT") + " " + ip, display);
-				logger.log(Level.INFO, "Successfully done debconf selections part at: {0}", new Object[] { ip });
-
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_DEBCONF_AT") + " " + ip, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				throw new Exception("INSTALLATION_FAILED_AT" + " " + ip);
-			}
-
-			// Install mariadb-server-10.1
-			try {
-				printMessage(Messages.getString("INSTALLING_PACKAGE") + " 'mariadb-server-10.1' to: " + ip, display);
-				manager.execCommand("apt-get -y --force-yes install mariadb-server-10.1", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE") + " 'software-properties-common' to: "
-						+ ip, display);
-				logger.log(Level.INFO, "Successfully installed package mariadb-server-10.1 at: {0}",
-						new Object[] { ip });
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("COULD_NOT_INSTALL_MARIADB_TO") + " " + ip, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				throw new Exception("INSTALLATION_FAILED_AT" + " " + ip);
-			}
-
-			// TODO
-			// Start mysql service
-			// Execute mysql commands(first normal server commands)
-			try {
-				printMessage(Messages.getString("STARTING_MYSQL_SERVER_AT") + ip, display);
-				manager.execCommand("service mysql start", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_STARTED_MYSQL_SERVER_AT") + ip, display);
-
-				printMessage(Messages.getString("EXECUTING_MYSQL_COMMANDS_AT") + ip, display);
-				manager.execCommand(
-						"mysql -uroot -p{0} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{1}' WITH GRANT OPTION;\"",
-						new Object[] { config.getDatabaseRootPassword(), config.getDatabaseRootPassword() });
-				manager.execCommand("mysql -uroot -p{0} -e \"DELETE FROM mysql.user WHERE user='';\"",
-						new Object[] { config.getDatabaseRootPassword() });
-				manager.execCommand("mysql -uroot -p{0} -e \"GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '{1}';\"",
-						new Object[] { config.getDatabaseRootPassword(), config.getDatabaseRootPassword() });
-				manager.execCommand("mysql -uroot -p{0} -e \"GRANT USAGE ON *.* to {1}@'%' IDENTIFIED BY '{2}';\"",
-						new Object[] { config.getDatabaseRootPassword(), config.getDatabaseSstUsername(),
-								config.getDatabaseSstPwd() });
-				manager.execCommand("mysql -uroot -p{0} -e \"GRANT ALL PRIVILEGES on *.* to {1}r@'%';\"",
-						new Object[] { config.getDatabaseRootPassword(), config.getDatabaseSstUsername() });
-				manager.execCommand("mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"",
-						new Object[] { config.getDatabaseRootPassword() });
-				printMessage(Messages.getString("SUCCESSFULLY_EXECUTED_MYSQL_COMMANDS_AT") + ip, display);
-				logger.log(Level.INFO, "Successfully mysql commands at: {0}",
-						new Object[] { ip });
-
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_ON_MYSQL_SERVICE_AT") + " " + ip, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + ip, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				throw new Exception("INSTALLATION_FAILED_AT" + " " + ip);
-			}
-
-			// TODO
-			// Stop mysql service
-			// Send galera conf
-
-		} catch (Exception e) {
-			// TODO
-			// TODO
-			// TODO
-		} finally {
-			if (manager != null) {
-				manager.disconnect();
-			}
-		}
-
-		// Set frontend as noninteractive
-		manager.execCommand("export DEBIAN_FRONTEND='noninteractive'", new Object[] {});
-
-		manager.disconnect();
-		manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
-		manager.connect();
-
-		manager.disconnect();
-
-	}
-
-	/**
-	 * Generates debconf values for database root password
-	 * 
-	 * @return
-	 */
-	public String[] generateDebconfValues() {
-		String debconfPwd = PropertyReader.property("database.cluster.debconf.password") + " "
-				+ config.getDatabaseRootPassword();
-		String debconfPwdAgain = PropertyReader.property("database.cluster.debconf.password.again") + " "
-				+ config.getDatabaseRootPassword();
-		return new String[] { debconfPwd, debconfPwdAgain };
 	}
 
 }
