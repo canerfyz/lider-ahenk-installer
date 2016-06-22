@@ -1,9 +1,9 @@
 package tr.org.liderahenk.installer.lider.config;
 
-import java.util.List;
 import java.util.Map;
 
-import tr.org.liderahenk.installer.lider.wizard.model.DatabaseClusterNodeModel;import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
+import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
@@ -103,7 +103,9 @@ public class LiderSetupConfig {
 	
 	private String databaseSstPwd;
 	
-	private Map<Integer, DatabaseClusterNodeModel> databaseNodeMap; 
+	private Map<Integer, DatabaseNodeSwtModel> databaseNodeMap; 
+
+	private Map<Integer, DatabaseNodeInfoModel> databaseNodeInfoMap; 
 
 	/**
 	 * ###################################
@@ -1085,12 +1087,20 @@ public class LiderSetupConfig {
 		this.databaseSstPwd = databaseSstPwd;
 	}
 
-	public Map<Integer, DatabaseClusterNodeModel> getDatabaseNodeMap() {
+	public Map<Integer, DatabaseNodeSwtModel> getDatabaseNodeMap() {
 		return databaseNodeMap;
 	}
 
-	public void setDatabaseNodeMap(Map<Integer, DatabaseClusterNodeModel> databaseNodeMap) {
+	public void setDatabaseNodeMap(Map<Integer, DatabaseNodeSwtModel> databaseNodeMap) {
 		this.databaseNodeMap = databaseNodeMap;
+	}
+
+	public Map<Integer, DatabaseNodeInfoModel> getDatabaseNodeInfoMap() {
+		return databaseNodeInfoMap;
+	}
+
+	public void setDatabaseNodeInfoMap(Map<Integer, DatabaseNodeInfoModel> databaseNodeInfoMap) {
+		this.databaseNodeInfoMap = databaseNodeInfoMap;
 	}
 
 }
