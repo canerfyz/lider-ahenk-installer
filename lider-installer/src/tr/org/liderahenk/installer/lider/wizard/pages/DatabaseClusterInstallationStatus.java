@@ -61,7 +61,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		txtLogConsole = GUIHelper.createText(container, new GridData(GridData.FILL_BOTH),
 				SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		txtLogConsole.setText("denemedenemedeneme");
+		txtLogConsole.setTopIndex(txtLogConsole.getLineCount() - 1);
 
 		progressBar = new ProgressBar(container, SWT.SMOOTH | SWT.INDETERMINATE);
 		progressBar.setSelection(0);
@@ -79,10 +79,15 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
-		if (super.isCurrentPage() && !isInstallationFinished
-				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+
+		// TODO open here
+		// if (super.isCurrentPage() && !isInstallationFinished
+		// && nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+		if (true) {
 
 			canGoBack = false;
+
+			progressBar.setVisible(true);
 
 			// Get display before new main runnable
 			final Display display = Display.getCurrent();
@@ -90,7 +95,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			clearLogConsole(display);
 
 			// Create a thread pool
-			final ExecutorService executor = Executors.newFixedThreadPool(3);
+			final ExecutorService executor = Executors.newFixedThreadPool(10);
 
 			// Create future list that will keep the results of callables.
 			final List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>();
@@ -110,11 +115,13 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						final DatabaseNodeInfoModel clusterNode = entry.getValue();
 
 						if (clusterNode.isNodeNewSetup()) {
-							Callable<Boolean> callable = new DatabaseSetupClusterNodeCallable(
-									clusterNode.getNodeIp(), clusterNode.getNodeRootPwd(),
-									clusterNode.getNodeName(), display, config, txtLogConsole);
+							Callable<Boolean> callable = new DatabaseSetupClusterNodeCallable(clusterNode.getNodeIp(),
+									clusterNode.getNodeRootPwd(), clusterNode.getNodeName(), display, config,
+									txtLogConsole);
 							Future<Boolean> result = executor.submit(callable);
 							resultList.add(result);
+						} else {
+							// TODO only configuration
 						}
 					}
 
@@ -125,11 +132,15 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						e.printStackTrace();
 					}
 
-					boolean allNodesSuccess = true;
+					boolean allNodesSuccess = false;
 
+					// Check if all nodes are properly installed
 					for (Future<Boolean> future : resultList) {
 						try {
 							allNodesSuccess = future.get();
+							if (!allNodesSuccess) {
+								break;
+							}
 						} catch (Exception e) {
 							e.printStackTrace();
 							allNodesSuccess = false;
@@ -139,7 +150,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 					if (allNodesSuccess) {
 						// Get first node
-						DatabaseNodeInfoModel firstNode = config.getDatabaseNodeInfoMap().get("1");
+						DatabaseNodeInfoModel firstNode = config.getDatabaseNodeInfoMap().get(1);
 
 						try {
 
@@ -147,6 +158,18 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 							startFirstNode(firstNode, display);
 
 							// Copy debian.cnf of first node to all other nodes
+							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
+									.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
+
+								Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
+								final DatabaseNodeInfoModel clusterNode = entry.getValue();
+
+								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
+									// Send debian.cnf from first node to others
+									configureAndStartNode(firstNode, clusterNode, display);
+								}
+							}
+							
 							// And start other nodes.
 							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
 									.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
@@ -155,7 +178,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 								final DatabaseNodeInfoModel clusterNode = entry.getValue();
 
 								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
-									configureAndStartNode(firstNode, clusterNode, display);
+									// start other nodes.
+									startNode(firstNode, clusterNode, display);
 								}
 							}
 
@@ -192,7 +216,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						});
 					}
 
-					canGoBack = false;
+					// canGoBack = false;
+					canGoBack = true;
 
 					isInstallationFinished = true;
 
@@ -203,12 +228,13 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						}
 					});
 
-					printMessage("Installation finished.", display);
+					printMessage(Messages.getString("MARIADB_GALERA_INSTALLATION_FINISHED"), display);
 
 					config.setInstallationFinished(isInstallationFinished);
 
 					// To enable finish button
-					setPageCompleteAsync(isInstallationFinished, display);
+					// setPageCompleteAsync(isInstallationFinished, display);
+					setPageCompleteAsync(false, display);
 				}
 			};
 			Thread thread = new Thread(mainRunnable);
@@ -225,27 +251,32 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + " " + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root",
-					firstNode.getNodeRootPwd(), 22, null, null);
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, null, null);
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
-			printMessage(Messages.getString("STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(), display);
 			manager.execCommand("galera_new_cluster", new Object[] {});
-			printMessage(
-					Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
 					display);
 
-		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(),
+			printMessage(
+					Messages.getString("WAITING_FOR_A_FEW_SECONDS_UNTIL_MYSQL_UP_AT") + " " + firstNode.getNodeIp(),
 					display);
+			Thread.sleep(30000);
+
+			printMessage(Messages.getString("FIRST_NODE_STATUS"), display);
+			manager.execCommand("service mysql status", new Object[] {});
+
+		} catch (SSHConnectionException e) {
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT") + " "
-					+ firstNode.getNodeIp(), display);
+			printMessage(
+					Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE") + e.getMessage(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
@@ -264,31 +295,31 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root",
-					firstNode.getNodeRootPwd(), 22, null, null);
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, null, null);
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
 			printMessage(Messages.getString("INSTALLING_SSHPASS_TO") + firstNode.getNodeIp(), display);
 			manager.execCommand("apt-get -y --force-yes install sshpass", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(), display);
 
 			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
 					+ clusterNode.getNodeIp(), display);
 			manager.execCommand(
 					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
 					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
-			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + firstNode.getNodeIp()
-					+ " to " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
+					+ clusterNode.getNodeIp(), display);
 			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
 					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
 
-			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-			manager.execCommand("service mysql start", new Object[] {});
-			printMessage(
-					Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(),
-					display);
+//			printMessage(Messages.getString("STOPPING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+//			manager.execCommand("service mysql stop", new Object[] {});
+//			printMessage(Messages.getString("SUCCESSFULLY_STOPPED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+
+//			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+//			manager.execCommand("systemctl start mysql.service", new Object[] {});
+//			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
 
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
@@ -309,6 +340,42 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
+	private void startNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
+			Display display) throws Exception {
+
+		SSHManager manager = null;
+
+		try {
+			
+			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, null, null);
+			manager.connect();
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
+			
+			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand("/etc/init.d/mysql start", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			// TODO date'le kontrol et
+			
+		} catch (SSHConnectionException e) {
+			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+					+ clusterNode.getNodeIp(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT") + " "
+					+ clusterNode.getNodeIp(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
+			}
+		}
+	}
+	
 	/**
 	 * Prints log message to the log console widget
 	 * 

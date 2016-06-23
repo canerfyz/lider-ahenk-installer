@@ -49,7 +49,7 @@ public class DatabaseClusterConfirmPage extends WizardPage implements IDatabaseP
 
 		// Set page complete to true, otherwise it does not go into getNextPage
 		// method of DatabaseInstallationStatus page.
-//		((WizardPage) super.getNextPage()).setPageComplete(true);
+		((WizardPage) super.getNextPage()).setPageComplete(true);
 
 		// Set global variable to false before every installation status page,
 		// if it is not set and there are more than one component to be

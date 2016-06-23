@@ -205,6 +205,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		DatabaseNodeSwtModel clusterNode = new DatabaseNodeSwtModel();
 
 		Integer nodeNumber = nodeMap.size() + 1;
+		clusterNode.setNodeNumber(nodeNumber);
+		
 		GUIHelper.createLabel(grpClusterNode, nodeNumber.toString());
 
 		Text txtNodeIp = GUIHelper.createText(grpClusterNode);
@@ -270,7 +272,10 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		config.setDatabaseSstUsername(txtSstUsername.getText());
 		config.setDatabaseSstPwd(txtSstPwd.getText());
 		config.setDatabaseNodeMap(nodeMap);
-		config.setDatabaseNodeInfoMap(createInfoModelMap());
+		
+		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = createInfoModelMap();
+		
+		config.setDatabaseNodeInfoMap(nodeInfoMap);
 	}
 
 	private String createWsrepClusterAddress() {
@@ -293,8 +298,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	}
 
 	private Map<Integer, DatabaseNodeInfoModel> createInfoModelMap() {
-		
-		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = new HashMap<Integer, DatabaseNodeInfoModel>();
+				Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = new HashMap<Integer, DatabaseNodeInfoModel>();
 				
 		for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
 				.hasNext();) {
@@ -304,6 +308,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 			DatabaseNodeInfoModel nodeInfo = new DatabaseNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
 					nodeSwt.getTxtNodeRootPwd().getText(), nodeSwt.getBtnNodeNewSetup().getSelection());
+			
+			System.out.println(nodeSwt.getNodeNumber());
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
 		
