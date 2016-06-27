@@ -271,14 +271,14 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 //													config.getPasswordCm(), config.getPort(),
 //													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
 //													PackageInstaller.GDEBI);
+//											printMessage("Installing slixmpp", display);
+//											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+//													config.getPasswordCm(), config.getPort(),
+//													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+//													"sudo apt-get install slixmpp");
+											
 											// Adding "--force-overwrite" option, because if files under /etc/ahenk has been removed
 											// manually before this installation, DPKG will not create them again.
-											printMessage("Installing slixmpp", display);
-											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"sudo apt-get install slixmpp");
-											
 											printMessage("Installing Ahenk", display);
 											SetupUtils.installPackageGdebiWithOpts(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
