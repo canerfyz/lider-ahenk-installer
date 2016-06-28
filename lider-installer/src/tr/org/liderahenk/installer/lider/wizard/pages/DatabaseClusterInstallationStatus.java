@@ -1,6 +1,9 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -122,6 +125,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 							resultList.add(result);
 						} else {
 							// TODO only configuration
+							// TODO get first node's IP
+							// 
 						}
 					}
 
@@ -154,8 +159,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 						try {
 
-							// Start first node
-							startFirstNode(firstNode, display);
 
 							// Copy debian.cnf of first node to all other nodes
 							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
@@ -166,9 +169,12 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
 									// Send debian.cnf from first node to others
-									configureAndStartNode(firstNode, clusterNode, display);
+									configureNode(firstNode, clusterNode, display);
 								}
 							}
+							
+							// Start first node
+							startFirstNode(firstNode, display);
 							
 							// And start other nodes.
 							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
@@ -288,7 +294,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
-	private void configureAndStartNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
+	private void configureNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
 			Display display) throws Exception {
 
 		SSHManager manager = null;
@@ -312,14 +318,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 					+ clusterNode.getNodeIp(), display);
 			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
 					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
-
-//			printMessage(Messages.getString("STOPPING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-//			manager.execCommand("service mysql stop", new Object[] {});
-//			printMessage(Messages.getString("SUCCESSFULLY_STOPPED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-
-//			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-//			manager.execCommand("systemctl start mysql.service", new Object[] {});
-//			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
 
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
@@ -352,10 +350,19 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 			
-			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-			manager.execCommand("/etc/init.d/mysql start", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
 			// TODO date'le kontrol et
+			DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+			
+			System.out.println("Starting node: " + clusterNode.getNodeIp() + " | " + dateFormat.format(date));
+			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand("service mysql start", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			date = new Date();
+			System.out.println("Started node: " + clusterNode.getNodeIp() + " | " + dateFormat.format(date));
+
+			System.out.println("WAITING");
+			Thread.sleep(40000);
 			
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
