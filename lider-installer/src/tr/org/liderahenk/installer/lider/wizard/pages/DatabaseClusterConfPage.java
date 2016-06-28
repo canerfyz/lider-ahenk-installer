@@ -119,7 +119,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		lblNodeName.setLayoutData(gdLabels);
 		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
 		lblNodeRootPwd.setLayoutData(gdLabels);
-		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_NEW_SETUP"));
+		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_EXISTS"));
 		lblNodeNewSetup.setLayoutData(gdLabels);
 
 		Composite cmpNodeList = GUIHelper.createComposite(cmpMain, 2);
@@ -245,7 +245,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		Button btnNodeNewSetup = new Button(grpClusterNode, SWT.CHECK | SWT.BORDER);
 		btnNodeNewSetup.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		btnNodeNewSetup.setSelection(true);
-		btnNodeNewSetup.setToolTipText(Messages.getString("UNCHECK_IF_THIS_NODE_IS_ALREADY_INSTALLED"));
+		btnNodeNewSetup.setToolTipText(Messages.getString("CHECK_IF_THIS_NODE_IS_ALREADY_INSTALLED"));
 		clusterNode.setBtnNodeNewSetup(btnNodeNewSetup);
 
 		nodeMap.put(nodeNumber, clusterNode);
