@@ -41,15 +41,15 @@ public class LiderComponentSelectionPage extends WizardPage {
 		GUIHelper.createLabel(mainContainer, Messages.getString("WHICH_COMPONENTS_WILL_BE_INSTALLED"));
 		GUIHelper.createLabel(mainContainer, "");
 
-		btnCheckAll = GUIHelper.createButton(mainContainer, SWT.CHECK, Messages.getString("ALL_RECOMMENDED"));
+		btnCheckAll = GUIHelper.createButton(mainContainer, SWT.CHECK | SWT.BORDER, Messages.getString("ALL_RECOMMENDED"));
 
-		btnCheckDatabase = GUIHelper.createButton(mainContainer, SWT.CHECK, Messages.getString("DATABASE"));
+		btnCheckDatabase = GUIHelper.createButton(mainContainer, SWT.CHECK | SWT.BORDER, Messages.getString("DATABASE"));
 
-		btnCheckLdap = GUIHelper.createButton(mainContainer, SWT.CHECK, Messages.getString("LDAP"));
+		btnCheckLdap = GUIHelper.createButton(mainContainer, SWT.CHECK | SWT.BORDER, Messages.getString("LDAP"));
 
-		btnCheckXmpp = GUIHelper.createButton(mainContainer, SWT.CHECK, Messages.getString("XMPP"));
+		btnCheckXmpp = GUIHelper.createButton(mainContainer, SWT.CHECK | SWT.BORDER, Messages.getString("XMPP"));
 
-		btnCheckLider = GUIHelper.createButton(mainContainer, SWT.CHECK, Messages.getString("LIDER"));
+		btnCheckLider = GUIHelper.createButton(mainContainer, SWT.CHECK | SWT.BORDER, Messages.getString("LIDER"));
 
 		// Adding "select all" functionality to checkAll button.
 		// And updating page complete status.
