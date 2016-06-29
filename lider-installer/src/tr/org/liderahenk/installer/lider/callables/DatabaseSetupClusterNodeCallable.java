@@ -51,10 +51,10 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 	@Override
 	public Boolean call() throws Exception {
 
-		return setupClusterNode(nodeIp, nodeRootPwd, nodeName, display);
+		return setupClusterNode();
 	}
 
-	private boolean setupClusterNode(String nodeIp, String nodeRootPwd, String nodeName, Display display) {
+	private boolean setupClusterNode() {
 
 		SSHManager manager = null;
 
@@ -118,7 +118,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 								+ " 'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' to " + nodeIp,
 						display);
 				manager.execCommand(
-						"add-apt-repository -y 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'",
+						"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list",
 						new Object[] {});
 				printMessage(
 						Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY")
@@ -281,7 +281,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				}
 				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 						? txtLogConsole.getText() + "\n" : "") + message);
-			}
+				txtLogConsole.setSelection(txtLogConsole.getCharCount() - 1);			}
 		});
 	}
 
