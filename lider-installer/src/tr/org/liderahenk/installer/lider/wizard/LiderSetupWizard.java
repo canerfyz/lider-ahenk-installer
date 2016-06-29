@@ -13,10 +13,13 @@ import org.eclipse.swt.widgets.Composite;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallationStatus;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterInstallationStatus;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfirmPage;
@@ -26,8 +29,12 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateExistingPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateStatusPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallMethodPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderOrganizationPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
@@ -35,14 +42,6 @@ import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallationStatus;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseAccessPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterInstallationStatus;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterOrServerPage;
 
 public class LiderSetupWizard extends Wizard {
 
@@ -67,7 +66,6 @@ public class LiderSetupWizard extends Wizard {
 	LiderLocationOfComponentsPage locatOfComps = new LiderLocationOfComponentsPage(config);
 
 	// TODO add cluster pages
-	DatabaseClusterOrServerPage dbChoice = new DatabaseClusterOrServerPage(config);
 	DatabaseClusterConfPage dbClusterConf = new DatabaseClusterConfPage(config);
 	DatabaseClusterConfirmPage dbClusterConfirm = new DatabaseClusterConfirmPage(config);
 	DatabaseClusterInstallationStatus dbClusterStatus = new DatabaseClusterInstallationStatus(config);
@@ -106,7 +104,6 @@ public class LiderSetupWizard extends Wizard {
 		addPage(locatOfComps);
 
 		// Database configuration
-		addPage(dbChoice);
 		addPage(dbClusterConf);
 		addPage(dbClusterConfirm);
 		addPage(dbClusterStatus);
