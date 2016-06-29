@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.wizard.LiderSetupWizard;
-import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
@@ -43,6 +42,8 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private Text txtLdapPort;
 	private Text txtXmppPort;
 	private Text txtLiderPort;
+	
+	private Button btnDatabaseCluster;
 
 	public LiderLocationOfComponentsPage(LiderSetupConfig config) {
 		super(LiderLocationOfComponentsPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -88,16 +89,42 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		btnInstallDistributed = GUIHelper.createButton(mainContainer, SWT.RADIO,
 				Messages.getString("INSTALL_COMPONENT_TO_DIFFERENT_COMPUTERS"));
 
-		// Creating another child container.
-		Composite secondChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
+
+		GridLayout glDatabase = new GridLayout(5, false);
+		glDatabase.marginLeft = 30;
+		Composite cmpDatabase = GUIHelper.createComposite(mainContainer, glDatabase, new GridData());
 
 		// IP's for components will be taken in this section.
-		GUIHelper.createLabel(secondChild, Messages.getString("DATABASE"));
+		GUIHelper.createLabel(cmpDatabase, Messages.getString("DATABASE"));
 
-		txtDatabaseIp = GUIHelper.createText(secondChild, gdForIpField);
+		txtDatabaseIp = GUIHelper.createText(cmpDatabase, gdForIpField);
 
-		txtDatabasePort = GUIHelper.createText(secondChild, gdForPortField);
+		txtDatabasePort = GUIHelper.createText(cmpDatabase, gdForPortField);
 		txtDatabasePort.setText("22");
+		
+		GUIHelper.createLabel(cmpDatabase, Messages.getString("DATABASE_CLUSTER"));
+		
+		btnDatabaseCluster = GUIHelper.createButton(cmpDatabase, SWT.CHECK | SWT.BORDER);
+		btnDatabaseCluster.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (btnDatabaseCluster.getSelection()) {
+					txtDatabaseIp.setEnabled(false);
+					txtDatabasePort.setEnabled(false);
+				} else {
+					txtDatabaseIp.setEnabled(true);
+					txtDatabasePort.setEnabled(true);
+				}
+				updatePageStatus(true);
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
+		// TODO checkbox
+
+		// Creating another child container.
+		Composite secondChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
 		GUIHelper.createLabel(secondChild, Messages.getString("LDAP"));
 
@@ -106,12 +133,16 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		txtLdapPort = GUIHelper.createText(secondChild, gdForPortField);
 		txtLdapPort.setText("22");
 
+		// TODO checkbox
+
 		GUIHelper.createLabel(secondChild, Messages.getString("XMPP"));
 
 		txtXmppIp = GUIHelper.createText(secondChild, gdForIpField);
 
 		txtXmppPort = GUIHelper.createText(secondChild, gdForPortField);
 		txtXmppPort.setText("22");
+
+		// TODO checkbox
 
 		GUIHelper.createLabel(secondChild, Messages.getString("LIDER"));
 
@@ -238,8 +269,14 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 			// Enable second option
 			if (config.isInstallDatabase()) {
-				txtDatabaseIp.setEnabled(true);
-				txtDatabasePort.setEnabled(true);
+				btnDatabaseCluster.setEnabled(true);
+				if (btnDatabaseCluster.getSelection()) {
+					txtDatabaseIp.setEnabled(false);
+					txtDatabasePort.setEnabled(false);
+				} else {
+					txtDatabaseIp.setEnabled(false);
+					txtDatabasePort.setEnabled(false);
+				}
 			}
 			if (config.isInstallLdap()) {
 				txtLdapIp.setEnabled(true);
@@ -263,6 +300,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			// Disable second option
 			txtDatabaseIp.setEnabled(false);
 			txtDatabasePort.setEnabled(false);
+			btnDatabaseCluster.setEnabled(false);
 			txtLdapIp.setEnabled(false);
 			txtLdapPort.setEnabled(false);
 			txtXmppIp.setEnabled(false);
@@ -310,7 +348,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		boolean xmppIpEntered = false; 
 		boolean liderIpEntered = false; 
 		
-		if (config.isInstallDatabase()) {
+		if (config.isInstallDatabase() && !btnDatabaseCluster.getSelection()) {
 			if (!txtDatabaseIp.getText().isEmpty() && NetworkUtils.isIpValid(txtDatabaseIp.getText())) {
 				databaseIpEntered = true;
 			} else {
@@ -362,6 +400,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				if (config.isInstallDatabase()) {
 					config.setDatabaseIp("localhost");
 					config.setDatabasePort(null);
+					config.setDatabaseCluster(false);
 				}
 				if (config.isInstallLdap()) {
 					config.setLdapIp("localhost");
@@ -383,6 +422,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 					config.setDatabaseIp(txtRemoteIp.getText());
 					config.setDatabasePort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
 							? new Integer(txtRemotePort.getText()) : null);
+					config.setDatabaseCluster(false);
 				}
 				if (config.isInstallLdap()) {
 					config.setLdapIp(txtRemoteIp.getText());
@@ -404,10 +444,12 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// If components will be installed distributed.
 		else {
 			// Set only selected components
-			if (config.isInstallDatabase()) {
+			if (config.isInstallDatabase() && !btnDatabaseCluster.getSelection()) {
 				config.setDatabaseIp(txtDatabaseIp.getText());
 				config.setDatabasePort(txtDatabasePort.getText() != null && !txtDatabasePort.getText().isEmpty()
 						? new Integer(txtDatabasePort.getText()) : null);
+			} else if (config.isInstallDatabase() && btnDatabaseCluster.getSelection()) {
+				config.setDatabaseCluster(true);
 			}
 			if (config.isInstallLdap()) {
 				config.setLdapIp(txtLdapIp.getText());
@@ -435,7 +477,11 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private IWizardPage selectNextPage() {
 		LinkedList<IWizardPage> pagesList = ((LiderSetupWizard) this.getWizard()).getPagesList();
 		if (config.isInstallDatabase()) {
-			return findFirstInstance(pagesList, IDatabasePage.class);
+			if (config.isDatabaseCluster()) {
+				return getWizard().getPage(DatabaseClusterConfPage.class.getName());
+			} else {
+				return getWizard().getPage(DatabaseAccessPage.class.getName());
+			}
 		} else if (config.isInstallLdap()) {
 			return findFirstInstance(pagesList, ILdapPage.class);
 		} else if (config.isInstallXmpp()) {
