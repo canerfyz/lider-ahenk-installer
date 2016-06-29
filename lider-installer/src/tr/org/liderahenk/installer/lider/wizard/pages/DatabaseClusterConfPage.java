@@ -244,7 +244,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 		Button btnNodeNewSetup = new Button(grpClusterNode, SWT.CHECK | SWT.BORDER);
 		btnNodeNewSetup.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
-		btnNodeNewSetup.setSelection(true);
+		btnNodeNewSetup.setSelection(false);
 		btnNodeNewSetup.setToolTipText(Messages.getString("CHECK_IF_THIS_NODE_IS_ALREADY_INSTALLED"));
 		clusterNode.setBtnNodeNewSetup(btnNodeNewSetup);
 
@@ -307,9 +307,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 			DatabaseNodeInfoModel nodeInfo = new DatabaseNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
-					nodeSwt.getTxtNodeRootPwd().getText(), nodeSwt.getBtnNodeNewSetup().getSelection());
+					nodeSwt.getTxtNodeRootPwd().getText(), !nodeSwt.getBtnNodeNewSetup().getSelection());
 			
-			System.out.println(nodeSwt.getNodeNumber());
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
 		
@@ -327,7 +326,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 				Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
 				DatabaseNodeSwtModel node = entry.getValue();
 				if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()
-						&& !node.getTxtNodeRootPwd().getText().isEmpty() && node.getBtnNodeNewSetup().getSelection()) {
+						&& !node.getTxtNodeRootPwd().getText().isEmpty()) {
 					pageComplete = true;
 				} else {
 					pageComplete = false;
