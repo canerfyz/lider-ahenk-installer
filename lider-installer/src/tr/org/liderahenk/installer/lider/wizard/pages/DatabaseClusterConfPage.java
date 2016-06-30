@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -41,8 +42,15 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private Text txtClusterName;
 	private Text txtSstUsername;
 	private Text txtSstPwd;
+	private Button btnUsePrivateKey;
+	private Text txtPrivateKey;
+	private Button btnUploadKey;
+	private FileDialog dialog;
+	private String selectedFile;
+	private Text txtPassphrase;
 
 	private Map<Integer, DatabaseNodeSwtModel> nodeMap = new HashMap<Integer, DatabaseNodeSwtModel>();
+
 
 	public DatabaseClusterConfPage(LiderSetupConfig config) {
 		super(DatabaseClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -105,6 +113,52 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 			}
 		});
 
+		Composite cmpPrivateKey = GUIHelper.createComposite(cmpMain, 3);
+		cmpPrivateKey.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
+
+		// Create a dialog window.
+		dialog = new FileDialog(cmpMain.getShell(), SWT.SAVE);
+		dialog.setText(Messages.getString("UPLOAD_KEY"));
+
+		btnUsePrivateKey = GUIHelper.createButton(cmpPrivateKey, SWT.CHECK | SWT.BORDER,
+				Messages.getString("USE_PRIVATE_KEY"));
+		btnUsePrivateKey.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				organizePasswordFields();
+				updatePageCompleteStatus();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
+
+		txtPrivateKey = GUIHelper.createText(cmpPrivateKey);
+		txtPrivateKey.setEnabled(false);
+		// User should not be able to write
+		// anything to this text field.
+		txtPrivateKey.setEditable(false);
+
+		btnUploadKey = GUIHelper.createButton(cmpPrivateKey, SWT.PUSH | SWT.BORDER,
+				Messages.getString("UPLOAD_PRIVATE_KEY"));
+		btnUploadKey.setEnabled(false);
+		btnUploadKey.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				openDialog();
+				updatePageCompleteStatus();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		GUIHelper.createLabel(cmpPrivateKey, Messages.getString("PASSPHRASE"));
+		txtPassphrase = GUIHelper.createText(cmpPrivateKey);
+		txtPassphrase.setEnabled(false);
+		
 		Label lblNodeInfo = GUIHelper.createLabel(cmpMain, Messages.getString("MARIADB_CLUSTER_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
@@ -147,6 +201,40 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		});
 
 		setPageComplete(false);
+	}
+
+	private void organizePasswordFields() {
+		if (btnUsePrivateKey.getSelection()) {
+			txtPrivateKey.setEnabled(true);
+			btnUploadKey.setEnabled(true);
+			txtPassphrase.setEnabled(true);
+		} else {
+			txtPrivateKey.setEnabled(false);
+			btnUploadKey.setEnabled(false);
+			txtPassphrase.setEnabled(false);
+		}
+
+		for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
+				.hasNext();) {
+			Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
+			DatabaseNodeSwtModel node = entry.getValue();
+			if (btnUsePrivateKey.getSelection()) {
+				node.getTxtNodeRootPwd().setEnabled(false);
+			} else {
+				node.getTxtNodeRootPwd().setEnabled(true);
+			}
+		}
+	}
+
+	/**
+	 * This method opens a dialog when triggered, and sets the private key text
+	 * field.
+	 */
+	private void openDialog() {
+		selectedFile = dialog.open();
+		if (selectedFile != null && !"".equals(selectedFile)) {
+			txtPrivateKey.setText(selectedFile);
+		}
 	}
 
 	private void handleAddButtonClick(SelectionEvent event) {
@@ -206,7 +294,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 		Integer nodeNumber = nodeMap.size() + 1;
 		clusterNode.setNodeNumber(nodeNumber);
-		
+
 		GUIHelper.createLabel(grpClusterNode, nodeNumber.toString());
 
 		Text txtNodeIp = GUIHelper.createText(grpClusterNode);
@@ -260,7 +348,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	public IWizardPage getNextPage() {
 
 		setConfigVariables();
-		
+
 		return super.getNextPage();
 	}
 
@@ -272,10 +360,16 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		config.setDatabaseSstUsername(txtSstUsername.getText());
 		config.setDatabaseSstPwd(txtSstPwd.getText());
 		config.setDatabaseNodeMap(nodeMap);
-		
+
 		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = createInfoModelMap();
-		
+
 		config.setDatabaseNodeInfoMap(nodeInfoMap);
+		
+		if (btnUsePrivateKey.getSelection()) {
+			config.setDatabaseAccessKeyPath(txtPrivateKey.getText());
+			config.setDatabaseAccessPassphrase(txtPassphrase.getText());
+		}
+		
 	}
 
 	private String createWsrepClusterAddress() {
@@ -298,8 +392,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	}
 
 	private Map<Integer, DatabaseNodeInfoModel> createInfoModelMap() {
-				Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = new HashMap<Integer, DatabaseNodeInfoModel>();
-				
+		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = new HashMap<Integer, DatabaseNodeInfoModel>();
+
 		for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
 				.hasNext();) {
 			Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
@@ -307,11 +401,11 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 			DatabaseNodeInfoModel nodeInfo = new DatabaseNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
-					nodeSwt.getTxtNodeRootPwd().getText(), !nodeSwt.getBtnNodeNewSetup().getSelection());
-			
+					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(), !nodeSwt.getBtnNodeNewSetup().getSelection());
+
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
-		
+
 		return nodeInfoMap;
 	}
 
@@ -325,14 +419,27 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 					.hasNext();) {
 				Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
 				DatabaseNodeSwtModel node = entry.getValue();
-				if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()
-						&& !node.getTxtNodeRootPwd().getText().isEmpty()) {
-					pageComplete = true;
+
+				if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()) {
+					if (btnUsePrivateKey.getSelection()) {
+						if (!txtPrivateKey.getText().isEmpty()) {
+							pageComplete = true;
+						} else {
+							pageComplete = false;
+							break;
+						}
+					} else {
+						if (!node.getTxtNodeRootPwd().getText().isEmpty()) {
+							pageComplete = true;
+						} else {
+							pageComplete = false;
+							break;
+						}
+					}
 				} else {
 					pageComplete = false;
 					break;
 				}
-
 			}
 
 			setPageComplete(pageComplete);
