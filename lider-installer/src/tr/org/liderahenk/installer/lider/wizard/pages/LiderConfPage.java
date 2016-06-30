@@ -351,7 +351,11 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		xmppPacketReplyTimeout.setText("10000");
 		xmppPingTimeout.setText("3000");
 		xmppFilePath.setText("/tmp/xmpp-files/");
-		dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
+		if (!config.isDatabaseCluster()) {
+			dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
+		} else {
+			dbServer.setText(config.getDatabaseClusterAddress() != null ? config.getDatabaseClusterAddress() : "db." + config.getLdapOrgCn());
+		}
 		dbPort.setText("3306");
 		dbDatabase.setText("liderdb");
 		dbUsername.setText("root");
