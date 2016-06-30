@@ -80,10 +80,10 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		// To prevent triggering installation again
 		// (i.e. when clicked "next" after installation finished),
 		// set isInstallationFinished to true when its done.
-		 if (super.isCurrentPage() && !isInstallationFinished
-		 && nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+		if (super.isCurrentPage() && !isInstallationFinished
+				&& nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 
-			 canGoBack = false;
+			canGoBack = false;
 
 			progressBar.setVisible(true);
 
@@ -135,7 +135,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 					}
 
 					boolean allNodesSuccess = false;
-					
+
 					if (resultList.size() > 0) {
 						// Check if all nodes are properly installed
 						for (Future<Boolean> future : resultList) {
@@ -172,10 +172,10 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 									configureNode(firstNode, clusterNode, display);
 								}
 							}
-							
+
 							// Start first node
 							startFirstNode(firstNode, display);
-							
+
 							// And start other nodes.
 							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
 									.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
@@ -188,6 +188,24 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 									startNode(clusterNode, display);
 								}
 							}
+
+							canGoBack = false;
+
+							isInstallationFinished = true;
+
+							display.asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									progressBar.setVisible(false);
+								}
+							});
+
+							printMessage(Messages.getString("MARIADB_GALERA_INSTALLATION_FINISHED"), display);
+
+							config.setInstallationFinished(isInstallationFinished);
+
+							// To enable finish button
+							setPageCompleteAsync(isInstallationFinished, display);
 
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -222,23 +240,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						});
 					}
 
-					canGoBack = false;
-
-					isInstallationFinished = true;
-
-					display.asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							progressBar.setVisible(false);
-						}
-					});
-
-					printMessage(Messages.getString("MARIADB_GALERA_INSTALLATION_FINISHED"), display);
-
-					config.setInstallationFinished(isInstallationFinished);
-
-					// To enable finish button
-					 setPageCompleteAsync(isInstallationFinished, display);
 				}
 			};
 			Thread thread = new Thread(mainRunnable);
@@ -289,8 +290,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
-	private void configureNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
-			Display display) throws Exception {
+	private void configureNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode, Display display)
+			throws Exception {
 
 		SSHManager manager = null;
 
@@ -333,18 +334,17 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
-	private void startNode(DatabaseNodeInfoModel clusterNode,
-			Display display) throws Exception {
+	private void startNode(DatabaseNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
 
 		try {
-			
-			printMessage(Messages.getString("CONNECTING_TO") + clusterNode.getNodeIp(), display);
+
+			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), 22, null, null);
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
-			
+
 			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
 			manager.execCommand("service mysql start", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
@@ -356,8 +356,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT") + " "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT") + " " + clusterNode.getNodeIp(),
+					display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -367,7 +367,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			}
 		}
 	}
-	
+
 	/**
 	 * Prints log message to the log console widget
 	 * 
