@@ -368,6 +368,9 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		if (btnUsePrivateKey.getSelection()) {
 			config.setDatabaseAccessKeyPath(txtPrivateKey.getText());
 			config.setDatabaseAccessPassphrase(txtPassphrase.getText());
+		} else {
+			config.setDatabaseAccessKeyPath(null);
+			config.setDatabaseAccessPassphrase(null);
 		}
 		
 	}
