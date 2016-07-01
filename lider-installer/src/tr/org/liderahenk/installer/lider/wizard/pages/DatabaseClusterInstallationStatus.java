@@ -1,5 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -209,8 +210,9 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 						} catch (Exception e) {
 							e.printStackTrace();
+							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"), display);
+							printMessage(Messages.getString("ERROR_MESSAGE" + " " + e.getMessage()), display);
 							isInstallationFinished = false;
-
 							// If any error occured user should be
 							// able to go back and change selections
 							// etc.
@@ -238,6 +240,9 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 								progressBar.setVisible(false);
 							}
 						});
+						
+						// To enable finish button
+						setPageCompleteAsync(isInstallationFinished, display);
 					}
 
 				}
@@ -256,7 +261,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + " " + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, null, null);
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
@@ -297,7 +302,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, null, null);
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
@@ -305,15 +310,22 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			manager.execCommand("apt-get -y --force-yes install sshpass", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(), display);
 
-			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
-					+ clusterNode.getNodeIp(), display);
-			manager.execCommand(
-					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
-					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
-			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
-					+ clusterNode.getNodeIp(), display);
-			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
-					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
+			if (config.getDatabaseAccessKeyPath() == null) {
+				printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
+						+ clusterNode.getNodeIp(), display);
+				manager.execCommand(
+						"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
+						new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
+				printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
+						+ clusterNode.getNodeIp(), display);
+			} else {
+				InetAddress ip = InetAddress.getLocalHost();
+				// TODO get debian.cnf from node to local via executing scp command at local
+				
+				
+			}
+//			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
+//					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
@@ -341,7 +353,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		try {
 
 			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), 22, null, null);
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
 
@@ -420,6 +432,17 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		});
 	}
 
+	private void executeCmdLocal(String command) {
+		StringBuffer output = new StringBuffer();
+		
+		Process p;
+		try {
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
 	@Override
 	public IWizardPage getPreviousPage() {
 		// Do not allow to go back from this page if installation completed
