@@ -64,7 +64,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			try {
 				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + nodeIp, display);
 
-				manager = new SSHManager(nodeIp, "root", nodeRootPwd, 22, null, null);
+				manager = new SSHManager(nodeIp, "root", nodeRootPwd, 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + nodeIp, display);
@@ -202,9 +202,9 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				manager.execCommand("mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"",
 						new Object[] { config.getDatabaseRootPassword() });
 				printMessage(Messages.getString("CREATING_DATABASE"), display);
-				manager.execCommand(
-						"mysql -uroot -p{0} -e \"CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci\"",
-						new Object[] { config.getDatabaseRootPassword() });
+//				manager.execCommand(
+//						"mysql -uroot -p{0} -e \"CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci\"",
+//						new Object[] { config.getDatabaseRootPassword() });
 				printMessage(Messages.getString("SUCCESSFULLY_EXECUTED_MYSQL_COMMANDS_AT") + nodeIp, display);
 				logger.log(Level.INFO, "Successfully mysql commands at: {0}", new Object[] { nodeIp });
 
