@@ -1,6 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import java.net.InetAddress;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -156,21 +158,40 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 					}
 
 					if (allNodesSuccess) {
-						// Get first node
-						DatabaseNodeInfoModel firstNode = config.getDatabaseNodeInfoMap().get(1);
 
 						try {
+							// Get first node
+							DatabaseNodeInfoModel firstNode = config.getDatabaseNodeInfoMap().get(1);
 
-							// Copy debian.cnf of first node to all other nodes
-							for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
-									.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
+							if (config.getDatabaseAccessKeyPath() == null) {
+								for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
+										.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
 
-								Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
-								final DatabaseNodeInfoModel clusterNode = entry.getValue();
+									Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
+									final DatabaseNodeInfoModel clusterNode = entry.getValue();
 
-								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
-									// Send debian.cnf from first node to others
-									configureNode(firstNode, clusterNode, display);
+									if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
+										// Send debian.cnf from first node to
+										// others
+										configureNodeFromNode(firstNode, clusterNode, display);
+									}
+								}
+							} else {
+								// Send debian.cnf from first node to local
+								copyFileToLocal(firstNode, display);
+
+								// Copy debian.cnf of first node to all other
+								// nodes
+								for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
+										.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
+
+									Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
+									final DatabaseNodeInfoModel clusterNode = entry.getValue();
+
+									if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
+										// Copy debian.cnf from local to nodes
+										configureNodeFromLocal(clusterNode, display);
+									}
 								}
 							}
 
@@ -210,7 +231,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 						} catch (Exception e) {
 							e.printStackTrace();
-							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"), display);
+							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"),
+									display);
 							printMessage(Messages.getString("ERROR_MESSAGE" + " " + e.getMessage()), display);
 							isInstallationFinished = false;
 							// If any error occured user should be
@@ -240,7 +262,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 								progressBar.setVisible(false);
 							}
 						});
-						
+
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
 					}
@@ -261,7 +283,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + " " + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(),
+					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
@@ -295,14 +318,15 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
-	private void configureNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode, Display display)
-			throws Exception {
+	private void configureNodeFromNode(DatabaseNodeInfoModel firstNode, DatabaseNodeInfoModel clusterNode,
+			Display display) throws Exception {
 
 		SSHManager manager = null;
 
 		try {
 			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
-			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(),
+					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
 
@@ -310,32 +334,25 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			manager.execCommand("apt-get -y --force-yes install sshpass", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(), display);
 
-			if (config.getDatabaseAccessKeyPath() == null) {
-				printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
-						+ clusterNode.getNodeIp(), display);
-				manager.execCommand(
-						"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
-						new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
-				printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
-						+ clusterNode.getNodeIp(), display);
-			} else {
-				InetAddress ip = InetAddress.getLocalHost();
-				// TODO get debian.cnf from node to local via executing scp command at local
-				
-				
-			}
-//			logger.log(Level.INFO, "Successfully sent debian.cnf from: {0} to {1}",
-//					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
+			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
+					+ clusterNode.getNodeIp(), display);
+			manager.execCommand(
+					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
+					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
+					+ clusterNode.getNodeIp(), display);
 
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
 					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT") + " "
 					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -346,6 +363,106 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
+	private void copyFileToLocal(DatabaseNodeInfoModel firstNode, Display display) throws Exception {
+
+		Process process;
+
+		try {
+
+			printMessage(Messages.getString("COPYING_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to local", display);
+			// Prepare command to execute on local
+			String command = "scp -o StrictHostKeyChecking=no root@{0}:/etc/mysql/debian.cnf /tmp";
+			command = command.replace("{0}", firstNode.getNodeIp());
+			// TODO passphrase
+
+			StringBuffer output = new StringBuffer();
+
+			// Get debian.cnf to local
+			process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+
+			if (process.exitValue() == 0) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					output.append(line + "\n");
+				}
+				logger.log(Level.INFO, output.toString());
+				printMessage(Messages.getString("SUCCESSFULLY_COPIED_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to local", display);
+			} else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					output.append(line + "\n");
+				}
+				logger.log(Level.SEVERE, output.toString());
+				printMessage(Messages.getString("ERROR_OCCURED_WHILE_COPYING_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp()
+						+ " to local", display);
+			}
+
+		} catch (IOException e) {
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (InterruptedException e) {
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		}
+
+	}
+
+	private void configureNodeFromLocal(DatabaseNodeInfoModel clusterNode, Display display) throws Exception {
+		
+		Process process;
+
+		try {
+
+			printMessage(Messages.getString("COPYING_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
+			// Prepare command to execute on local
+			String command = "scp -o StrictHostKeyChecking=no /tmp/debian.cnf root@{0}:/etc/mysql/";
+			command = command.replace("{0}", clusterNode.getNodeIp());
+			// TODO passphrase
+
+			StringBuffer output = new StringBuffer();
+
+			// Send debian.cnf to node
+			process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+
+			if (process.exitValue() == 0) {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					output.append(line + "\n");
+				}
+				logger.log(Level.INFO, output.toString());
+				printMessage(Messages.getString("SUCCESSFULLY_COPIED_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
+			} else {
+				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+				String line = "";
+				while ((line = reader.readLine()) != null) {
+					output.append(line + "\n");
+				}
+				logger.log(Level.SEVERE, output.toString());
+				printMessage(Messages.getString("ERROR_OCCURED_WHILE_COPYING_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
+			}
+
+		} catch (IOException e) {
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (InterruptedException e) {
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		}
+	}
+
 	private void startNode(DatabaseNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
@@ -353,7 +470,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		try {
 
 			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
 
@@ -432,17 +550,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		});
 	}
 
-	private void executeCmdLocal(String command) {
-		StringBuffer output = new StringBuffer();
-		
-		Process p;
-		try {
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-	}
-	
 	@Override
 	public IWizardPage getPreviousPage() {
 		// Do not allow to go back from this page if installation completed
