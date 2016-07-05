@@ -354,7 +354,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		if (!config.isDatabaseCluster()) {
 			dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
 		} else {
-			dbServer.setText(config.getDatabaseClusterAddress() != null ? config.getDatabaseClusterAddress() : "db." + config.getLdapOrgCn());
+			dbServer.setText(config.getDatabaseClusterAddressForLider() != null ? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn());
 		}
 		dbPort.setText("3306");
 		dbDatabase.setText("liderdb");
