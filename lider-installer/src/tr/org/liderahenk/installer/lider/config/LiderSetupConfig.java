@@ -96,6 +96,8 @@ public class LiderSetupConfig {
 	private boolean databaseCluster;
 	
 	private String databaseClusterAddress;
+
+	private String databaseClusterAddressForLider;
 	
 	private String databaseClusterName;
 
@@ -1101,6 +1103,14 @@ public class LiderSetupConfig {
 
 	public void setDatabaseNodeInfoMap(Map<Integer, DatabaseNodeInfoModel> databaseNodeInfoMap) {
 		this.databaseNodeInfoMap = databaseNodeInfoMap;
+	}
+
+	public String getDatabaseClusterAddressForLider() {
+		return databaseClusterAddressForLider;
+	}
+
+	public void setDatabaseClusterAddressForLider(String databaseClusterAddressForLider) {
+		this.databaseClusterAddressForLider = databaseClusterAddressForLider;
 	}
 
 }
