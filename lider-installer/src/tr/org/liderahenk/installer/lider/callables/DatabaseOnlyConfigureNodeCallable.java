@@ -63,7 +63,7 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 			try {
 				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + nodeIp, display);
 
-				manager = new SSHManager(nodeIp, "root", nodeRootPwd, 22, config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + nodeIp, display);
