@@ -27,7 +27,6 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
-import tr.org.pardus.mys.liderahenksetup.utils.FontProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage {
@@ -39,6 +38,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private Button btnAddRemoveNode;
 
 	private Text txtDbRootPwd;
+	private Text txtDbSshPort;
 	private Text txtClusterName;
 	private Text txtSstUsername;
 	private Text txtSstPwd;
@@ -50,7 +50,6 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private Text txtPassphrase;
 
 	private Map<Integer, DatabaseNodeSwtModel> nodeMap = new HashMap<Integer, DatabaseNodeSwtModel>();
-
 
 	public DatabaseClusterConfPage(LiderSetupConfig config) {
 		super(DatabaseClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -86,6 +85,17 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		txtDbRootPwd = GUIHelper.createText(cmpGeneralInfo);
 		txtDbRootPwd.setMessage(Messages.getString("ENTER_PWD_FOR_DB_ROOT_USER"));
 		txtDbRootPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("SSH_PORT"));
+		txtDbSshPort = GUIHelper.createText(cmpGeneralInfo);
+		txtDbSshPort.setText("22");
+		txtDbSshPort.setMessage(Messages.getString("ENTER_PORT_FOR_SSH_CONNECTION"));
+		txtDbSshPort.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				updatePageCompleteStatus();
@@ -158,7 +168,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		GUIHelper.createLabel(cmpPrivateKey, Messages.getString("PASSPHRASE"));
 		txtPassphrase = GUIHelper.createText(cmpPrivateKey);
 		txtPassphrase.setEnabled(false);
-		
+
 		Label lblNodeInfo = GUIHelper.createLabel(cmpMain, Messages.getString("MARIADB_CLUSTER_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
@@ -331,7 +341,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		clusterNode.setTxtNodeRootPwd(txtNodeRootPwd);
 
 		Button btnNodeNewSetup = new Button(grpClusterNode, SWT.CHECK | SWT.BORDER);
-		btnNodeNewSetup.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
+		// btnNodeNewSetup.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		btnNodeNewSetup.setSelection(false);
 		btnNodeNewSetup.setToolTipText(Messages.getString("CHECK_IF_THIS_NODE_IS_ALREADY_INSTALLED"));
 		clusterNode.setBtnNodeNewSetup(btnNodeNewSetup);
@@ -355,16 +365,19 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private void setConfigVariables() {
 
 		config.setDatabaseClusterAddress(createWsrepClusterAddress());
+		config.setDatabaseClusterAddressForLider(createWsrepAddressForLider());
 		config.setDatabaseClusterName(txtClusterName.getText());
 		config.setDatabaseRootPassword(txtDbRootPwd.getText());
 		config.setDatabaseSstUsername(txtSstUsername.getText());
 		config.setDatabaseSstPwd(txtSstPwd.getText());
 		config.setDatabaseNodeMap(nodeMap);
+		config.setDatabasePort(txtDbSshPort.getText() != null ? new Integer(txtDbSshPort.getText()) : null);
+		
 
 		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = createInfoModelMap();
 
 		config.setDatabaseNodeInfoMap(nodeInfoMap);
-		
+
 		if (btnUsePrivateKey.getSelection()) {
 			config.setDatabaseAccessKeyPath(txtPrivateKey.getText());
 			config.setDatabaseAccessPassphrase(txtPassphrase.getText());
@@ -372,7 +385,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 			config.setDatabaseAccessKeyPath(null);
 			config.setDatabaseAccessPassphrase(null);
 		}
-		
+
 	}
 
 	private String createWsrepClusterAddress() {
@@ -394,6 +407,25 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 	}
 
+	private String createWsrepAddressForLider() {
+		
+		String wsrepClusterAddress = "";
+		
+		for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
+				.hasNext();) {
+			Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
+			DatabaseNodeSwtModel clusterNode = entry.getValue();
+			wsrepClusterAddress += clusterNode.getTxtNodeIp().getText() + ":3306,";
+			
+		}
+		
+		// Delete last comma
+		wsrepClusterAddress = wsrepClusterAddress.substring(0, wsrepClusterAddress.length() - 1);
+		
+		return wsrepClusterAddress;
+		
+	}
+
 	private Map<Integer, DatabaseNodeInfoModel> createInfoModelMap() {
 		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = new HashMap<Integer, DatabaseNodeInfoModel>();
 
@@ -404,7 +436,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 			DatabaseNodeInfoModel nodeInfo = new DatabaseNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
-					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(), !nodeSwt.getBtnNodeNewSetup().getSelection());
+					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
+					!nodeSwt.getBtnNodeNewSetup().getSelection());
 
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
@@ -417,7 +450,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		boolean pageComplete = false;
 
 		if (!txtClusterName.getText().isEmpty() && !txtDbRootPwd.getText().isEmpty()
-				&& !txtSstUsername.getText().isEmpty() && !txtSstPwd.getText().isEmpty()) {
+				&& !txtDbSshPort.getText().isEmpty() && !txtSstUsername.getText().isEmpty()
+				&& !txtSstPwd.getText().isEmpty()) {
 			for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
 					.hasNext();) {
 				Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
