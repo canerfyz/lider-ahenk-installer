@@ -274,8 +274,8 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 					txtDatabaseIp.setEnabled(false);
 					txtDatabasePort.setEnabled(false);
 				} else {
-					txtDatabaseIp.setEnabled(false);
-					txtDatabasePort.setEnabled(false);
+					txtDatabaseIp.setEnabled(true);
+					txtDatabasePort.setEnabled(true);
 				}
 			}
 			if (config.isInstallLdap()) {
