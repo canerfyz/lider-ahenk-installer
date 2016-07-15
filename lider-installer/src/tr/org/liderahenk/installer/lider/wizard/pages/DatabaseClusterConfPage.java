@@ -331,7 +331,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
-		txtNodeRootPwd.setMessage("ENTER_ROOT_PWD_OF_THIS_NODE");
+		txtNodeRootPwd.setMessage(Messages.getString("ENTER_ROOT_PWD_OF_THIS_NODE"));
 		txtNodeRootPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
