@@ -93,7 +93,8 @@ public class SSHManager {
 				session.setPassword(password);
 			}
 			session.setConfig(config);
-			session.connect(PropertyReader.propertyInt("session.timeout").intValue());
+			int timeout = PropertyReader.propertyInt("session.timeout").intValue();
+			session.connect(timeout);
 		} catch (JSchException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 			throw new SSHConnectionException(e.getMessage());

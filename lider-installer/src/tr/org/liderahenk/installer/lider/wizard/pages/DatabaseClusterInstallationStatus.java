@@ -1,8 +1,5 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -177,21 +174,16 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 									}
 								}
 							} else {
-								// Send debian.cnf from first node to local
-								copyFileToLocal(firstNode, display);
 
-								// Copy debian.cnf of first node to all other
-								// nodes
+								// Change password parameter in debian.cnf of
+								// all nodes (they must be same)
 								for (Iterator<Entry<Integer, DatabaseNodeInfoModel>> iterator = config
 										.getDatabaseNodeInfoMap().entrySet().iterator(); iterator.hasNext();) {
 
 									Entry<Integer, DatabaseNodeInfoModel> entry = iterator.next();
 									final DatabaseNodeInfoModel clusterNode = entry.getValue();
 
-									if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
-										// Copy debian.cnf from local to nodes
-										configureNodeFromLocal(clusterNode, display);
-									}
+									configureNodeFromLocal(clusterNode, display);
 								}
 							}
 
@@ -363,103 +355,42 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 	}
 
-	private void copyFileToLocal(DatabaseNodeInfoModel firstNode, Display display) throws Exception {
-
-		Process process;
-
-		try {
-
-			printMessage(Messages.getString("COPYING_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to local", display);
-			// Prepare command to execute on local
-			String command = "scp -o StrictHostKeyChecking=no root@{0}:/etc/mysql/debian.cnf /tmp";
-			command = command.replace("{0}", firstNode.getNodeIp());
-			// TODO passphrase
-
-			StringBuffer output = new StringBuffer();
-
-			// Get debian.cnf to local
-			process = Runtime.getRuntime().exec(command);
-			process.waitFor();
-
-			if (process.exitValue() == 0) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line = "";
-				while ((line = reader.readLine()) != null) {
-					output.append(line + "\n");
-				}
-				logger.log(Level.INFO, output.toString());
-				printMessage(Messages.getString("SUCCESSFULLY_COPIED_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to local", display);
-			} else {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				String line = "";
-				while ((line = reader.readLine()) != null) {
-					output.append(line + "\n");
-				}
-				logger.log(Level.SEVERE, output.toString());
-				printMessage(Messages.getString("ERROR_OCCURED_WHILE_COPYING_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp()
-						+ " to local", display);
-			}
-
-		} catch (IOException e) {
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
-			throw new Exception();
-		} catch (InterruptedException e) {
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
-			throw new Exception();
-		}
-
-	}
-
 	private void configureNodeFromLocal(DatabaseNodeInfoModel clusterNode, Display display) throws Exception {
-		
-		Process process;
+
+		SSHManager manager = null;
 
 		try {
 
-			printMessage(Messages.getString("COPYING_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
-			// Prepare command to execute on local
-			String command = "scp -o StrictHostKeyChecking=no /tmp/debian.cnf root@{0}:/etc/mysql/";
-			command = command.replace("{0}", clusterNode.getNodeIp());
-			// TODO passphrase
+			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+			manager.connect();
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
 
-			StringBuffer output = new StringBuffer();
+			printMessage(Messages.getString("MODIFYING_DEBIAN_CNF_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand("sed -i '/password/c\\password = 1' /etc/mysql/debian.cnf", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_DEBIAN_CNF_AT") + " " + clusterNode.getNodeIp(),
+					display);
 
-			// Send debian.cnf to node
-			process = Runtime.getRuntime().exec(command);
-			process.waitFor();
-
-			if (process.exitValue() == 0) {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-				String line = "";
-				while ((line = reader.readLine()) != null) {
-					output.append(line + "\n");
-				}
-				logger.log(Level.INFO, output.toString());
-				printMessage(Messages.getString("SUCCESSFULLY_COPIED_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
-			} else {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-				String line = "";
-				while ((line = reader.readLine()) != null) {
-					output.append(line + "\n");
-				}
-				logger.log(Level.SEVERE, output.toString());
-				printMessage(Messages.getString("ERROR_OCCURED_WHILE_COPYING_DEBIAN_CNF_FROM_LOCAL_TO") + " " + clusterNode.getNodeIp(), display);
+		} catch (SSHConnectionException e) {
+			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} catch (CommandExecutionException e) {
+			printMessage(
+					Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_NODE_AT") + " " + clusterNode.getNodeIp(),
+					display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
 			}
-
-		} catch (IOException e) {
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
-			throw new Exception();
-		} catch (InterruptedException e) {
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
-			throw new Exception();
 		}
 	}
 
