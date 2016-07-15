@@ -70,7 +70,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		cmpGeneralInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		// General parameters' inputs
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("MARIA_CLUSTER_NAME"));
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("MARIADB_CLUSTER_NAME"));
 		txtClusterName = GUIHelper.createText(cmpGeneralInfo);
 		txtClusterName.setText("MariaDB_Cluster");
 		txtClusterName.setMessage(Messages.getString("ENTER_NAME_FOR_CLUSTER"));
