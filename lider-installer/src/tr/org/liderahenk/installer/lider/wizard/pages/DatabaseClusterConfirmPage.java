@@ -34,7 +34,7 @@ public class DatabaseClusterConfirmPage extends WizardPage implements IDatabaseP
 		lblIp = GUIHelper.createLabel(container, "localhost");
 		lblIp.setLayoutData(gd);
 
-		GUIHelper.createLabel(container, "- " + Messages.getString("USE_SPECIAL_REPOSITORY"));
+		GUIHelper.createLabel(container, "- " + Messages.getString("USE_DEFAULT_REPOSITORY"));
 
 		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_CLUSTER_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
