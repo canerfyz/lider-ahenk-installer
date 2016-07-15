@@ -131,7 +131,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				logger.log(Level.INFO, "Successfully done prerequiste part at: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUSITES_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUISITES_AT") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
@@ -182,9 +182,9 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			// Start mysql service
 			// Execute mysql commands(first normal server commands)
 			try {
-				printMessage(Messages.getString("STARTING_MYSQL_SERVER_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("STARTING_MYSQL_SERVICE_AT") + " " + nodeIp, display);
 				manager.execCommand("service mysql start", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_STARTED_MYSQL_SERVER_AT") + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_STARTED_MYSQL_SERVICE_AT") + nodeIp, display);
 
 				printMessage(Messages.getString("EXECUTING_MYSQL_COMMANDS_AT") + nodeIp, display);
 				manager.execCommand(
