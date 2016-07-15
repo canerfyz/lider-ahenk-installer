@@ -98,7 +98,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			// Create future list that will keep the results of callables.
 			final List<Future<Boolean>> resultList = new ArrayList<Future<Boolean>>();
 
-			printMessage("Initializing installation...", display);
+			printMessage(Messages.getString("INITIALIZING_INSTALLATION"), display);
 
 			// Create a main runnable and execute installations as new runnables
 			// under this one. Because at the end of installation I have to wait
