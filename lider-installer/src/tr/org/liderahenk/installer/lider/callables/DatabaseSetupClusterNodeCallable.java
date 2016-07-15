@@ -201,7 +201,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 						new Object[] { config.getDatabaseRootPassword(), config.getDatabaseSstUsername() });
 				manager.execCommand("mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"",
 						new Object[] { config.getDatabaseRootPassword() });
-				printMessage(Messages.getString("CREATING_DATABASE"), display);
+				printMessage(Messages.getString("CREATING_DATABASE_AT") + " " + nodeIp, display);
 				manager.execCommand(
 						"mysql -uroot -p{0} -e \"CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci\"",
 						new Object[] { config.getDatabaseRootPassword() });
