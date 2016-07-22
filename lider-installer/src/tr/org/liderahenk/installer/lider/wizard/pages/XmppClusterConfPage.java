@@ -5,14 +5,17 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -24,8 +27,9 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
-import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
+import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeSwtModel;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 public class XmppClusterConfPage extends WizardPage implements IXmppPage {
@@ -42,19 +46,29 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 	private FileDialog dialog;
 	private String selectedFile;
 	private Text txtPassphrase;
-	
+
 	private Text txtServiceName;
 	private Text txtXmppPort;
 	private Text txtLdapServer;
 	private Text txtLdapRootDn;
-	private Text txtLdapRootPassword;
+	private Text txtLdapRootPwd;
 	private Text txtLdapBaseDn;
-	
+	private Text txtAdminPwd;
+	private Text txtLiderUsername;
+	private Text txtLiderUserPwd;
+
 	private Text txtProxyAddress;
 	private Text txtProxyPwd;
-	private Text txtProxyName;
-	
+
 	private Map<Integer, XmppNodeSwtModel> nodeMap = new HashMap<Integer, XmppNodeSwtModel>();
+
+	private Composite innerContainer;
+
+	private final static String CLUSTER_CLIENTS = "server  server1 #NODE_IP:5222 check fall 3 id 1005 inter 5000 rise 3 slowstart 120000 weight 50";
+	private final static String CLUSTER_CLIENTS_SSL = "server  server1 #NODE_IP:5223 check fall 3 id 1008 inter 5000 rise 3 slowstart 240000 weight 50";
+	private final static String CLUSTER_SERVERS = "server  server1 #CLUSTER_SERVER:5269 check fall 3 id 1011 inter 5000 rise 3 slowstart 60000 weight 50";
+	
+	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 
 	public XmppClusterConfPage(LiderSetupConfig config) {
 		super(XmppClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -62,16 +76,27 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		this.config = config;
 	}
 
+	
 	@Override
 	public void createControl(Composite parent) {
-		
+
 		cmpMain = GUIHelper.createComposite(parent, 1);
 		setControl(cmpMain);
 
-		Label lblGeneralInfo = GUIHelper.createLabel(cmpMain, Messages.getString("XMPP_CLUSTER_GENERAL_INFO"));
+		GUIHelper.createLabel(cmpMain, "");
+
+		cmpMain = new ScrolledComposite(cmpMain, SWT.V_SCROLL);
+		cmpMain.setLayout(new GridLayout(1, false));
+		cmpMain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		innerContainer = new Composite(cmpMain, SWT.NONE);
+		innerContainer.setLayout(new GridLayout(1, false));
+		innerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		Label lblGeneralInfo = GUIHelper.createLabel(innerContainer, Messages.getString("XMPP_CLUSTER_GENERAL_INFO"));
 		lblGeneralInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
-		Composite cmpGeneralInfo = GUIHelper.createComposite(cmpMain, 2);
+		Composite cmpGeneralInfo = GUIHelper.createComposite(innerContainer, 2);
 		cmpGeneralInfo.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		// General parameters' inputs
@@ -106,7 +131,6 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			}
 		});
 
-
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LDAP_ROOT_DN"));
 		txtLdapRootDn = GUIHelper.createText(cmpGeneralInfo);
 		txtLdapRootDn.setMessage(Messages.getString("ENTER_ROOT_DN_OF_LDAP"));
@@ -118,9 +142,9 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		});
 
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LDAP_ROOT_PWD"));
-		txtLdapRootPassword = GUIHelper.createText(cmpGeneralInfo);
-		txtLdapRootPassword.setMessage(Messages.getString("ENTER_LDAP_ROOT_PWD"));
-		txtLdapRootPassword.addModifyListener(new ModifyListener() {
+		txtLdapRootPwd = GUIHelper.createText(cmpGeneralInfo);
+		txtLdapRootPwd.setMessage(Messages.getString("ENTER_LDAP_ROOT_PWD"));
+		txtLdapRootPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				updatePageCompleteStatus();
@@ -137,20 +161,40 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			}
 		});
 
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("HAPROXY_ADDRESS"));
-		txtProxyAddress = GUIHelper.createText(cmpGeneralInfo);
-		txtProxyAddress.setMessage(Messages.getString("ENTER_IP_ADDRESS_OF_HAPROXY"));
-		txtProxyAddress.addModifyListener(new ModifyListener() {
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("EJABBERD_ADMIN_PWD"));
+		txtAdminPwd = GUIHelper.createText(cmpGeneralInfo);
+		txtAdminPwd.setMessage(Messages.getString("ENTER_PWD_FOR_EJABBERD_ADMIN"));
+		txtAdminPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				updatePageCompleteStatus();
 			}
 		});
 
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("HAPROXY_NAME"));
-		txtProxyName = GUIHelper.createText(cmpGeneralInfo);
-		txtProxyName.setMessage(Messages.getString("ENTER_NAME_FOR_HA_PROXY"));
-		txtProxyName.addModifyListener(new ModifyListener() {
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LIDER_SERVER_USERNAME"));
+		txtLiderUsername = GUIHelper.createText(cmpGeneralInfo);
+		txtLiderUsername.setMessage(Messages.getString("ENTER_USERNAME_FOR_LIDER_SERVER"));
+		txtLiderUsername.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LIDER_SERVER_USER_PWD"));
+		txtLiderUserPwd = GUIHelper.createText(cmpGeneralInfo);
+		txtLiderUserPwd.setMessage(Messages.getString("ENTER_PWD_FOR_LIDER_SERVER_USER"));
+		txtLiderUserPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("HAPROXY_ADDRESS"));
+		txtProxyAddress = GUIHelper.createText(cmpGeneralInfo);
+		txtProxyAddress.setMessage(Messages.getString("ENTER_IP_ADDRESS_OF_HAPROXY"));
+		txtProxyAddress.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
 				updatePageCompleteStatus();
@@ -167,11 +211,11 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			}
 		});
 
-		Composite cmpPrivateKey = GUIHelper.createComposite(cmpMain, 3);
+		Composite cmpPrivateKey = GUIHelper.createComposite(innerContainer, 3);
 		cmpPrivateKey.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, false));
 
 		// Create a dialog window.
-		dialog = new FileDialog(cmpMain.getShell(), SWT.SAVE);
+		dialog = new FileDialog(innerContainer.getShell(), SWT.SAVE);
 		dialog.setText(Messages.getString("UPLOAD_KEY"));
 
 		btnUsePrivateKey = GUIHelper.createButton(cmpPrivateKey, SWT.CHECK | SWT.BORDER,
@@ -213,11 +257,11 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		txtPassphrase = GUIHelper.createText(cmpPrivateKey);
 		txtPassphrase.setEnabled(false);
 
-		Label lblNodeInfo = GUIHelper.createLabel(cmpMain, Messages.getString("XMPP_CLUSTER_NODE_INFO"));
+		Label lblNodeInfo = GUIHelper.createLabel(innerContainer, Messages.getString("XMPP_CLUSTER_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
 		// Labels for headers
-		Composite cmpLabels = GUIHelper.createComposite(cmpMain, 4);
+		Composite cmpLabels = GUIHelper.createComposite(innerContainer, 4);
 		cmpLabels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 		GridData gdLabels = new GridData();
 		gdLabels.widthHint = 205;
@@ -230,7 +274,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_EXISTS"));
 		lblNodeNewSetup.setLayoutData(gdLabels);
 
-		Composite cmpNodeList = GUIHelper.createComposite(cmpMain, 2);
+		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// Add at least 2 nodes
@@ -253,26 +297,29 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		});
 
 		setPageComplete(false);
+
+		((ScrolledComposite) cmpMain).setContent(innerContainer);
+		innerContainer.setSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		((ScrolledComposite) cmpMain).setExpandVertical(true);
+		((ScrolledComposite) cmpMain).setExpandHorizontal(true);
+		((ScrolledComposite) cmpMain).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 	}
-	
+
 	private void updatePageCompleteStatus() {
 
 		boolean pageComplete = false;
-		
+
 		if (!txtServiceName.getText().isEmpty() && !txtXmppPort.getText().isEmpty()
 				&& !txtLdapServer.getText().isEmpty() && !txtLdapRootDn.getText().isEmpty()
-				&& !txtLdapRootPassword.getText().isEmpty()
-				&& !txtLdapBaseDn.getText().isEmpty()
-				&& !txtProxyAddress.getText().isEmpty()
-				&& !txtProxyName.getText().isEmpty()
-				&& !txtLdapRootPassword.getText().isEmpty()) {
-			
+				&& !txtLdapRootPwd.getText().isEmpty() && !txtLdapBaseDn.getText().isEmpty()
+				&& !txtProxyAddress.getText().isEmpty() && !txtLdapRootPwd.getText().isEmpty()) {
+
 			if (!btnUsePrivateKey.getSelection() && !txtProxyPwd.getText().isEmpty()) {
 				for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
 						.hasNext();) {
 					Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
 					XmppNodeSwtModel node = entry.getValue();
-					
+
 					if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()) {
 						if (btnUsePrivateKey.getSelection()) {
 							if (!txtPrivateKey.getText().isEmpty()) {
@@ -303,7 +350,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			setPageComplete(false);
 		}
 	}
-	
+
 	private void organizePasswordFields() {
 		if (btnUsePrivateKey.getSelection()) {
 			txtPrivateKey.setEnabled(true);
@@ -315,8 +362,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			txtPassphrase.setEnabled(false);
 		}
 
-		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
-				.hasNext();) {
+		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator.hasNext();) {
 			Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
 			XmppNodeSwtModel node = entry.getValue();
 			if (btnUsePrivateKey.getSelection()) {
@@ -326,7 +372,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			}
 		}
 	}
-	
+
 	/**
 	 * This method opens a dialog when triggered, and sets the private key text
 	 * field.
@@ -337,7 +383,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			txtPrivateKey.setText(selectedFile);
 		}
 	}
-	
+
 	private void createNewNode(Composite cmpNodeList) {
 		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 6);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -393,7 +439,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 		nodeMap.put(nodeNumber, clusterNode);
 	}
-	
+
 	private void handleAddButtonClick(SelectionEvent event) {
 		Composite parent = (Composite) ((Button) event.getSource()).getParent();
 		createNewNode(parent);
@@ -414,9 +460,12 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 		redraw();
 
+		innerContainer.setSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		((ScrolledComposite) cmpMain).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
 		updatePageCompleteStatus();
 	}
-	
+
 	private void handleRemoveButtonClick(SelectionEvent event) {
 		Button btnThis = (Button) event.getSource();
 		Composite parent = btnThis.getParent();
@@ -437,11 +486,96 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			}
 		}
 
+		innerContainer.setSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+		((ScrolledComposite) cmpMain).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+
 		updatePageCompleteStatus();
 	}
-	
+
 	private void redraw() {
 		cmpMain.redraw();
 		cmpMain.layout(true, true);
 	}
+
+	@Override
+	public IWizardPage getNextPage() {
+		
+		setConfigVariables();
+		
+		return super.getNextPage();
+	}
+
+	private void setConfigVariables() {
+
+		config.setXmppHostname(txtServiceName.getText());
+		config.setXmppPort(!txtXmppPort.getText().isEmpty() ? new Integer(txtXmppPort.getText()): null);
+		config.setXmppLdapServerAddress(txtLdapServer.getText());
+		config.setXmppLdapRootDn(txtLdapRootDn.getText());
+		config.setXmppLdapRootPwd(txtLdapRootPwd.getText());
+		config.setXmppLdapBaseDn(txtLdapBaseDn.getText());
+		config.setXmppProxyAddress(txtProxyAddress.getText());
+		config.setXmppAdminPwd(txtAdminPwd.getText());
+		config.setXmppLiderUsername(txtLiderUsername.getText());
+		config.setXmppLiderPassword(txtLiderUserPwd.getText());
+		config.setXmppNodeInfoMap(createInfoModelMap());
+
+		if (btnUsePrivateKey.getSelection()) {
+			config.setXmppAccessKeyPath(txtPrivateKey.getText());
+			config.setXmppAccessPassphrase(txtPassphrase.getText());
+			config.setXmppProxyPwd(null);
+		} else {
+			config.setXmppAccessKeyPath(null);
+			config.setXmppAccessPassphrase(null);
+			config.setXmppProxyPwd(txtProxyPwd.getText());
+		}
+
+	}
+
+	private Map<Integer, XmppNodeInfoModel> createInfoModelMap() {
+		Map<Integer, XmppNodeInfoModel> nodeInfoMap = new HashMap<Integer, XmppNodeInfoModel>();
+
+		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
+				.hasNext();) {
+			Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
+			XmppNodeSwtModel nodeSwt = entry.getValue();
+
+			XmppNodeInfoModel nodeInfo = new XmppNodeInfoModel(nodeSwt.getNodeNumber(),
+					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
+					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
+					!nodeSwt.getBtnNodeNewSetup().getSelection());
+
+			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
+		}
+
+		return nodeInfoMap;
+	}
+	
+	private void setInputValues() {
+		txtServiceName.setText("im." + config.getLdapOrgCn());
+		txtLdapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
+		if (config.isLdapUpdate()) {
+			txtLdapRootDn.setText(config.getLdapAdminDn());
+		} else {
+			txtLdapRootDn.setText(
+					config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
+							: "cn=admin," + config.getLdapBaseDn());
+		}
+		txtLdapRootPwd.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
+		txtLdapBaseDn.setText(config.getLdapBaseDn());
+		txtLiderUsername.setText("lider_sunucu");
+		txtProxyAddress.setText("proxy." + config.getLdapOrgCn());
+	}
+
+
+	@Override
+	public IWizardPage getPreviousPage() {
+		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
+			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
+			setInputValues();
+		}
+		
+		return super.getPreviousPage();
+	}
+
+	
 }
