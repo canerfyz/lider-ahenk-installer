@@ -370,7 +370,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		config.setDatabaseRootPassword(txtDbRootPwd.getText());
 		config.setDatabaseSstUsername(txtSstUsername.getText());
 		config.setDatabaseSstPwd(txtSstPwd.getText());
-		config.setDatabaseNodeMap(nodeMap);
+//		config.setDatabaseNodeMap(nodeMap);
 		config.setDatabasePort(txtDbSshPort.getText() != null ? new Integer(txtDbSshPort.getText()) : null);
 		
 
