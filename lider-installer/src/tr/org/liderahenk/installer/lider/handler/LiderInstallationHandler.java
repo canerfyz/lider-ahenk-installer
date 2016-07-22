@@ -21,7 +21,7 @@ public class LiderInstallationHandler {
 
 		if (versionDialog.isContinueInstallation()) {
 			WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(Display.getCurrent().getActiveShell(),
-					new LiderSetupWizard(), new Point(800, 600));
+					new LiderSetupWizard(), new Point(1000, 600));
 			wizardDialog.open();
 		}
 	}
