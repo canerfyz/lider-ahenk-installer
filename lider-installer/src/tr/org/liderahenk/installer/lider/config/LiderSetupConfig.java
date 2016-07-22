@@ -4,6 +4,7 @@ import java.util.Map;
 
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
+import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
@@ -318,6 +319,15 @@ public class LiderSetupConfig {
 	 */
 	private String xmppAbsPathConfFile;
 
+	private Map<Integer, XmppNodeInfoModel> xmppNodeInfoMap;
+
+	private String xmppLdapServerAddress;
+	private String xmppLdapRootDn;
+	private String xmppLdapRootPwd;
+	private String xmppLdapBaseDn;
+	private String xmppProxyAddress;
+	private String xmppProxyPwd;
+	
 	/**
 	 * ###################################
 	 * 
@@ -1111,6 +1121,62 @@ public class LiderSetupConfig {
 
 	public void setDatabaseClusterAddressForLider(String databaseClusterAddressForLider) {
 		this.databaseClusterAddressForLider = databaseClusterAddressForLider;
+	}
+
+	public Map<Integer, XmppNodeInfoModel> getXmppNodeInfoMap() {
+		return xmppNodeInfoMap;
+	}
+
+	public void setXmppNodeInfoMap(Map<Integer, XmppNodeInfoModel> xmppNodeInfoMap) {
+		this.xmppNodeInfoMap = xmppNodeInfoMap;
+	}
+
+	public String getXmppLdapRootDn() {
+		return xmppLdapRootDn;
+	}
+
+	public void setXmppLdapRootDn(String xmppLdapRootDn) {
+		this.xmppLdapRootDn = xmppLdapRootDn;
+	}
+
+	public String getXmppLdapRootPwd() {
+		return xmppLdapRootPwd;
+	}
+
+	public void setXmppLdapRootPwd(String xmppLdapRootPwd) {
+		this.xmppLdapRootPwd = xmppLdapRootPwd;
+	}
+
+	public String getXmppLdapBaseDn() {
+		return xmppLdapBaseDn;
+	}
+
+	public void setXmppLdapBaseDn(String xmppLdapBaseDn) {
+		this.xmppLdapBaseDn = xmppLdapBaseDn;
+	}
+
+	public String getXmppProxyAddress() {
+		return xmppProxyAddress;
+	}
+
+	public void setXmppProxyAddress(String xmppProxyAddress) {
+		this.xmppProxyAddress = xmppProxyAddress;
+	}
+
+	public String getXmppProxyPwd() {
+		return xmppProxyPwd;
+	}
+
+	public void setXmppProxyPwd(String xmppProxyPwd) {
+		this.xmppProxyPwd = xmppProxyPwd;
+	}
+
+	public String getXmppLdapServerAddress() {
+		return xmppLdapServerAddress;
+	}
+
+	public void setXmppLdapServerAddress(String xmppLdapServerAddress) {
+		this.xmppLdapServerAddress = xmppLdapServerAddress;
 	}
 
 }
