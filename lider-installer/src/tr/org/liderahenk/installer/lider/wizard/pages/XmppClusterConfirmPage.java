@@ -19,7 +19,7 @@ public class XmppClusterConfirmPage extends WizardPage implements IXmppPage {
 
 	public XmppClusterConfirmPage(LiderSetupConfig config) {
 		super(XmppClusterConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("2.3 " + Messages.getString("MARIA_DB_CLUSTER_CONFIRM"));
+		setDescription("4.3 " + Messages.getString("EJABBERD_CLUSTER_CONFIRM"));
 		this.config = config;
 	}
 
@@ -37,7 +37,7 @@ public class XmppClusterConfirmPage extends WizardPage implements IXmppPage {
 
 		GUIHelper.createLabel(container, "- " + Messages.getString("USE_DEFAULT_REPOSITORY"));
 
-		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_CLUSTER_WILL_BE_INSTALLED") + " "
+		GUIHelper.createLabel(container, Messages.getString("EJABBERD_CLUSTER_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 
