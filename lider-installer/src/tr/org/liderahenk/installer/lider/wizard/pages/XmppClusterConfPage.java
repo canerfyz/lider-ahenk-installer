@@ -64,10 +64,6 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 	private Composite innerContainer;
 
-	private final static String CLUSTER_CLIENTS = "server  server1 #NODE_IP:5222 check fall 3 id 1005 inter 5000 rise 3 slowstart 120000 weight 50";
-	private final static String CLUSTER_CLIENTS_SSL = "server  server1 #NODE_IP:5223 check fall 3 id 1008 inter 5000 rise 3 slowstart 240000 weight 50";
-	private final static String CLUSTER_SERVERS = "server  server1 #CLUSTER_SERVER:5269 check fall 3 id 1011 inter 5000 rise 3 slowstart 60000 weight 50";
-	
 	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 
 	public XmppClusterConfPage(LiderSetupConfig config) {
