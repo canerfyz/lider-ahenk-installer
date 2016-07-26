@@ -39,6 +39,8 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LiderLocationOfComponentsP
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderOrganizationPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppClusterConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppClusterInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallMethodPage;
@@ -86,6 +88,8 @@ public class LiderSetupWizard extends Wizard {
 	LdapInstallationStatus ldapStatus = new LdapInstallationStatus(config);
 
 	XmppClusterConfPage xmppClusterConf = new XmppClusterConfPage(config);
+	XmppClusterConfirmPage xmppClusterConfirm = new XmppClusterConfirmPage(config);
+	XmppClusterInstallationStatus xmppClusterStatus = new XmppClusterInstallationStatus(config);
 	XmppAccessPage xmppAccess = new XmppAccessPage(config);
 	XmppInstallMethodPage xmppInstallMethod = new XmppInstallMethodPage(config);
 	XmppConfPage xmppConfPage = new XmppConfPage(config);
@@ -125,6 +129,8 @@ public class LiderSetupWizard extends Wizard {
 		addPage(ldapStatus);
 		// XMPP configuration
 		addPage(xmppClusterConf);
+		addPage(xmppClusterConfirm);
+		addPage(xmppClusterStatus);
 		addPage(xmppAccess);
 		addPage(xmppInstallMethod);
 		addPage(xmppConfPage);
