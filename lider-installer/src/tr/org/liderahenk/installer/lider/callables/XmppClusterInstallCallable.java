@@ -123,7 +123,7 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 			// Install Ejabberd package
 			try {
 				printMessage(Messages.getString("INSTALLING_EJABBERD_TO") + " " + nodeIp, display);
-				manager.execCommand("gdebi /tmp/ejabberd_16.06-0_amd64.deb", new Object[] {});
+				manager.execCommand("gdebi -n /tmp/ejabberd_16.06-0_amd64.deb", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_EJABBERD_TO") + " " + nodeIp, display);
 				logger.log(Level.INFO, "Successfully installed Ejabberd at: {0}", new Object[] { nodeIp });
 
@@ -210,20 +210,20 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 			}
 
 			// Create admin user with post install script of Ejabberd
-			try {
-				printMessage(Messages.getString("CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
-				manager.execCommand("/opt/ejabberd-16.06/bin/postinstall.sh admin {0} {1}",
-						new Object[] { config.getXmppHostname(), config.getXmppAdminPwd() });
-				printMessage(Messages.getString("SUCCESSFULLY_CREATED_ADMIN_USER_AT") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully created admin user at: {0}", new Object[] { nodeIp });
-
-			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
-				throw new Exception();
-			}
+//			try {
+//				printMessage(Messages.getString("CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
+//				manager.execCommand("/opt/ejabberd-16.06/bin/postinstall.sh admin {0} {1}",
+//						new Object[] { config.getXmppHostname(), config.getXmppAdminPwd() });
+//				printMessage(Messages.getString("SUCCESSFULLY_CREATED_ADMIN_USER_AT") + " " + nodeIp, display);
+//				logger.log(Level.INFO, "Successfully created admin user at: {0}", new Object[] { nodeIp });
+//
+//			} catch (CommandExecutionException e) {
+//				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
+//				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+//				logger.log(Level.SEVERE, e.getMessage());
+//				e.printStackTrace();
+//				throw new Exception();
+//			}
 
 			printMessage(Messages.getString("INSTALLATION_COMPLETED_SUCCESSFULLY_AT") + " " + nodeIp, display);
 			successfullSetup = true;
