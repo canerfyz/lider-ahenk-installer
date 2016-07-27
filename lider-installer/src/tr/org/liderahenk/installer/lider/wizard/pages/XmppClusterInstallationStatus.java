@@ -371,6 +371,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					"admin", config.getXmppHostname(), config.getXmppAdminPwd() });
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_ADMIN_USER_AT") + " " + firstNode.getNodeIp(),
 					display);
+			
 
 			printMessage(Messages.getString("REGISTERING_USER") + " " + config.getXmppLiderUsername() + " at "
 					+ firstNode.getNodeIp(), display);
@@ -379,6 +380,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_USER") + " " + config.getXmppLiderUsername()
 					+ " at " + firstNode.getNodeIp(), display);
 
+			// TODO Restart ejabberd
+			
 			logger.log(Level.INFO, "Successfully registered users at {0}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
@@ -390,7 +393,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-			throw new Exception();
+//			throw new Exception();
 		}
 
 	}
@@ -448,7 +451,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("SENDING_HAPROXY_CONFIG_FILE_TO") + " " + xmppProxyAddress, display);
-			manager.copyFileToRemote(haproxyCfgFile, "/etc/haproxy", false);
+			manager.copyFileToRemote(haproxyCfgFile, "/etc/haproxy/", false);
 			printMessage(Messages.getString("SUCCESSFULLY_SENT_HAPROXY_CONFIG_FILE_TO") + " " + xmppProxyAddress,
 					display);
 			logger.log(Level.INFO, "Successfully sent haproxy.cfg to {0}", new Object[] {});
@@ -491,9 +494,9 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		Map<String, String> propertyMap = new HashMap<String, String>();
 
-		String clusterClients = null;
-		String clusterClientsSsl = null;
-		String clusterServers = null;
+		String clusterClients = "";
+		String clusterClientsSsl = "";
+		String clusterServers = "";
 
 		for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap().entrySet()
 				.iterator(); iterator.hasNext();) {
@@ -503,15 +506,15 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 			clusterClients += CLUSTER_CLIENTS.replace("#NODE_IP", clusterNode.getNodeIp()).replace("#CLIENT_ID",
 					clientId.toString());
-			clusterClients += "\n\t\t";
+			clusterClients += "\n\t";
 			++clientId;
 			clusterClientsSsl += CLUSTER_CLIENTS_SSL.replace("#NODE_IP", clusterNode.getNodeIp())
 					.replace("#CLIENT_SSL_ID", clientSslId.toString());
-			clusterClientsSsl += "\n\t\t";
+			clusterClientsSsl += "\n\t";
 			++clientSslId;
 			clusterServers += CLUSTER_SERVERS.replace("#NODE_IP", clusterNode.getNodeIp()).replace("#SERVER_ID",
 					serverId.toString());
-			clusterServers += "\n\t\t";
+			clusterServers += "\n\t";
 			++serverId;
 		}
 
@@ -567,6 +570,10 @@ public class XmppClusterInstallationStatus extends WizardPage
 			manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl restart", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_EJABBERD_AT") + " " + clusterNode.getNodeIp(),
 					display);
+
+			printMessage(Messages.getString("WAITING_FOR_RESTARTING_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+			Thread.sleep(15000);
+			
 			logger.log(Level.INFO, "Successfully restarted Ejabberd at {0}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
