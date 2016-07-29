@@ -68,6 +68,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create everyone {1} \"everyone\" this_is_everyone everyone";
 	private static final String EJABBERD_SRG_ADD_ALL = "{0}ejabberdctl srg-user-add @all@ {1} everyone {2}";
 	private static final String EJABBERD_REGISTER = "{0}ejabberdctl register {1} {2} {3}";
+	
+	private static final String SCP_FROM_LOCAL = "scp -o StrictHostKeyChecking=no root@{0}:{1}.erlang.cookie /tmp";
 
 	private static final Logger logger = Logger.getLogger(XmppClusterInstallationStatus.class.getName());
 
@@ -181,10 +183,11 @@ public class XmppClusterInstallationStatus extends WizardPage
 							// Get first node
 							XmppNodeInfoModel firstNode = config.getXmppNodeInfoMap().get(1);
 
-							// Install sshpass to first node
-							installSshPass(firstNode, display);
 
 							if (config.getXmppAccessKeyPath() == null) {
+								// Install sshpass to first node
+								installSshPass(firstNode, display);
+
 								for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
 										.entrySet().iterator(); iterator.hasNext();) {
 
@@ -199,6 +202,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 								}
 							} else {
 
+								pullErlangCookie(firstNode.getNodeIp(), display);
+								
 								for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
 										.entrySet().iterator(); iterator.hasNext();) {
 
@@ -324,6 +329,18 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 	}
 
+	private void pullErlangCookie(String firstNodeIp, Display display) {
+		String scpCmd;
+		try {
+			printMessage(Messages.getString("COPYING_ERLANG_COOKIE_FROM") + " " + firstNodeIp + " to local", display);
+			scpCmd = SCP_FROM_LOCAL.replace("{0}", firstNodeIp).replace("{1}", PropertyReader.property("xmpp.cluster.path"));
+			Runtime.getRuntime().exec(scpCmd);
+			printMessage(Messages.getString("SUCCESSFULLY_COPYIED_ERLANG_COOKIE_FROM") + " " + firstNodeIp + " to local", display);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void createSrgAndUsers(XmppNodeInfoModel firstNode, Display display) throws Exception {
 
 		SSHManager manager = null;
@@ -393,7 +410,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-//			throw new Exception();
+			throw new Exception();
 		}
 
 	}
