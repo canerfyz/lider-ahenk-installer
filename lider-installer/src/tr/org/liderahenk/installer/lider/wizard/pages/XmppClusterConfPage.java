@@ -72,7 +72,6 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		this.config = config;
 	}
 
-	
 	@Override
 	public void createControl(Composite parent) {
 
@@ -308,37 +307,34 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		if (!txtServiceName.getText().isEmpty() && !txtXmppPort.getText().isEmpty()
 				&& !txtLdapServer.getText().isEmpty() && !txtLdapRootDn.getText().isEmpty()
 				&& !txtLdapRootPwd.getText().isEmpty() && !txtLdapBaseDn.getText().isEmpty()
-				&& !txtProxyAddress.getText().isEmpty() && !txtLdapRootPwd.getText().isEmpty()) {
+				&& !txtProxyAddress.getText().isEmpty() && !txtLdapRootPwd.getText().isEmpty()
+				&& (btnUsePrivateKey.getSelection() ? true : !txtProxyPwd.getText().isEmpty())) {
 
-			if (!btnUsePrivateKey.getSelection() && !txtProxyPwd.getText().isEmpty()) {
-				for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
-						.hasNext();) {
-					Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
-					XmppNodeSwtModel node = entry.getValue();
+			for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
+					.hasNext();) {
+				Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
+				XmppNodeSwtModel node = entry.getValue();
 
-					if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()) {
-						if (btnUsePrivateKey.getSelection()) {
-							if (!txtPrivateKey.getText().isEmpty()) {
-								pageComplete = true;
-							} else {
-								pageComplete = false;
-								break;
-							}
+				if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()) {
+					if (btnUsePrivateKey.getSelection()) {
+						if (!txtPrivateKey.getText().isEmpty()) {
+							pageComplete = true;
 						} else {
-							if (!node.getTxtNodeRootPwd().getText().isEmpty()) {
-								pageComplete = true;
-							} else {
-								pageComplete = false;
-								break;
-							}
+							pageComplete = false;
+							break;
 						}
 					} else {
-						pageComplete = false;
-						break;
+						if (!node.getTxtNodeRootPwd().getText().isEmpty()) {
+							pageComplete = true;
+						} else {
+							pageComplete = false;
+							break;
+						}
 					}
+				} else {
+					pageComplete = false;
+					break;
 				}
-			} else {
-				setPageComplete(false);
 			}
 
 			setPageComplete(pageComplete);
@@ -352,10 +348,12 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 			txtPrivateKey.setEnabled(true);
 			btnUploadKey.setEnabled(true);
 			txtPassphrase.setEnabled(true);
+			txtProxyPwd.setEnabled(false);
 		} else {
 			txtPrivateKey.setEnabled(false);
 			btnUploadKey.setEnabled(false);
 			txtPassphrase.setEnabled(false);
+			txtProxyPwd.setEnabled(true);
 		}
 
 		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator.hasNext();) {
@@ -495,16 +493,16 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-		
+
 		setConfigVariables();
-		
+
 		return super.getNextPage();
 	}
 
 	private void setConfigVariables() {
 
 		config.setXmppHostname(txtServiceName.getText());
-		config.setXmppPort(!txtXmppPort.getText().isEmpty() ? new Integer(txtXmppPort.getText()): null);
+		config.setXmppPort(!txtXmppPort.getText().isEmpty() ? new Integer(txtXmppPort.getText()) : null);
 		config.setXmppLdapServerAddress(txtLdapServer.getText());
 		config.setXmppLdapRootDn(txtLdapRootDn.getText());
 		config.setXmppLdapRootPwd(txtLdapRootPwd.getText());
@@ -530,8 +528,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 	private Map<Integer, XmppNodeInfoModel> createInfoModelMap() {
 		Map<Integer, XmppNodeInfoModel> nodeInfoMap = new HashMap<Integer, XmppNodeInfoModel>();
 
-		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
-				.hasNext();) {
+		for (Iterator<Entry<Integer, XmppNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator.hasNext();) {
 			Entry<Integer, XmppNodeSwtModel> entry = iterator.next();
 			XmppNodeSwtModel nodeSwt = entry.getValue();
 
@@ -545,7 +542,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 		return nodeInfoMap;
 	}
-	
+
 	private void setInputValues() {
 		txtServiceName.setText("im." + config.getLdapOrgCn());
 		txtLdapServer.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
@@ -562,16 +559,14 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		txtProxyAddress.setText("proxy." + config.getLdapOrgCn());
 	}
 
-
 	@Override
 	public IWizardPage getPreviousPage() {
 		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
 			setInputValues();
 		}
-		
+
 		return super.getPreviousPage();
 	}
 
-	
 }
