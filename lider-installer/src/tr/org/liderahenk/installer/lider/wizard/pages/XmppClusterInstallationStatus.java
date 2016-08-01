@@ -68,11 +68,14 @@ public class XmppClusterInstallationStatus extends WizardPage
 	private static final String EJABBERD_SRG_CREATE = "{0}ejabberdctl srg-create everyone {1} \"everyone\" this_is_everyone everyone";
 	private static final String EJABBERD_SRG_ADD_ALL = "{0}ejabberdctl srg-user-add @all@ {1} everyone {2}";
 	private static final String EJABBERD_REGISTER = "{0}ejabberdctl register {1} {2} {3}";
-	
-	private static final String SCP_FROM_LOCAL = "scp -o StrictHostKeyChecking=no root@{0}:{1}.erlang.cookie /tmp";
+
+	private String erlangCookie = null;
 
 	private static final Logger logger = Logger.getLogger(XmppClusterInstallationStatus.class.getName());
 
+	private List<XmppNodeInfoModel> installedNodeList;
+	private List<XmppNodeInfoModel> newNodeList;
+	
 	public XmppClusterInstallationStatus(LiderSetupConfig config) {
 		super(XmppClusterInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("4.4 " + Messages.getString("XMPP_CLUSTER_INSTALLATION"));
@@ -131,25 +134,50 @@ public class XmppClusterInstallationStatus extends WizardPage
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
-					for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap().entrySet()
-							.iterator(); iterator.hasNext();) {
 
-						Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
-						final XmppNodeInfoModel clusterNode = entry.getValue();
+					// A node that will be the first to start in cluster
+					XmppNodeInfoModel firstNode = null;
 
-						if (clusterNode.isNodeNewSetup()) {
-							Callable<Boolean> callable = new XmppClusterInstallCallable(clusterNode.getNodeIp(),
-									clusterNode.getNodeRootPwd(), clusterNode.getNodeName(), display, config,
-									txtLogConsole);
-							Future<Boolean> result = executor.submit(callable);
-							resultList.add(result);
-						} else {
-							// TODO
-							// TODO run only configure callable
-							// TODO
+					// Selected already installed nodes and iterate over them
+					selectInstalledAndNewNodes();
+
+					boolean allNodesSuccess = false;
+					
+					for (XmppNodeInfoModel clusterNode : installedNodeList) {
+						try {
+							// If first node is not selected, select it
+							if (firstNode == null) {
+								firstNode = clusterNode;
+							}
+
+							// Read .erlang.cookie just once from first node.
+							if (erlangCookie == null) {
+								readErlangCookie(firstNode, display);
+							}
+
+							// Configure already installed node
+							onlyConfigureNode(clusterNode, display);
+							
+							allNodesSuccess = true;
+
+						} catch (Exception e) {
+							allNodesSuccess = false;
+							printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ONE_OF_ALREADY_INSTALLED_NODES"), display);
+							printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(), display);
+							logger.log(Level.SEVERE, e.getMessage());
+							e.printStackTrace();
 						}
+
 					}
 
+					for (XmppNodeInfoModel clusterNode : newNodeList) {
+						Callable<Boolean> callable = new XmppClusterInstallCallable(clusterNode.getNodeIp(),
+								clusterNode.getNodeRootPwd(), clusterNode.getNodeName(), display, config,
+								txtLogConsole);
+						Future<Boolean> result = executor.submit(callable);
+						resultList.add(result);
+					}
+					
 					try {
 						executor.shutdown();
 						executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -157,7 +185,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 						e.printStackTrace();
 					}
 
-					boolean allNodesSuccess = false;
+					allNodesSuccess = false;
 
 					if (resultList.size() > 0) {
 						// Check if all nodes are properly installed
@@ -178,22 +206,18 @@ public class XmppClusterInstallationStatus extends WizardPage
 					}
 
 					if (allNodesSuccess) {
-
 						try {
-							// Get first node
-							XmppNodeInfoModel firstNode = config.getXmppNodeInfoMap().get(1);
-
+							// If first node is not selected from only
+							// configured nodes, get first node
+							if (firstNode == null) {
+								firstNode = config.getXmppNodeInfoMap().get(1);
+							}
 
 							if (config.getXmppAccessKeyPath() == null) {
 								// Install sshpass to first node
 								installSshPass(firstNode, display);
 
-								for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
-										.entrySet().iterator(); iterator.hasNext();) {
-
-									Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
-									final XmppNodeInfoModel clusterNode = entry.getValue();
-
+								for (XmppNodeInfoModel clusterNode : newNodeList) {
 									if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
 										// Send Erlang cookie from first node to
 										// others
@@ -202,43 +226,27 @@ public class XmppClusterInstallationStatus extends WizardPage
 								}
 							} else {
 
-								pullErlangCookie(firstNode.getNodeIp(), display);
-								
-								for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
-										.entrySet().iterator(); iterator.hasNext();) {
+								readErlangCookie(firstNode, display);
 
-									Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
-									final XmppNodeInfoModel clusterNode = entry.getValue();
-
-									sendErlangCookieFromLocal(clusterNode, display);
-									// TODO
-									// TODO pull erlang cookie to yourself first
-									// TODO
-
+								for (XmppNodeInfoModel clusterNode : newNodeList) {
+									if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
+										modifyErlangCookie(clusterNode, display);
+									}
 								}
 							}
 
 							// Start Ejabberd at each node
-							for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
-									.entrySet().iterator(); iterator.hasNext();) {
-
-								Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
-								final XmppNodeInfoModel clusterNode = entry.getValue();
+							for (XmppNodeInfoModel clusterNode : newNodeList) {
 
 								// Send Erlang cookie from first node to others
 								startEjabberd(clusterNode, display);
 							}
-							
+
 							printMessage(Messages.getString("WAITING_EJABBERD_TO_START"), display);
 							Thread.sleep(15000);
 
 							// Join each node except first node to cluster
-							for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap()
-									.entrySet().iterator(); iterator.hasNext();) {
-
-								Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
-								final XmppNodeInfoModel clusterNode = entry.getValue();
-
+							for (XmppNodeInfoModel clusterNode : newNodeList) {
 								if (clusterNode.getNodeNumber() != firstNode.getNodeNumber()) {
 									// start other nodes.
 									joinToCluster(firstNode.getNodeName(), clusterNode, display);
@@ -257,8 +265,10 @@ public class XmppClusterInstallationStatus extends WizardPage
 							// does not work properly
 							restartEjabberd(firstNode, display);
 
-							// Create shared roster group and users
-							createSrgAndUsers(firstNode, display);
+							if (installedNodeList == null && installedNodeList.isEmpty()) {
+								// Create shared roster group and users
+								createSrgAndUsers(firstNode, display);
+							}
 
 							canGoBack = false;
 
@@ -330,20 +340,88 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 	}
 
-	private void sendErlangCookieFromLocal(XmppNodeInfoModel clusterNode, Display display) throws Exception {
-		
+	private void onlyConfigureNode(XmppNodeInfoModel clusterNode, Display display) throws Exception {
+
 		SSHManager manager = null;
+
+		// Check SSH connection
 		try {
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), config.getXmppPort(),
-					config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
+			printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + clusterNode.getNodeIp(), display);
+
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getXmppPort(), config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("SENDING_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
-			File erlangCookie = new File(System.getProperty("java.io.tmpdir") + File.separator + ".erlang.cookie");
-			manager.copyFileToRemote(erlangCookie, PropertyReader.property("xmpp.cluster.path"), false);
-			printMessage(Messages.getString("SUCCESSFULLY_SENT_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + clusterNode.getNodeIp(), display);
+			logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
+					new Object[] { clusterNode.getNodeIp(), "root" });
 
-			logger.log(Level.INFO, "Successfully sent .erlang.cookie to {0}",
+		} catch (SSHConnectionException e) {
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + clusterNode.getNodeIp()), display);
+			printMessage(
+					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+					display);
+			e.printStackTrace();
+			logger.log(Level.SEVERE, e.getMessage());
+			throw new Exception();
+		}
+
+		// Modify /etc/hosts
+		try {
+			printMessage(Messages.getString("CONFIGURING_ALREADY_INSTALLED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+
+			// Write each node to /etc/hosts
+			for (XmppNodeInfoModel newNode : newNodeList) {
+				manager.execCommand("sed -i '1 i\\{0} {1}.{2}' /etc/hosts",
+						new Object[] { newNode.getNodeIp(), newNode.getNodeName(), config.getXmppHostname() });
+			}
+
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ETC_HOSTS_AT") + " " + clusterNode.getNodeIp(), display);
+			logger.log(Level.INFO, "Successfully modified /etc/hosts at: {0}", new Object[] { clusterNode.getNodeIp() });
+
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ALREADY_INSTALLED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		}
+	}
+
+	private void selectInstalledAndNewNodes() {
+		installedNodeList = new ArrayList<XmppNodeInfoModel>();
+		newNodeList = new ArrayList<XmppNodeInfoModel>();
+		
+		for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap().entrySet()
+				.iterator(); iterator.hasNext();) {
+
+			Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
+			final XmppNodeInfoModel clusterNode = entry.getValue();
+			
+			if (!clusterNode.isNodeNewSetup()) {
+				installedNodeList.add(clusterNode);
+			} else {
+				newNodeList.add(clusterNode);
+			}
+		}
+	}
+
+	private void modifyErlangCookie(XmppNodeInfoModel clusterNode, Display display) throws Exception {
+
+		SSHManager manager = null;
+		try {
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getXmppPort(), config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
+			manager.connect();
+
+			printMessage(Messages.getString("MODIFYING_ERLANG_COOKIE_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand("sed -i '1s/.*/{0}/' {1}.erlang.cookie",
+					new Object[] { erlangCookie, PropertyReader.property("xmpp.cluster.path") });
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ERLANG_COOKIE_AT") + " " + clusterNode.getNodeIp(),
+					display);
+
+			logger.log(Level.INFO, "Successfully modified .erlang.cookie at {0}",
 					new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
@@ -354,7 +432,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_ERLANG_COOKIE_AT") + " "
+					+ clusterNode.getNodeIp(), display);
 			printMessage(
 					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
 					display);
@@ -362,18 +441,43 @@ public class XmppClusterInstallationStatus extends WizardPage
 			e.printStackTrace();
 			throw new Exception();
 		}
-		
+
 	}
 
-	private void pullErlangCookie(String firstNodeIp, Display display) {
-		String scpCmd;
+	private void readErlangCookie(XmppNodeInfoModel firstNode, Display display) throws Exception {
+
+		SSHManager manager = null;
 		try {
-			printMessage(Messages.getString("COPYING_ERLANG_COOKIE_FROM") + " " + firstNodeIp + " to local", display);
-			scpCmd = SCP_FROM_LOCAL.replace("{0}", firstNodeIp).replace("{1}", PropertyReader.property("xmpp.cluster.path"));
-			Runtime.getRuntime().exec(scpCmd);
-			printMessage(Messages.getString("SUCCESSFULLY_COPYIED_ERLANG_COOKIE_FROM") + " " + firstNodeIp + " to local", display);
-		} catch (IOException e) {
+			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(), config.getXmppPort(),
+					config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
+			manager.connect();
+
+			printMessage(Messages.getString("READING_ERLANG_COOKIE_FROM") + " " + firstNode.getNodeIp(), display);
+			erlangCookie = manager.execCommand("more {0}.erlang.cookie",
+					new Object[] { PropertyReader.property("xmpp.cluster.path"), config.getXmppHostname() });
+			// Remove new lines
+			erlangCookie = erlangCookie.replaceAll("\n", "");
+			printMessage(Messages.getString("SUCCESSFULLY_READ_ERLANG_COOKIE_FROM") + " " + firstNode.getNodeIp(),
+					display);
+
+			logger.log(Level.INFO, "Successfully read .erlang.cookie from {0}", new Object[] { firstNode.getNodeIp() });
+
+		} catch (SSHConnectionException e) {
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
+			throw new Exception();
+
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_READING_ERLANG_COOKIE_AT") + firstNode.getNodeIp(),
+					display);
+			printMessage(
+					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + firstNode.getNodeIp(),
+					display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
 		}
 	}
 
@@ -424,7 +528,6 @@ public class XmppClusterInstallationStatus extends WizardPage
 					"admin", config.getXmppHostname(), config.getXmppAdminPwd() });
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_ADMIN_USER_AT") + " " + firstNode.getNodeIp(),
 					display);
-			
 
 			printMessage(Messages.getString("REGISTERING_USER") + " " + config.getXmppLiderUsername() + " at "
 					+ firstNode.getNodeIp(), display);
@@ -434,7 +537,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					+ " at " + firstNode.getNodeIp(), display);
 
 			// TODO Restart ejabberd
-			
+
 			logger.log(Level.INFO, "Successfully registered users at {0}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
@@ -570,7 +673,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			clusterServers += "\n\t";
 			++serverId;
 		}
-
+		
 		propertyMap.put("CLUSTER_CLIENTS", clusterClients);
 		propertyMap.put("CLUSTER_CLIENTS_SSL", clusterClientsSsl);
 		propertyMap.put("CLUSTER_SERVERS", clusterServers);
@@ -624,9 +727,10 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_EJABBERD_AT") + " " + clusterNode.getNodeIp(),
 					display);
 
-			printMessage(Messages.getString("WAITING_FOR_RESTARTING_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("WAITING_FOR_RESTARTING_EJABBERD_AT") + " " + clusterNode.getNodeIp(),
+					display);
 			Thread.sleep(15000);
-			
+
 			logger.log(Level.INFO, "Successfully restarted Ejabberd at {0}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
