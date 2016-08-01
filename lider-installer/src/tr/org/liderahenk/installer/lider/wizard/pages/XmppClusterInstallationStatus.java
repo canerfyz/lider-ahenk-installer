@@ -210,6 +210,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 									Entry<Integer, XmppNodeInfoModel> entry = iterator.next();
 									final XmppNodeInfoModel clusterNode = entry.getValue();
 
+									sendErlangCookieFromLocal(clusterNode, display);
 									// TODO
 									// TODO pull erlang cookie to yourself first
 									// TODO
@@ -327,6 +328,41 @@ public class XmppClusterInstallationStatus extends WizardPage
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
 
+	}
+
+	private void sendErlangCookieFromLocal(XmppNodeInfoModel clusterNode, Display display) throws Exception {
+		
+		SSHManager manager = null;
+		try {
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), config.getXmppPort(),
+					config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
+			manager.connect();
+
+			printMessage(Messages.getString("SENDING_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
+			File erlangCookie = new File(System.getProperty("java.io.tmpdir") + File.separator + ".erlang.cookie");
+			manager.copyFileToRemote(erlangCookie, PropertyReader.property("xmpp.cluster.path"), false);
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
+
+			logger.log(Level.INFO, "Successfully sent .erlang.cookie to {0}",
+					new Object[] { clusterNode.getNodeIp() });
+
+		} catch (SSHConnectionException e) {
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_ERLANG_COOKIE_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(
+					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+					display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		}
+		
 	}
 
 	private void pullErlangCookie(String firstNodeIp, Display display) {
