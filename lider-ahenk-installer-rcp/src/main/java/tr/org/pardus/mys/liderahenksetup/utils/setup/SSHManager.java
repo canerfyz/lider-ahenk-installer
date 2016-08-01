@@ -111,17 +111,20 @@ public class SSHManager {
 	 * @param outputStreamProvider
 	 *            Provides an array of bytes which is used to pass arguments to
 	 *            the command executed.
+	 * @return 
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 * 
 	 */
-	public void execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 
 		Channel channel = null;
 		
 		logger.log(Level.INFO, "Command: {0}", command);
 
+		String output = null;
+		
 		try {
 			channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand(command);
@@ -152,7 +155,7 @@ public class SSHManager {
 					int i = inputStream.read(tmp, 0, 1024);
 					if (i < 0)
 						break;
-					String output = new String(tmp, 0, i);
+					output = new String(tmp, 0, i);
 					logger.log(Level.INFO, output);
 				}
 				if (channel.isClosed()) {
@@ -181,6 +184,8 @@ public class SSHManager {
 				}
 			}
 		}
+		
+		return output;
 	}
 
 	/**
@@ -192,8 +197,8 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public void execCommand(final String command, final Object[] params) throws CommandExecutionException {
-		execCommand(command, params, null);
+	public String execCommand(final String command, final Object[] params) throws CommandExecutionException {
+		return execCommand(command, params, null);
 	}
 
 	/**
@@ -207,7 +212,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public void execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
 			throws CommandExecutionException {
 		String tmpCommand = command;
 		if (params != null) {
@@ -216,7 +221,7 @@ public class SSHManager {
 				tmpCommand = tmpCommand.replaceAll("\\{" + i + "\\}", param);
 			}
 		}
-		execCommand(tmpCommand, outputStreamProvider);
+		return execCommand(tmpCommand, outputStreamProvider);
 	}
 
 	/**
