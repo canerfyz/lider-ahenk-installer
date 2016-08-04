@@ -321,12 +321,14 @@ public class LiderSetupConfig {
 
 	private Map<Integer, XmppNodeInfoModel> xmppNodeInfoMap;
 
+	private boolean xmppCluster;
 	private String xmppLdapServerAddress;
 	private String xmppLdapRootDn;
 	private String xmppLdapRootPwd;
 	private String xmppLdapBaseDn;
 	private String xmppProxyAddress;
 	private String xmppProxyPwd;
+	
 	
 	/**
 	 * ###################################
@@ -1177,6 +1179,14 @@ public class LiderSetupConfig {
 
 	public void setXmppLdapServerAddress(String xmppLdapServerAddress) {
 		this.xmppLdapServerAddress = xmppLdapServerAddress;
+	}
+
+	public boolean isXmppCluster() {
+		return xmppCluster;
+	}
+
+	public void setXmppCluster(boolean xmppCluster) {
+		this.xmppCluster = xmppCluster;
 	}
 
 }
