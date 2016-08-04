@@ -44,6 +44,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private Text txtLiderPort;
 	
 	private Button btnDatabaseCluster;
+	private Button btnXmppCluster;
 
 	public LiderLocationOfComponentsPage(LiderSetupConfig config) {
 		super(LiderLocationOfComponentsPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -135,15 +136,37 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 		// TODO checkbox
 
-		GUIHelper.createLabel(secondChild, Messages.getString("XMPP"));
+		GridLayout glXmpp= new GridLayout(5, false);
+		glXmpp.marginLeft = 30;
+		Composite cmpXmpp = GUIHelper.createComposite(mainContainer, glXmpp, new GridData());
+		
+		GUIHelper.createLabel(cmpXmpp, Messages.getString("XMPP"));
 
-		txtXmppIp = GUIHelper.createText(secondChild, gdForIpField);
+		txtXmppIp = GUIHelper.createText(cmpXmpp, gdForIpField);
 
-		txtXmppPort = GUIHelper.createText(secondChild, gdForPortField);
+		txtXmppPort = GUIHelper.createText(cmpXmpp, gdForPortField);
 		txtXmppPort.setText("22");
 
-		// TODO checkbox
+		GUIHelper.createLabel(cmpXmpp, Messages.getString("XMPP_CLUSTER"));
 
+		btnXmppCluster = GUIHelper.createButton(cmpXmpp, SWT.CHECK | SWT.BORDER);
+		btnXmppCluster.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (btnXmppCluster.getSelection()) {
+					txtXmppIp.setEnabled(false);
+					txtXmppPort.setEnabled(false);
+				} else {
+					txtXmppIp.setEnabled(true);
+					txtXmppPort.setEnabled(true);
+				}
+				updatePageStatus(true);
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
+		
 		GUIHelper.createLabel(secondChild, Messages.getString("LIDER"));
 
 		txtLiderIp = GUIHelper.createText(secondChild, gdForIpField);
@@ -283,8 +306,14 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				txtLdapPort.setEnabled(true);
 			}
 			if (config.isInstallXmpp()) {
-				txtXmppIp.setEnabled(true);
-				txtXmppPort.setEnabled(true);
+				btnXmppCluster.setEnabled(true);
+				if (btnXmppCluster.getSelection()) {
+					txtXmppIp.setEnabled(false);
+					txtXmppPort.setEnabled(false);
+				} else {
+					txtXmppIp.setEnabled(true);
+					txtXmppPort.setEnabled(true);
+				}
 			}
 			if (config.isInstallLider()) {
 				txtLiderIp.setEnabled(true);
@@ -301,6 +330,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			txtDatabaseIp.setEnabled(false);
 			txtDatabasePort.setEnabled(false);
 			btnDatabaseCluster.setEnabled(false);
+			btnXmppCluster.setEnabled(false);
 			txtLdapIp.setEnabled(false);
 			txtLdapPort.setEnabled(false);
 			txtXmppIp.setEnabled(false);
@@ -367,7 +397,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		else {
 			ldapIpEntered = true;
 		}
-		if (config.isInstallXmpp()) {
+		if (config.isInstallXmpp() && !btnXmppCluster.getSelection()) {
 			if (!txtXmppIp.getText().isEmpty() && NetworkUtils.isIpValid(txtXmppIp.getText())) {
 				xmppIpEntered = true;
 			} else {
@@ -456,10 +486,12 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				config.setLdapPort(txtLdapPort.getText() != null && !txtLdapPort.getText().isEmpty()
 						? new Integer(txtLdapPort.getText()) : null);
 			}
-			if (config.isInstallXmpp()) {
+			if (config.isInstallXmpp() && !btnXmppCluster.getSelection()) {
 				config.setXmppIp(txtXmppIp.getText());
 				config.setXmppPort(txtXmppPort.getText() != null && !txtXmppPort.getText().isEmpty()
 						? new Integer(txtXmppPort.getText()) : null);
+			} else if (config.isInstallXmpp() && btnXmppCluster.getSelection()) {
+				config.setXmppCluster(true);
 			}
 			if (config.isInstallLider()) {
 				config.setLiderIp(txtLiderIp.getText());
@@ -485,7 +517,11 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		} else if (config.isInstallLdap()) {
 			return findFirstInstance(pagesList, ILdapPage.class);
 		} else if (config.isInstallXmpp()) {
-			return findFirstInstance(pagesList, IXmppPage.class);
+			if (config.isXmppCluster()) {
+				return getWizard().getPage(XmppClusterConfPage.class.getName());
+			} else {
+				return getWizard().getPage(XmppAccessPage.class.getName());
+			}
 		} else if (config.isInstallLider()) { // Lider
 			return findFirstInstance(pagesList, ILiderPage.class);
 		}
