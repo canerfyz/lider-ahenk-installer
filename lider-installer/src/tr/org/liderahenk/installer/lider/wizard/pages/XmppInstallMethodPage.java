@@ -105,8 +105,8 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 										// be updated on file selection
 
 		// Copy ejabberd.deb to /tmp and bring it as default deb in page
-		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ejabberd_default_16_02.deb");
-		File ejabberdDeb = SetupUtils.streamToFile(inputStream, "ejabberd_default_16_02.deb");
+		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ejabberd_16.08-0_amd64.deb");
+		File ejabberdDeb = SetupUtils.streamToFile(inputStream, "ejabberd_16.08-0_amd64.deb");
 		txtFileName.setText(ejabberdDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes
