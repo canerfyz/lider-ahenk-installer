@@ -12,6 +12,11 @@ import tr.org.liderahenk.installer.lider.wizard.pages.ILdapPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.ILiderPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.IXmppPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.InstallationStatusPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 
 /**
  * This contains some helpful methods to control the page flow of wizard.
@@ -57,9 +62,20 @@ public class PageFlowHelper {
 			}
 		} else if (page instanceof ILdapPage) {
 			if (config.isInstallXmpp()) {
-				return findFirstInstance(pagesList, IXmppPage.class);
+				if (config.isXmppCluster()) {
+					return page.getWizard().getPage(XmppClusterConfPage.class.getName());
+				} else {
+//					XmppConfPage nextPage = (XmppConfPage) page.getWizard().getPage(XmppConfPage.class.getName());
+//					nextPage.setPageComplete(true);
+//					nextPage.setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
+					return page.getWizard().getPage(XmppConfPage.class.getName());
+				}
 			} else if (config.isInstallLider()) {
-				return findFirstInstance(pagesList, ILiderPage.class);
+				if (config.isLiderCluster()) {
+					return page.getWizard().getPage(LiderClusterConfPage.class.getName());
+				} else {
+					return page.getWizard().getPage(LiderConfPage.class.getName());
+				}
 			}
 		} else if (page instanceof IXmppPage) {
 			if (config.isInstallLider()) {
