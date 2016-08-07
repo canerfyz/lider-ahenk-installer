@@ -55,7 +55,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	private StyledText st;
 	
-	private NextPageEventType nextPageEventType;
+	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 
 	public XmppConfPage(LiderSetupConfig config) {
 		super(XmppConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -107,7 +107,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		GUIHelper.createLabel(inputsContainer, Messages.getString("ADMIN_PASSWORD"));
 
-		adminPwdTxt = GUIHelper.createText(inputsContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		adminPwdTxt = GUIHelper.createText(inputsContainer, new GridData(), SWT.SINGLE | SWT.BORDER);
 		adminPwdTxt.setLayoutData(gdForTxt);
 		adminPwdTxt.addModifyListener(new ModifyListener() {
 			@Override
@@ -140,7 +140,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		GUIHelper.createLabel(liderContainer, Messages.getString("PASSWORD"));
 
-		liderPwdTxt = GUIHelper.createText(liderContainer, new GridData(), SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+		liderPwdTxt = GUIHelper.createText(liderContainer, new GridData(), SWT.SINGLE | SWT.BORDER);
 		liderPwdTxt.setLayoutData(gdForTxt);
 		liderPwdTxt.addModifyListener(new ModifyListener() {
 			@Override
