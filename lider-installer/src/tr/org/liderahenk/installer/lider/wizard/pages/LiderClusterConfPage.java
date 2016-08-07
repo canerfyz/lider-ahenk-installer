@@ -347,16 +347,6 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			}
 		});
 
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("AGENT_LDAP_CLASSES"));
-		txtAgentLdapClasses = GUIHelper.createText(cmpGeneralInfo);
-		txtAgentLdapClasses.setMessage(Messages.getString("ENTER_AGENT_LDAP_CLASSES"));
-		txtAgentLdapClasses.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent event) {
-				updatePageCompleteStatus();
-			}
-		});
-
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("USER_LDAP_BASE_DN"));
 		txtUserLdapBaseDn = GUIHelper.createText(cmpGeneralInfo);
 		txtUserLdapBaseDn.setMessage(Messages.getString("ENTER_USER_LDAP_BASE_DN"));
@@ -546,7 +536,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				Entry<Integer, LiderNodeSwtModel> entry = iterator.next();
 				LiderNodeSwtModel node = entry.getValue();
 
-				if (!node.getTxtNodeIp().getText().isEmpty() && !node.getTxtNodeName().getText().isEmpty()) {
+				if (!node.getTxtNodeIp().getText().isEmpty()) {
 					if (btnUsePrivateKey.getSelection()) {
 						if (!txtPrivateKey.getText().isEmpty()) {
 							pageComplete = true;
@@ -611,7 +601,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 	}
 
 	private void createNewNode(Composite cmpNodeList) {
-		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 5);
+		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 4);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		GridData gd = new GridData();
@@ -634,17 +624,6 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			}
 		});
 		clusterNode.setTxtNodeIp(txtNodeIp);
-
-		Text txtNodeName = GUIHelper.createText(grpClusterNode);
-		txtNodeName.setLayoutData(gd);
-		txtNodeName.setMessage(Messages.getString("ENTER_NAME_FOR_THIS_NODE"));
-		txtNodeName.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent event) {
-				updatePageCompleteStatus();
-			}
-		});
-		clusterNode.setTxtNodeName(txtNodeName);
 
 		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
@@ -727,27 +706,54 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 	private void setConfigVariables() {
 
-		// config.setXmppHostname(txtServiceName.getText());
-		// config.setXmppPort(!txtXmppPort.getText().isEmpty() ? new
-		// Integer(txtXmppPort.getText()) : null);
-		// config.setXmppLdapServerAddress(txtLdapServer.getText());
-		// config.setXmppLdapRootDn(txtLdapRootDn.getText());
-		// config.setXmppLdapRootPwd(txtLdapRootPwd.getText());
-		// config.setXmppLdapBaseDn(txtLdapBaseDn.getText());
-		// config.setXmppProxyAddress(txtProxyAddress.getText());
-		// config.setXmppAdminPwd(txtAdminPwd.getText());
-		// config.setXmppLiderUsername(txtLiderUsername.getText());
-		// config.setXmppLiderPassword(txtLiderUserPwd.getText());
-		// config.setXmppNodeInfoMap(createInfoModelMap());
+		config.setLiderProxyAddress(txtProxyAddress.getText());
+		config.setLiderNodeInfoMap(createInfoModelMap());
+
+		config.setLiderLdapServerAddress(txtLdapAddress.getText());
+		config.setLiderLdapPort(new Integer(txtLdapPort.getText()));
+		config.setLiderLdapAdminUser(txtLdapAdminUser.getText());
+		config.setLiderLdapAdminPwd(txtLdapAdminPwd.getText());
+		config.setLiderLdapBaseDn(txtLdapBaseDn.getText());
+
+		config.setLiderXmppAddress(txtXmppAddress.getText());
+		config.setLiderXmppPort(new Integer(txtXmppPort.getText()));
+		config.setLiderXmppLiderUser(txtXmppLiderUser.getText());
+		config.setLiderXmppLiderPwd(txtXmppLiderPwd.getText());
+		config.setLiderXmppServiceName(txtXmppServiceName.getText());
+		config.setLiderXmppMaxTrials(txtXmppMaxTrials.getText());
+		config.setLiderXmppPacketTimeout(txtXmppPacketTimeout.getText());
+		config.setLiderXmppPingTimeout(txtXmppPingTimeout.getText());
+		config.setLiderXmppFileSharingPath(txtXmppFileSharingPath.getText());
+
+		config.setLiderDbAddress(txtDatabaseAddress.getText());
+		if (!config.isDatabaseCluster()) {
+			config.setLiderDbPort(new Integer(txtDatabasePort.getText()));
+		} else {
+			config.setLiderDbPort(null);
+		}
+		config.setLiderDbName(txtDatabaseName.getText());
+		config.setLiderDbUsername(txtDatabaseUsername.getText());
+		config.setLiderDbPwd(txtDatabasePwd.getText());
+
+		config.setLiderAgentLdapBaseDn(txtAgentLdapBaseDn.getText());
+		config.setLiderAgentLdapIdAttribute(txtAgentLdapIdAttribute.getText());
+		config.setLiderAgentLdapJidAttribute(txtAgentLdapJidAttribute.getText());
+		config.setLiderAgentLdapClasses(txtAgentLdapClasses.getText());
+
+		config.setLiderUserLdapBaseDn(txtUserLdapBaseDn.getText());
+		config.setLiderUserLdapIdAttribute(txtUserLdapIdAttribute.getText());
+		config.setLiderUserLdapPrivilegeAttribute(txtUserLdapPrivilegeAttribute.getText());
+		config.setLiderUserLdapClasses(txtUserLdapClasses.getText());
+		config.setLiderUserGroupLdapClasses(txtUserGroupLdapClasses.getText());
 
 		if (btnUsePrivateKey.getSelection()) {
-			config.setXmppAccessKeyPath(txtPrivateKey.getText());
-			config.setXmppAccessPassphrase(txtPassphrase.getText());
-			config.setXmppProxyPwd(null);
+			config.setLiderAccessKeyPath(txtPrivateKey.getText());
+			config.setLiderAccessPassphrase(txtPassphrase.getText());
+			config.setLiderProxyPwd(null);
 		} else {
-			config.setXmppAccessKeyPath(null);
-			config.setXmppAccessPassphrase(null);
-			config.setXmppProxyPwd(txtProxyPwd.getText());
+			config.setLiderAccessKeyPath(null);
+			config.setLiderAccessPassphrase(null);
+			config.setLiderProxyPwd(txtProxyPwd.getText());
 		}
 
 	}
@@ -761,7 +767,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			LiderNodeSwtModel nodeSwt = entry.getValue();
 
 			LiderNodeInfoModel nodeInfo = new LiderNodeInfoModel(nodeSwt.getNodeNumber(),
-					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
+					nodeSwt.getTxtNodeIp().getText(),
 					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText());
 
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
@@ -772,53 +778,13 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 	private void setInputValues() {
 
-		// private Text txtLdapAddress;
-		// private Text txtLdapPort;
-		// private Text txtLdapAdminUser;
-		// private Text txtLdapAdminPwd;
-		// private Text txtLdapBaseDn;
-		//
-		// private Text txtXmppAddress;
-		// private Text txtXmppPort;
-		// private Text txtXmppLiderUser;
-		// private Text txtXmppLiderPwd;
-		// private Text txtXmppServiceName;
-		// private Text txtXmppMaxTrials;
-		// private Text txtXmppPacketTimeout;
-		// private Text txtXmppPingTimeout;
-		// private Text txtXmppFileSharingPath;
-		//
-		// private Text txtDatabaseAddress;
-		// private Text txtDatabasePort;
-		// private Text txtDatabaseName;
-		// private Text txtDatabaseUsername;
-		// private Text txtDatabasePwd;
-		//
-		// private Text txtAgentLdapBaseDn;
-		// private Text txtAgentLdapIdAttribute;
-		// private Text txtAgentLdapJidAttribute;
-		// private Text txtAgentLdapClasses;
-		//
-		// private Text txtUserLdapBaseDn;
-		// private Text txtUserLdapIdAttribute;
-		// private Text txtUserLdapPrivilegeAttribute;
-		// private Text txtUserLdapClasses;
-		// private Text txtUserGroupLdapClasses;
-		//
-		// private Button btnUsePrivateKey;
-		// private Text txtPrivateKey;
-		// private Button btnUploadKey;
-		// private FileDialog dialog;
-		// private String selectedFile;
-		// private Text txtPassphrase;
-		// private Text txtProxyAddress;
-		// private Text txtProxyPwd;
-
 		txtLdapAddress.setText(config.getLdapIp() != null ? config.getLdapIp() : "ldap." + config.getLdapOrgCn());
 		txtLdapPort.setText("389");
 		txtLdapAdminUser.setText(
 				config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
 						: "cn=admin," + config.getLdapBaseDn());
+
+		txtLdapAdminPwd.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "");
 		txtLdapBaseDn.setText(config.getLdapBaseDn() != null ? config.getLdapBaseDn() : "dc=mys,dc=pardus,dc=org");
 
 		if (config.isXmppCluster()) {
@@ -829,6 +795,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtXmppPort.setText("5222");
 		txtXmppLiderUser
 				.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
+		txtXmppLiderPwd.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "");
 		txtXmppServiceName
 				.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im." + config.getLdapOrgCn());
 		txtXmppMaxTrials.setText("5");
@@ -850,25 +817,18 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		}
 		txtDatabaseName.setText("liderdb");
 		txtDatabaseUsername.setText("root");
-		
-		
-		txtAgentLdapBaseDn.setText("");// TODO 
-		// txtServiceName.setText("im." + config.getLdapOrgCn());
-		// txtLdapServer.setText(config.getLdapIp() != null ? config.getLdapIp()
-		// : "ldap." + config.getLdapOrgCn());
-		// if (config.isLdapUpdate()) {
-		// txtLdapRootDn.setText(config.getLdapAdminDn());
-		// } else {
-		// txtLdapRootDn.setText(
-		// config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() +
-		// "," + config.getLdapBaseDn()
-		// : "cn=admin," + config.getLdapBaseDn());
-		// }
-		// txtLdapRootPwd.setText(config.getLdapAdminCnPwd() != null ?
-		// config.getLdapAdminCnPwd() : "secret");
-		// txtLdapBaseDn.setText(config.getLdapBaseDn());
-		// txtLiderUsername.setText("lider_sunucu");
-		// txtProxyAddress.setText("proxy." + config.getLdapOrgCn());
+		txtDatabasePwd.setText(config.getDatabaseRootPassword() != null ? config.getDatabaseRootPassword() : "");
+
+		txtAgentLdapBaseDn.setText("ou=Uncategorized," + config.getLdapBaseDn());
+		txtAgentLdapIdAttribute.setText("cn");
+		txtAgentLdapJidAttribute.setText("uid");
+		txtAgentLdapClasses.setText("pardusDevice,device");
+
+		txtUserLdapBaseDn.setText(config.getLdapBaseDn());
+		txtUserLdapIdAttribute.setText("uid");
+		txtUserLdapPrivilegeAttribute.setText("liderPrivilege");
+		txtUserLdapClasses.setText("pardusLider");
+		txtUserGroupLdapClasses.setText("groupOfNames");
 	}
 
 	@Override
