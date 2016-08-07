@@ -4,14 +4,12 @@ public class LiderNodeInfoModel {
 
 	private int nodeNumber;
 	private String nodeIp;
-	private String nodeName;
 	private String nodeRootPwd;
 	
-	public LiderNodeInfoModel(int nodeNumber, String nodeIp, String nodeName, String nodeRootPwd) {
+	public LiderNodeInfoModel(int nodeNumber, String nodeIp, String nodeRootPwd) {
 		super();
 		this.nodeNumber = nodeNumber;
 		this.nodeIp = nodeIp;
-		this.nodeName = nodeName;
 		this.nodeRootPwd = nodeRootPwd;
 	}
 	
@@ -26,12 +24,6 @@ public class LiderNodeInfoModel {
 	}
 	public void setNodeIp(String nodeIp) {
 		this.nodeIp = nodeIp;
-	}
-	public String getNodeName() {
-		return nodeName;
-	}
-	public void setNodeName(String nodeName) {
-		this.nodeName = nodeName;
 	}
 	public String getNodeRootPwd() {
 		return nodeRootPwd;
