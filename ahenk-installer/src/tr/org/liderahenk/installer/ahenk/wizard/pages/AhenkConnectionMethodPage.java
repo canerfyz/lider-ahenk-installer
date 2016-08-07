@@ -128,7 +128,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		password = new Label(usernameContainer, SWT.SINGLE);
 		password.setText(Messages.getString("PASSWORD"));
 		
-		passwordTxt = new Text(usernameContainer, SWT.BORDER | SWT.PASSWORD);
+		passwordTxt = new Text(usernameContainer, SWT.BORDER);
 
 		GridData gdPasswordTxt = new GridData();
 		gdPasswordTxt.widthHint = 170;
@@ -221,7 +221,7 @@ public class AhenkConnectionMethodPage extends WizardPage {
 		passphraseContainer.setLayout(glPassphrase);
 		
 		//Passphrase text field
-		passphraseTxt = new Text(passphraseContainer, SWT.BORDER | SWT.PASSWORD);
+		passphraseTxt = new Text(passphraseContainer, SWT.BORDER);
 		GridData gdPassphrase = new GridData();
 		gdPassphrase.widthHint = 97;
 		passphraseTxt.setLayoutData(gdPassphrase);
