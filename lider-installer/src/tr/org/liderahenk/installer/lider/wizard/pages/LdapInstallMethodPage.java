@@ -216,7 +216,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 		
 		GUIHelper.createLabel(passwordComp, Messages.getString("LDAP_ROOT_PASSWORD"));
 
-		txtLdapRootPassword = GUIHelper.createPasswordText(passwordComp);
+		txtLdapRootPassword = GUIHelper.createText(passwordComp);
 		GridData gdRootPasswdTxt = new GridData();
 		gdRootPasswdTxt.widthHint = 200;
 		txtLdapRootPassword.setLayoutData(gdRootPasswdTxt);
