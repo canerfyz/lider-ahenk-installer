@@ -1,9 +1,5 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -16,9 +12,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
-import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -46,9 +40,9 @@ public class DatabaseInstallationStatus extends WizardPage
 	private final static String CREATE_DATABASE = "mysql -uroot -p{0} -e 'CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'";
 
 	private final static String GRANT_PRIVILEGES = "mysql -uroot -p{0} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{1}' WITH GRANT OPTION;\" && service mysql restart";
-	
+
 	private final static String REPLACE_BIND_ADDRESS = "sed -i 's/^bind-address/#&/' /etc/mysql/my.cnf";
-	
+
 	public DatabaseInstallationStatus(LiderSetupConfig config) {
 		super(DatabaseInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("2.4 " + Messages.getString("DATABASE_INSTALLATION"));
@@ -101,98 +95,85 @@ public class DatabaseInstallationStatus extends WizardPage
 					setProgressBar(10);
 
 					printMessage("Setting up parameters for database password.");
-					final String[] debconfValues = generateDebconfValues();
 					setProgressBar(20);
 
 					printMessage("Installing package...");
-					
-					if (config.getDatabaseInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getDatabaseDebFileName());
-						try {
+
+					try {
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"rm -rf /var/lib/mysql/");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"apt-get update");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"apt-get -y --force-yes install software-properties-common");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"apt-get update");
+
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"export DEBIAN_FRONTEND='noninteractive'");
+
+						final String[] debconfValues = generateDebconfValues();
+
+						for (String value : debconfValues) {
+							String cmd = "debconf-set-selections <<< '{0}'";
+							cmd = cmd.replace("{0}", value);
 							SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-									"rm -rf /var/lib/mysql/");
-							
-							SetupUtils.installPackageNonInteractively(config.getDatabaseIp(),
-									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabaseAccessPassphrase(), deb, debconfValues, PackageInstaller.GDEBI);
-
-							setProgressBar(90);
-
-							isInstallationFinished = true;
-
-							printMessage("Successfully installed package: " + deb.getName());
-						} catch (Exception e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getDatabaseInstallMethod() == InstallMethod.WGET) {
-						try {
-							SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
-									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-									"rm -rf /var/lib/mysql/");
-							
-							printMessage("Downloading MariaDB .deb package from: " + config.getDatabaseDownloadUrl());
-
-							// In case of folder name clash use current time as
-							// postfix
-							Date date = new Date();
-							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
-							String timestamp = dateFormat.format(date);
-
-							SetupUtils.downloadPackage(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
-									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-									"mariaDbTmp" + timestamp, "mariadb.deb", config.getDatabaseDownloadUrl());
-
-							setProgressBar(30);
-
-							printMessage("Successfully downloaded file.");
-
-							printMessage("MariaDB is being installed to: " + config.getDatabaseIp()
-									+ " from downloaded .deb file.");
-
-							SetupUtils.installDownloadedPackageNonInteractively(config.getDatabaseIp(),
-									config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(),
-									config.getDatabasePort(), config.getDatabaseAccessKeyPath(),
-									config.getDatabaseAccessPassphrase(), "mariaDbTmp" + timestamp, "mariadb.deb",
-									debconfValues, PackageInstaller.DPKG);
-
-							printMessage("MariaDB has been successfully installed to: " + config.getDatabaseIp());
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (SSHConnectionException e) {
-							isInstallationFinished = false;
-							// If any error occured user should be able to go
-							// back and change selections etc.
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
+									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), cmd);
 						}
 
-					} else {
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"apt-get -y --force-yes install mariadb-server-10.1");
+
+						setProgressBar(90);
+
+						isInstallationFinished = true;
+
+					} catch (Exception e) {
 						isInstallationFinished = false;
 						// If any error occured user should be able to go
 						// back and change selections etc.
 						canGoBack = true;
-						printMessage("Invalid installation method. Installation cancelled.");
+						printMessage("Error occurred: " + e.getMessage());
+						e.printStackTrace();
 					}
 
 					try {
 						printMessage("Creating database.");
-						
+
+						// Grant privileges
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								GRANT_PRIVILEGES.replace("{0}", config.getDatabaseRootPassword()).replace("{1}",
+										config.getDatabaseRootPassword()));
+
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
@@ -203,15 +184,10 @@ public class DatabaseInstallationStatus extends WizardPage
 						// Remove bind-address
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), REPLACE_BIND_ADDRESS);
-						
-						// Grant privileges
-						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
-								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								GRANT_PRIVILEGES.replace("{0}", config.getDatabaseRootPassword()).replace("{1}",
-										config.getDatabaseRootPassword()));
-						
+								REPLACE_BIND_ADDRESS);
+
+
 					} catch (CommandExecutionException e) {
 						isInstallationFinished = false;
 						// If any error occured user should be able to go
@@ -318,9 +294,9 @@ public class DatabaseInstallationStatus extends WizardPage
 	 * @return
 	 */
 	public String[] generateDebconfValues() {
-		String debconfPwd = PropertyReader.property("database.debconf.password") + " "
+		String debconfPwd = PropertyReader.property("database.cluster.debconf.password") + " "
 				+ config.getDatabaseRootPassword();
-		String debconfPwdAgain = PropertyReader.property("database.debconf.password.again") + " "
+		String debconfPwdAgain = PropertyReader.property("database.cluster.debconf.password.again") + " "
 				+ config.getDatabaseRootPassword();
 		return new String[] { debconfPwd, debconfPwdAgain };
 	}
