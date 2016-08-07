@@ -41,11 +41,13 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 	private Text passphraseTxt;
 
 	private NextPageEventType nextPageEventType;
-	
-	// Set to true as default otherwise 
+
+	// Set to true as default otherwise
 	// wizard button activations does not work properly.
 	private boolean goNextPage;
-	
+
+	private Text txtDatabaseRootPassword;
+
 	public DatabaseAccessPage(LiderSetupConfig config) {
 		super(DatabaseAccessPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("2.1 " + Messages.getString("DATABASE_ACCESS_FOR_INSTALLATION"));
@@ -81,8 +83,7 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 		GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
 
 		// Creating password style text field.
-		passwordTxt = GUIHelper.createText(childContainer, gdForTextField,
-				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);
+		passwordTxt = GUIHelper.createText(childContainer, gdForTextField, SWT.NONE | SWT.BORDER | SWT.SINGLE);
 
 		btnPrivateKey = GUIHelper.createButton(mainContainer, SWT.RADIO, Messages.getString("USE_PRIVATE_KEY"));
 
@@ -107,12 +108,26 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 		Composite thirdChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
 		GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE(OPTIONAL)"));
-		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField,
-				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);
+		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField, SWT.NONE | SWT.BORDER | SWT.SINGLE);
 
 		// Select user name and password option
 		// as default.
 		btnUsernamePassword.setSelection(true);
+
+		Composite passwordComp = GUIHelper.createComposite(mainContainer, 2);
+
+		GUIHelper.createLabel(passwordComp, Messages.getString("DATABASE_ROOT_PASSWORD"));
+
+		txtDatabaseRootPassword = GUIHelper.createText(passwordComp);
+		GridData gdRootPasswdTxt = new GridData();
+		gdRootPasswdTxt.widthHint = 200;
+		txtDatabaseRootPassword.setLayoutData(gdRootPasswdTxt);
+		txtDatabaseRootPassword.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent e) {
+				updatePageCompleteStatus();
+			}
+		});
 
 		// And organize fields according to
 		// default selection.
@@ -124,6 +139,7 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeFields();
+				updatePageCompleteStatus();
 			}
 
 			@Override
@@ -149,6 +165,7 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				organizeFields();
+				updatePageCompleteStatus();
 			}
 
 			@Override
@@ -203,13 +220,14 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 
 	private void updatePageCompleteStatus() {
 		if (btnUsernamePassword.getSelection()) {
-			if (!LiderAhenkUtils.isEmpty(usernameTxt.getText()) && !LiderAhenkUtils.isEmpty(passwordTxt.getText())) {
+			if (!LiderAhenkUtils.isEmpty(usernameTxt.getText()) && !LiderAhenkUtils.isEmpty(passwordTxt.getText())
+					&& !txtDatabaseRootPassword.getText().isEmpty()) {
 				setPageComplete(true);
 			} else {
 				setPageComplete(false);
 			}
 		} else {
-			if (!LiderAhenkUtils.isEmpty(privateKeyTxt.getText())) {
+			if (!LiderAhenkUtils.isEmpty(privateKeyTxt.getText()) && !txtDatabaseRootPassword.getText().isEmpty()) {
 				setPageComplete(true);
 			} else {
 				setPageComplete(false);
@@ -226,11 +244,13 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 			config.setDatabaseAccessMethod(AccessMethod.USERNAME_PASSWORD);
 			config.setDatabaseAccessUsername(usernameTxt.getText());
 			config.setDatabaseAccessPasswd(passwordTxt.getText());
+			config.setDatabaseRootPassword(txtDatabaseRootPassword.getText());
 		} else {
 			config.setDatabaseAccessMethod(AccessMethod.PRIVATE_KEY);
 			config.setDatabaseAccessUsername(usernameTxt.getText());
 			config.setDatabaseAccessKeyPath(privateKeyTxt.getText());
 			config.setDatabaseAccessPassphrase(passphraseTxt.getText());
+			config.setDatabaseRootPassword(txtDatabaseRootPassword.getText());
 		}
 	}
 
@@ -238,24 +258,24 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 	public IWizardPage getNextPage() {
 		// Set config variables before going next page.
 		setConfigVariables();
-		
+
 		// If next button clicked, open a dialog and start
 		// authorization check.
 		if (nextPageEventType == NextPageEventType.NEXT_BUTTON_CLICK) {
 			openConnectionCheckDialog(getShell());
 		}
-		
-		// Everytime this method runs, event type should be set to NEXT_BUTTON_CLICK
+
+		// Everytime this method runs, event type should be set to
+		// NEXT_BUTTON_CLICK
 		// otherwise we can never catch the real click to next button.
 		nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
-		
+
 		// goNextPage is the result of authorization check,
-		// if we can authorize then go to next page 
+		// if we can authorize then go to next page
 		// else do not allow.
 		if (goNextPage == true) {
 			return super.getNextPage();
-		}
-		else {
+		} else {
 			return this;
 		}
 	}
@@ -265,10 +285,10 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getDatabaseIp(),
 				config.getDatabaseAccessUsername(), config.getDatabaseAccessPasswd(), config.getDatabaseAccessKeyPath(),
 				config.getDatabaseAccessPassphrase(), config.getDatabaseAccessMethod());
-		
+
 		// Open it
 		ccDialog.open();
-		
+
 		// After closing it get the result of authorization check.
 		goNextPage = ccDialog.getCanAuthorize();
 	}
@@ -278,10 +298,10 @@ public class DatabaseAccessPage extends WizardPage implements IDatabasePage, Con
 		// Set event type here. If event type is not set,
 		// authorization check will be executed.
 		nextPageEventType = NextPageEventType.SET_PAGE_COMPLETE;
-		
+
 		super.setPageComplete(complete);
 	}
-	
+
 	@Override
 	public NextPageEventType getNextPageEventType() {
 		return nextPageEventType;
