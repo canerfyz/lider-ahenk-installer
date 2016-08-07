@@ -83,8 +83,7 @@ public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNe
 		GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
 
 		// Creating password style text field.
-		passwordTxt = GUIHelper.createText(childContainer, gdForTextField,
-				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);
+		passwordTxt = GUIHelper.createText(childContainer, gdForTextField, SWT.NONE | SWT.BORDER | SWT.SINGLE);
 
 		usePrivateKey = GUIHelper.createButton(mainContainer, SWT.RADIO, Messages.getString("USE_PRIVATE_KEY"));
 
@@ -110,8 +109,7 @@ public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNe
 
 		GUIHelper.createLabel(thirdChild, Messages.getString("PASSPHRASE(OPTIONAL)"));
 
-		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField,
-				SWT.PASSWORD | SWT.NONE | SWT.BORDER | SWT.SINGLE);
+		passphraseTxt = GUIHelper.createText(thirdChild, gdForTextField, SWT.NONE | SWT.BORDER | SWT.SINGLE);
 
 		// Select username and password option
 		// as default.
