@@ -4,6 +4,7 @@ import java.util.Map;
 
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
+import tr.org.liderahenk.installer.lider.wizard.model.LiderNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
@@ -424,6 +425,46 @@ public class LiderSetupConfig {
 
 	private String datasourceAbsPathConfFile;
 
+	private String liderProxyPwd;
+	
+	private String liderLdapServerAddress;
+	private Integer liderLdapPort;
+	private String liderLdapAdminUser;
+	private String liderLdapAdminPwd;
+	private String liderLdapBaseDn;
+	
+	private String liderXmppAddress;
+	private Integer liderXmppPort;
+	private String liderXmppLiderUser;
+	private String liderXmppLiderPwd;
+	private String liderXmppServiceName;
+	private String liderXmppMaxTrials;
+	private String liderXmppPacketTimeout;
+	private String liderXmppPingTimeout;
+	private String liderXmppFileSharingPath;
+	
+	private String liderDbAddress;
+	private Integer liderDbPort;
+	private String liderDbName;
+	private String liderDbUsername;
+	private String liderDbPwd;
+
+	private String liderAgentLdapBaseDn;
+	private String liderAgentLdapIdAttribute;
+	private String liderAgentLdapJidAttribute;
+	private String liderAgentLdapClasses;
+	
+	private String liderUserLdapBaseDn;
+	private String liderUserLdapIdAttribute;
+	private String liderUserLdapPrivilegeAttribute;
+	private String liderUserLdapClasses;
+	private String liderUserGroupLdapClasses;
+	
+	private String liderProxyAddress;
+	private Map<Integer, LiderNodeInfoModel> liderNodeInfoMap;
+	
+	private boolean isLiderCluster;
+	
 	/**
 	 * This variable is used to enable/disable finish button
 	 */
@@ -1187,6 +1228,262 @@ public class LiderSetupConfig {
 
 	public void setXmppCluster(boolean xmppCluster) {
 		this.xmppCluster = xmppCluster;
+	}
+
+	public String getLiderProxyPwd() {
+		return liderProxyPwd;
+	}
+
+	public void setLiderProxyPwd(String liderProxyPwd) {
+		this.liderProxyPwd = liderProxyPwd;
+	}
+
+	public String getLiderLdapServerAddress() {
+		return liderLdapServerAddress;
+	}
+
+	public void setLiderLdapServerAddress(String liderLdapServerAddress) {
+		this.liderLdapServerAddress = liderLdapServerAddress;
+	}
+
+	public String getLiderLdapAdminUser() {
+		return liderLdapAdminUser;
+	}
+
+	public void setLiderLdapAdminUser(String liderLdapAdminUser) {
+		this.liderLdapAdminUser = liderLdapAdminUser;
+	}
+
+	public String getLiderLdapAdminPwd() {
+		return liderLdapAdminPwd;
+	}
+
+	public void setLiderLdapAdminPwd(String liderLdapAdminPwd) {
+		this.liderLdapAdminPwd = liderLdapAdminPwd;
+	}
+
+	public String getLiderLdapBaseDn() {
+		return liderLdapBaseDn;
+	}
+
+	public void setLiderLdapBaseDn(String liderLdapBaseDn) {
+		this.liderLdapBaseDn = liderLdapBaseDn;
+	}
+
+	public String getLiderXmppAddress() {
+		return liderXmppAddress;
+	}
+
+	public void setLiderXmppAddress(String liderXmppAddress) {
+		this.liderXmppAddress = liderXmppAddress;
+	}
+
+	public String getLiderXmppLiderUser() {
+		return liderXmppLiderUser;
+	}
+
+	public void setLiderXmppLiderUser(String liderXmppLiderUser) {
+		this.liderXmppLiderUser = liderXmppLiderUser;
+	}
+
+	public String getLiderXmppLiderPwd() {
+		return liderXmppLiderPwd;
+	}
+
+	public void setLiderXmppLiderPwd(String liderXmppLiderPwd) {
+		this.liderXmppLiderPwd = liderXmppLiderPwd;
+	}
+
+	public String getLiderXmppServiceName() {
+		return liderXmppServiceName;
+	}
+
+	public void setLiderXmppServiceName(String liderXmppServiceName) {
+		this.liderXmppServiceName = liderXmppServiceName;
+	}
+
+	public String getLiderXmppMaxTrials() {
+		return liderXmppMaxTrials;
+	}
+
+	public void setLiderXmppMaxTrials(String liderXmppMaxTrials) {
+		this.liderXmppMaxTrials = liderXmppMaxTrials;
+	}
+
+	public String getLiderXmppPacketTimeout() {
+		return liderXmppPacketTimeout;
+	}
+
+	public void setLiderXmppPacketTimeout(String liderXmppPacketTimeout) {
+		this.liderXmppPacketTimeout = liderXmppPacketTimeout;
+	}
+
+	public String getLiderXmppPingTimeout() {
+		return liderXmppPingTimeout;
+	}
+
+	public void setLiderXmppPingTimeout(String liderXmppPingTimeout) {
+		this.liderXmppPingTimeout = liderXmppPingTimeout;
+	}
+
+	public String getLiderXmppFileSharingPath() {
+		return liderXmppFileSharingPath;
+	}
+
+	public void setLiderXmppFileSharingPath(String liderXmppFileSharingPath) {
+		this.liderXmppFileSharingPath = liderXmppFileSharingPath;
+	}
+
+	public String getLiderDbAddress() {
+		return liderDbAddress;
+	}
+
+	public void setLiderDbAddress(String liderDbAddress) {
+		this.liderDbAddress = liderDbAddress;
+	}
+
+	public String getLiderDbName() {
+		return liderDbName;
+	}
+
+	public void setLiderDbName(String liderDbName) {
+		this.liderDbName = liderDbName;
+	}
+
+	public String getLiderDbUsername() {
+		return liderDbUsername;
+	}
+
+	public void setLiderDbUsername(String liderDbUsername) {
+		this.liderDbUsername = liderDbUsername;
+	}
+
+	public String getLiderDbPwd() {
+		return liderDbPwd;
+	}
+
+	public void setLiderDbPwd(String liderDbPwd) {
+		this.liderDbPwd = liderDbPwd;
+	}
+
+	public String getLiderAgentLdapBaseDn() {
+		return liderAgentLdapBaseDn;
+	}
+
+	public void setLiderAgentLdapBaseDn(String liderAgentLdapBaseDn) {
+		this.liderAgentLdapBaseDn = liderAgentLdapBaseDn;
+	}
+
+	public String getLiderAgentLdapIdAttribute() {
+		return liderAgentLdapIdAttribute;
+	}
+
+	public void setLiderAgentLdapIdAttribute(String liderAgentLdapIdAttribute) {
+		this.liderAgentLdapIdAttribute = liderAgentLdapIdAttribute;
+	}
+
+	public String getLiderAgentLdapJidAttribute() {
+		return liderAgentLdapJidAttribute;
+	}
+
+	public void setLiderAgentLdapJidAttribute(String liderAgentLdapJidAttribute) {
+		this.liderAgentLdapJidAttribute = liderAgentLdapJidAttribute;
+	}
+
+	public String getLiderAgentLdapClasses() {
+		return liderAgentLdapClasses;
+	}
+
+	public void setLiderAgentLdapClasses(String liderAgentLdapClasses) {
+		this.liderAgentLdapClasses = liderAgentLdapClasses;
+	}
+
+	public String getLiderUserLdapBaseDn() {
+		return liderUserLdapBaseDn;
+	}
+
+	public void setLiderUserLdapBaseDn(String liderUserLdapBaseDn) {
+		this.liderUserLdapBaseDn = liderUserLdapBaseDn;
+	}
+
+	public String getLiderUserLdapIdAttribute() {
+		return liderUserLdapIdAttribute;
+	}
+
+	public void setLiderUserLdapIdAttribute(String liderUserLdapIdAttribute) {
+		this.liderUserLdapIdAttribute = liderUserLdapIdAttribute;
+	}
+
+	public String getLiderUserLdapPrivilegeAttribute() {
+		return liderUserLdapPrivilegeAttribute;
+	}
+
+	public void setLiderUserLdapPrivilegeAttribute(String liderUserLdapPrivilegeAttribute) {
+		this.liderUserLdapPrivilegeAttribute = liderUserLdapPrivilegeAttribute;
+	}
+
+	public String getLiderUserLdapClasses() {
+		return liderUserLdapClasses;
+	}
+
+	public void setLiderUserLdapClasses(String liderUserLdapClasses) {
+		this.liderUserLdapClasses = liderUserLdapClasses;
+	}
+
+	public String getLiderUserGroupLdapClasses() {
+		return liderUserGroupLdapClasses;
+	}
+
+	public void setLiderUserGroupLdapClasses(String liderUserGroupLdapClasses) {
+		this.liderUserGroupLdapClasses = liderUserGroupLdapClasses;
+	}
+
+	public String getLiderProxyAddress() {
+		return liderProxyAddress;
+	}
+
+	public void setLiderProxyAddress(String liderProxyAddress) {
+		this.liderProxyAddress = liderProxyAddress;
+	}
+
+	public Map<Integer, LiderNodeInfoModel> getLiderNodeInfoMap() {
+		return liderNodeInfoMap;
+	}
+
+	public void setLiderNodeInfoMap(Map<Integer, LiderNodeInfoModel> liderNodeInfoMap) {
+		this.liderNodeInfoMap = liderNodeInfoMap;
+	}
+
+	public Integer getLiderLdapPort() {
+		return liderLdapPort;
+	}
+
+	public void setLiderLdapPort(Integer liderLdapPort) {
+		this.liderLdapPort = liderLdapPort;
+	}
+
+	public Integer getLiderXmppPort() {
+		return liderXmppPort;
+	}
+
+	public void setLiderXmppPort(Integer liderXmppPort) {
+		this.liderXmppPort = liderXmppPort;
+	}
+
+	public Integer getLiderDbPort() {
+		return liderDbPort;
+	}
+
+	public void setLiderDbPort(Integer liderDbPort) {
+		this.liderDbPort = liderDbPort;
+	}
+
+	public boolean isLiderCluster() {
+		return isLiderCluster;
+	}
+
+	public void setLiderCluster(boolean isLiderCluster) {
+		this.isLiderCluster = isLiderCluster;
 	}
 
 }
