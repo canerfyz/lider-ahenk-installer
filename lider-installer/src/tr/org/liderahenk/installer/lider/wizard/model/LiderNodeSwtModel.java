@@ -6,7 +6,6 @@ public class LiderNodeSwtModel {
 
 	private int nodeNumber;
 	private Text txtNodeIp;
-	private Text txtNodeName;
 	private Text txtNodeRootPwd;
 	
 	public Text getTxtNodeIp() {
@@ -14,12 +13,6 @@ public class LiderNodeSwtModel {
 	}
 	public void setTxtNodeIp(Text txtNodeIp) {
 		this.txtNodeIp = txtNodeIp;
-	}
-	public Text getTxtNodeName() {
-		return txtNodeName;
-	}
-	public void setTxtNodeName(Text txtNodeName) {
-		this.txtNodeName = txtNodeName;
 	}
 	public Text getTxtNodeRootPwd() {
 		return txtNodeRootPwd;
