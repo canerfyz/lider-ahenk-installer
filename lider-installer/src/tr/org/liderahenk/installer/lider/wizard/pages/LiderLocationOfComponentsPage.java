@@ -46,6 +46,8 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 	private Button btnDatabaseCluster;
 	private Button btnXmppCluster;
 
+	private Button btnLiderCluster;
+
 	public LiderLocationOfComponentsPage(LiderSetupConfig config) {
 		super(LiderLocationOfComponentsPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
 		setDescription("1.2 " + Messages.getString("WHERE_TO_INSTALL_COMPONENTS"));
@@ -122,7 +124,6 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 		});
-		// TODO checkbox
 
 		// Creating another child container.
 		Composite secondChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
@@ -133,8 +134,6 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 
 		txtLdapPort = GUIHelper.createText(secondChild, gdForPortField);
 		txtLdapPort.setText("22");
-
-		// TODO checkbox
 
 		GridLayout glXmpp= new GridLayout(5, false);
 		glXmpp.marginLeft = 30;
@@ -166,14 +165,38 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 		});
+
+		GridLayout glLider = new GridLayout(5, false);
+		glLider.marginLeft = 30;
+		Composite cmpLider = GUIHelper.createComposite(mainContainer, glLider, new GridData());
 		
-		GUIHelper.createLabel(secondChild, Messages.getString("LIDER"));
+		GUIHelper.createLabel(cmpLider, Messages.getString("LIDER"));
 
-		txtLiderIp = GUIHelper.createText(secondChild, gdForIpField);
+		txtLiderIp = GUIHelper.createText(cmpLider, gdForIpField);
 
-		txtLiderPort = GUIHelper.createText(secondChild, gdForPortField);
+		txtLiderPort = GUIHelper.createText(cmpLider, gdForPortField);
 		txtLiderPort.setText("22");
+		
+		GUIHelper.createLabel(cmpLider, Messages.getString("LIDER_CLUSTER"));
 
+		btnLiderCluster = GUIHelper.createButton(cmpLider, SWT.CHECK | SWT.BORDER);
+		btnLiderCluster.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (btnLiderCluster.getSelection()) {
+					txtLiderIp.setEnabled(false);
+					txtLiderPort.setEnabled(false);
+				} else {
+					txtLiderIp.setEnabled(true);
+					txtLiderPort.setEnabled(true);
+				}
+				updatePageStatus(true);
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
+		
 		// Adding selection listeners for
 		// user's choices on radio buttons
 		btnInstallCentral.addSelectionListener(new SelectionListener() {
@@ -316,8 +339,14 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				}
 			}
 			if (config.isInstallLider()) {
-				txtLiderIp.setEnabled(true);
-				txtLiderPort.setEnabled(true);
+				btnLiderCluster.setEnabled(true);
+				if (btnLiderCluster.getSelection()) {
+					txtLiderIp.setEnabled(false);
+					txtLiderPort.setEnabled(false);
+				} else {
+					txtLiderIp.setEnabled(true);
+					txtLiderPort.setEnabled(true);
+				}
 			}
 		} else {
 			// Enable first option
@@ -331,6 +360,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 			txtDatabasePort.setEnabled(false);
 			btnDatabaseCluster.setEnabled(false);
 			btnXmppCluster.setEnabled(false);
+			btnLiderCluster.setEnabled(false);
 			txtLdapIp.setEnabled(false);
 			txtLdapPort.setEnabled(false);
 			txtXmppIp.setEnabled(false);
@@ -407,7 +437,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		else {
 			xmppIpEntered = true;
 		}
-		if (config.isInstallLider()) {
+		if (config.isInstallLider()  && !btnLiderCluster.getSelection()) {
 			if (!txtLiderIp.getText().isEmpty() && NetworkUtils.isIpValid(txtLiderIp.getText())) {
 				liderIpEntered = true;
 			} else {
@@ -439,10 +469,12 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				if (config.isInstallXmpp()) {
 					config.setXmppIp("localhost");
 					config.setXmppPort(null);
+					config.setXmppCluster(false);
 				}
 				if (config.isInstallLider()) {
 					config.setLiderIp("localhost");
 					config.setLiderPort(null);
+					config.setLiderCluster(false);
 				}
 			}
 			// If all components will be installed to a remote computer
@@ -463,11 +495,13 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 					config.setXmppIp(txtRemoteIp.getText());
 					config.setXmppPort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
 							? new Integer(txtRemotePort.getText()) : null);
+					config.setXmppCluster(false);
 				}
 				if (config.isInstallLider()) {
 					config.setLiderIp(txtRemoteIp.getText());
 					config.setLiderPort(txtRemotePort.getText() != null && !txtRemotePort.getText().isEmpty()
 							? new Integer(txtRemotePort.getText()) : null);
+					config.setLiderCluster(false);
 				}
 			}
 		}
@@ -478,6 +512,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				config.setDatabaseIp(txtDatabaseIp.getText());
 				config.setDatabasePort(txtDatabasePort.getText() != null && !txtDatabasePort.getText().isEmpty()
 						? new Integer(txtDatabasePort.getText()) : null);
+				config.setDatabaseCluster(false);
 			} else if (config.isInstallDatabase() && btnDatabaseCluster.getSelection()) {
 				config.setDatabaseCluster(true);
 			}
@@ -490,13 +525,17 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				config.setXmppIp(txtXmppIp.getText());
 				config.setXmppPort(txtXmppPort.getText() != null && !txtXmppPort.getText().isEmpty()
 						? new Integer(txtXmppPort.getText()) : null);
+				config.setXmppCluster(false);
 			} else if (config.isInstallXmpp() && btnXmppCluster.getSelection()) {
 				config.setXmppCluster(true);
 			}
-			if (config.isInstallLider()) {
+			if (config.isInstallLider() && !btnLiderCluster.getSelection()) {
 				config.setLiderIp(txtLiderIp.getText());
 				config.setLiderPort(txtLiderPort.getText() != null && !txtLiderPort.getText().isEmpty()
 						? new Integer(txtLiderPort.getText()) : null);
+				config.setLiderCluster(false);
+			} else if (config.isInstallLider() && btnLiderCluster.getSelection()) {
+				config.setLiderCluster(true);
 			}
 		}
 	}
@@ -523,7 +562,11 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 				return getWizard().getPage(XmppAccessPage.class.getName());
 			}
 		} else if (config.isInstallLider()) { // Lider
-			return findFirstInstance(pagesList, ILiderPage.class);
+			if (config.isLiderCluster()) {
+				return getWizard().getPage(LiderClusterConfPage.class.getName());
+			} else {
+				return getWizard().getPage(LiderAccessPage.class.getName());
+			}
 		}
 		return null;
 	}
