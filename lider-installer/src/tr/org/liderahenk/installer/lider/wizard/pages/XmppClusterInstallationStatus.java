@@ -592,7 +592,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 		printMessage(Messages.getString("SUCCESSFULLY_PREPARED_BACKEND_PROPERTIES"), display);
 
 		printMessage(Messages.getString("CREATING_HAPROXY_CONFIG_FILE"), display);
-		String haproxyCfg = readFile("haproxy.cfg");
+		String haproxyCfg = readFile("haproxy_ejabberd.cfg");
 
 		Map<String, String> map = new HashMap<>();
 		map.put("#HAPROXY_ADDRESS", config.getXmppProxyAddress());
