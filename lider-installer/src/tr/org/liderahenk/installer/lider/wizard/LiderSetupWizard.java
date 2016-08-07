@@ -30,6 +30,9 @@ import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateExistingPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapUpdateStatusPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderClusterConfPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderClusterConfirmPage;
+import tr.org.liderahenk.installer.lider.wizard.pages.LiderClusterInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderComponentSelectionPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfirmPage;
@@ -73,7 +76,7 @@ public class LiderSetupWizard extends Wizard {
 	DatabaseClusterConfirmPage dbClusterConfirm = new DatabaseClusterConfirmPage(config);
 	DatabaseClusterInstallationStatus dbClusterStatus = new DatabaseClusterInstallationStatus(config);
 	DatabaseAccessPage dbAccess = new DatabaseAccessPage(config);
-	DatabaseInstallMethodPage dbInstallMethod = new DatabaseInstallMethodPage(config);
+//	DatabaseInstallMethodPage dbInstallMethod = new DatabaseInstallMethodPage(config);
 	DatabaseConfirmPage dbConfirm = new DatabaseConfirmPage(config);
 	DatabaseInstallationStatus dbStatus = new DatabaseInstallationStatus(config);
 
@@ -96,6 +99,9 @@ public class LiderSetupWizard extends Wizard {
 	XmppConfirmPage xmppConfirm = new XmppConfirmPage(config);
 	XmppInstallationStatus xmppStatus = new XmppInstallationStatus(config);
 
+	LiderClusterConfPage liderClusterConf = new LiderClusterConfPage(config);
+	LiderClusterConfirmPage liderClusterConfirm = new LiderClusterConfirmPage(config);
+	LiderClusterInstallationStatus liderClusterStatus = new LiderClusterInstallationStatus(config);
 	LiderAccessPage liderAccess = new LiderAccessPage(config);
 	LiderInstallMethodPage liderInstallMethod = new LiderInstallMethodPage(config);
 	LiderConfPage liderConfPage = new LiderConfPage(config);
@@ -114,7 +120,7 @@ public class LiderSetupWizard extends Wizard {
 		addPage(dbClusterConfirm);
 		addPage(dbClusterStatus);
 		addPage(dbAccess);
-		addPage(dbInstallMethod);
+//		addPage(dbInstallMethod);
 		addPage(dbConfirm);
 		addPage(dbStatus);
 		// LDAP configuration
@@ -137,6 +143,9 @@ public class LiderSetupWizard extends Wizard {
 		addPage(xmppConfirm);
 		addPage(xmppStatus);
 		// Lider configuration
+		addPage(liderClusterConf);
+		addPage(liderClusterConfirm);
+		addPage(liderClusterStatus);
 		addPage(liderAccess);
 		addPage(liderInstallMethod);
 		addPage(liderConfPage);
