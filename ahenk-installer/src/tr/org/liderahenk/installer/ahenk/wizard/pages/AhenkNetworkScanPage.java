@@ -210,7 +210,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 		txtSudoUsername.setText("root");
 		txtSudoUsername.setEnabled(false);
 
-		txtSudoPassword = new Text(inputContainer, SWT.BORDER | SWT.PASSWORD);
+		txtSudoPassword = new Text(inputContainer, SWT.BORDER);
 		txtSudoPassword.setToolTipText(Messages.getString("PASSWORD"));
 		txtSudoPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		txtSudoPassword.setEnabled(false);
