@@ -19,7 +19,10 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -71,7 +74,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 		setControl(mainContainer);
 		
 		Label label = GUIHelper.createLabel(mainContainer,
-				"Hazır gelen değerler daha önceki kurulumlara veya\nvarsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir. Lütfen kontrol ediniz.");
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 		
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
@@ -119,12 +122,30 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 		
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
 		
-		GUIHelper.createLabel(container, Messages.getString("LDAP_ENTER_CONF_CONTENT"));
+		final Button btnAdvCnf = GUIHelper.createButton(container, SWT.PUSH, Messages.getString("ENABLE_ADVANCED_CONFIGURATION"));
+		btnAdvCnf.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (st.isEnabled()) {
+					st.setEnabled(false);
+					btnAdvCnf.setText(Messages.getString("ENABLE_ADVANCED_CONFIGURATION"));
+				} else {
+					st.setEnabled(true);
+					btnAdvCnf.setText(Messages.getString("DISABLE_ADVANCED_CONFIGURATION"));
+				}
+			}
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
 
 		// Add a text area for configuration.
 		st = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		st.setLayoutData(new GridData(GridData.FILL_BOTH));
-
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint = 90;
+		st.setLayoutData(gd);
+		st.setEnabled(false);
+		
 		// Add a menu which pops up when right clicked.
 		final Menu rightClickMenu = new Menu(st);
 
