@@ -19,8 +19,11 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -54,7 +57,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 	private Text ldapBase;
 
 	private StyledText st;
-	
+
 	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 
 	public XmppConfPage(LiderSetupConfig config) {
@@ -69,10 +72,10 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		Composite mainContainer = GUIHelper.createComposite(parent, 1);
 
 		setControl(mainContainer);
-		
+
 		// TODO messages
 		Label label = GUIHelper.createLabel(mainContainer,
-				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir.\nLütfen kontrol ediniz.");
+				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir. Lütfen kontrol ediniz.");
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
@@ -151,13 +154,36 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		// ------------------------------------------------------------//
 
 		// ----------- Text Editor --------------------//
+
 		GUIHelper.createLabel(container, Messages.getString("XMPP_ENTER_CONF_CONTENT"));
+
+		final Button btnAdvCnf = GUIHelper.createButton(container, SWT.PUSH,
+				Messages.getString("ENABLE_ADVANCED_CONFIGURATION"));
+		btnAdvCnf.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (st.isEnabled()) {
+					st.setEnabled(false);
+					btnAdvCnf.setText(Messages.getString("ENABLE_ADVANCED_CONFIGURATION"));
+				} else {
+					st.setEnabled(true);
+					btnAdvCnf.setText(Messages.getString("DISABLE_ADVANCED_CONFIGURATION"));
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+		});
 
 		Composite textAreaContainer = GUIHelper.createComposite(container, 1);
 
 		// Add a text area for configuration.
 		st = new StyledText(textAreaContainer, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-		st.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.heightHint = 90;
+		st.setLayoutData(gd);
+		st.setEnabled(false);
 
 		// Add a menu which pops up when right clicked.
 		final Menu rightClickMenu = new Menu(st);
@@ -242,13 +268,13 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 	@Override
 	public IWizardPage getNextPage() {
-		
+
 		if (nextPageEventType == NextPageEventType.CLICK_FROM_PREV_PAGE) {
 			// Set default or predefined values to inputs
 			setInputValues();
 			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
 		}
-		
+
 		// Set config variables before going to next page
 		config.setXmppConfContent(st.getText());
 		config.setXmppHostname(host.getText());
@@ -280,8 +306,9 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		if (config.isLdapUpdate()) {
 			ldapRootDn.setText(config.getLdapAdminDn());
 		} else {
-			ldapRootDn.setText(config.getLdapAdminCn() != null
-					? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn() : "cn=admin," + config.getLdapBaseDn());
+			ldapRootDn.setText(
+					config.getLdapAdminCn() != null ? "cn=" + config.getLdapAdminCn() + "," + config.getLdapBaseDn()
+							: "cn=admin," + config.getLdapBaseDn());
 		}
 		ldapPassword.setText(config.getLdapAdminCnPwd() != null ? config.getLdapAdminCnPwd() : "secret");
 		ldapBase.setText(config.getLdapBaseDn());
