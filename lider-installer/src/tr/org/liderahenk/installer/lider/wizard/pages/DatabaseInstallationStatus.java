@@ -179,7 +179,28 @@ public class DatabaseInstallationStatus extends WizardPage
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								CREATE_DATABASE.replace("{0}", config.getDatabaseRootPassword()));
 
+						String command = "mysql -uroot -p{0} -e \"DELETE FROM mysql.user WHERE user='';\"";
+						command = command.replace("{0}", config.getDatabaseRootPassword());
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								command);
+
 						printMessage("Database created successfully.");
+
+						command = "mysql -uroot -p{0} -e \"GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '{1}';\"";
+						command = command.replace("{0}", config.getDatabaseRootPassword()).replace("{1}", config.getDatabaseRootPassword());
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								command);
+						
+						command = "mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"";
+						command = command.replace("{0}", config.getDatabaseRootPassword());
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								command);
 
 						// Remove bind-address
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
@@ -187,6 +208,10 @@ public class DatabaseInstallationStatus extends WizardPage
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								REPLACE_BIND_ADDRESS);
 
+						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
+								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
+								"service mysql restart");
 
 					} catch (CommandExecutionException e) {
 						isInstallationFinished = false;
