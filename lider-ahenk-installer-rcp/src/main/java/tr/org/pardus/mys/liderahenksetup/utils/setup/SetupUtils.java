@@ -96,7 +96,7 @@ public class SetupUtils {
 
 	private static final String EXTRACT_FILE = "tar -xzvf {0} --directory {1}";
 
-	private static final String INSTALL_GDEBI = "apt-get install -y gdebi*";
+	private static final String INSTALL_GDEBI = "apt-get install -y gdebi";
 
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
