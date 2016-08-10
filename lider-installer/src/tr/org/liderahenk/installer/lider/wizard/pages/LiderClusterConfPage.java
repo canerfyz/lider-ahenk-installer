@@ -57,7 +57,6 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 	private Text txtXmppFileSharingPath;
 
 	private Text txtDatabaseAddress;
-	private Text txtDatabasePort;
 	private Text txtDatabaseName;
 	private Text txtDatabaseUsername;
 	private Text txtDatabasePwd;
@@ -267,16 +266,6 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			}
 		});
 
-		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("DATABASE_PORT"));
-		txtDatabasePort = GUIHelper.createText(cmpGeneralInfo);
-		txtDatabasePort.setMessage(Messages.getString("ENTER_PORT_OF_DATABASE_SERVER"));
-		txtDatabasePort.addModifyListener(new ModifyListener() {
-			@Override
-			public void modifyText(ModifyEvent event) {
-				updatePageCompleteStatus();
-			}
-		});
-
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("DATABASE_USERNAME"));
 		txtDatabaseUsername = GUIHelper.createText(cmpGeneralInfo);
 		txtDatabaseUsername.setMessage(Messages.getString("ENTER_USERNAME_OF_DATABASE"));
@@ -473,12 +462,8 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		gdLabels.widthHint = 205;
 		Label lblNodeIp = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_IP"));
 		lblNodeIp.setLayoutData(gdLabels);
-		Label lblNodeName = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_NAME"));
-		lblNodeName.setLayoutData(gdLabels);
 		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
 		lblNodeRootPwd.setLayoutData(gdLabels);
-		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_EXISTS"));
-		lblNodeNewSetup.setLayoutData(gdLabels);
 
 		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -522,7 +507,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				&& !txtXmppLiderPwd.getText().isEmpty() && !txtXmppServiceName.getText().isEmpty()
 				&& !txtXmppMaxTrials.getText().isEmpty() && !txtXmppPacketTimeout.getText().isEmpty()
 				&& !txtXmppPingTimeout.getText().isEmpty() && !txtXmppFileSharingPath.getText().isEmpty()
-				&& !txtDatabaseAddress.getText().isEmpty() && !txtDatabasePort.getText().isEmpty()
+				&& !txtDatabaseAddress.getText().isEmpty() 
 				&& !txtDatabaseName.getText().isEmpty() && !txtDatabaseUsername.getText().isEmpty()
 				&& !txtDatabasePwd.getText().isEmpty() && !txtAgentLdapBaseDn.getText().isEmpty()
 				&& !txtAgentLdapIdAttribute.getText().isEmpty() && !txtAgentLdapJidAttribute.getText().isEmpty()
@@ -726,11 +711,6 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		config.setLiderXmppFileSharingPath(txtXmppFileSharingPath.getText());
 
 		config.setLiderDbAddress(txtDatabaseAddress.getText());
-		if (!config.isDatabaseCluster()) {
-			config.setLiderDbPort(new Integer(txtDatabasePort.getText()));
-		} else {
-			config.setLiderDbPort(null);
-		}
 		config.setLiderDbName(txtDatabaseName.getText());
 		config.setLiderDbUsername(txtDatabaseUsername.getText());
 		config.setLiderDbPwd(txtDatabasePwd.getText());
@@ -805,15 +785,10 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 		if (!config.isDatabaseCluster()) {
 			txtDatabaseAddress
-					.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
+					.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() + ":3306" : "db." + config.getLdapOrgCn() + ":3306");
 		} else {
 			txtDatabaseAddress.setText(config.getDatabaseClusterAddressForLider() != null
-					? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn());
-		}
-		if (!config.isDatabaseCluster()) {
-			txtDatabasePort.setText("3306");
-		} else {
-			txtDatabasePort.setEnabled(false);
+					? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn() + ":3306");
 		}
 		txtDatabaseName.setText("liderdb");
 		txtDatabaseUsername.setText("root");
