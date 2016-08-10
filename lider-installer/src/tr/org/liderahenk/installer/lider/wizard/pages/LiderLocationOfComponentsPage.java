@@ -13,6 +13,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -97,9 +98,13 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		glDatabase.marginLeft = 30;
 		Composite cmpDatabase = GUIHelper.createComposite(mainContainer, glDatabase, new GridData());
 
+		GridData gdForLabels = new GridData();
+		gdForLabels.widthHint = 140;
+		
 		// IP's for components will be taken in this section.
-		GUIHelper.createLabel(cmpDatabase, Messages.getString("DATABASE"));
-
+		Label lblDb = GUIHelper.createLabel(cmpDatabase, Messages.getString("DATABASE"));
+		lblDb.setLayoutData(gdForLabels);
+		
 		txtDatabaseIp = GUIHelper.createText(cmpDatabase, gdForIpField);
 
 		txtDatabasePort = GUIHelper.createText(cmpDatabase, gdForPortField);
@@ -128,8 +133,9 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// Creating another child container.
 		Composite secondChild = GUIHelper.createComposite(mainContainer, gl, new GridData());
 
-		GUIHelper.createLabel(secondChild, Messages.getString("LDAP"));
-
+		Label lblLdap = GUIHelper.createLabel(secondChild, Messages.getString("LDAP"));
+		lblLdap.setLayoutData(gdForLabels);
+		
 		txtLdapIp = GUIHelper.createText(secondChild, gdForIpField);
 
 		txtLdapPort = GUIHelper.createText(secondChild, gdForPortField);
@@ -139,8 +145,9 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		glXmpp.marginLeft = 30;
 		Composite cmpXmpp = GUIHelper.createComposite(mainContainer, glXmpp, new GridData());
 		
-		GUIHelper.createLabel(cmpXmpp, Messages.getString("XMPP"));
-
+		Label lblXmpp = GUIHelper.createLabel(cmpXmpp, Messages.getString("XMPP"));
+		lblXmpp.setLayoutData(gdForLabels);
+		
 		txtXmppIp = GUIHelper.createText(cmpXmpp, gdForIpField);
 
 		txtXmppPort = GUIHelper.createText(cmpXmpp, gdForPortField);
@@ -170,8 +177,9 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		glLider.marginLeft = 30;
 		Composite cmpLider = GUIHelper.createComposite(mainContainer, glLider, new GridData());
 		
-		GUIHelper.createLabel(cmpLider, Messages.getString("LIDER"));
-
+		Label lblLider = GUIHelper.createLabel(cmpLider, Messages.getString("LIDER"));
+		lblLider.setLayoutData(gdForLabels);
+		
 		txtLiderIp = GUIHelper.createText(cmpLider, gdForIpField);
 
 		txtLiderPort = GUIHelper.createText(cmpLider, gdForPortField);
