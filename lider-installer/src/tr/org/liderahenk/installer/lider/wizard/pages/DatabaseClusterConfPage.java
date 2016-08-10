@@ -365,7 +365,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	private void setConfigVariables() {
 
 		config.setDatabaseClusterAddress(createWsrepClusterAddress());
-		config.setDatabaseClusterAddressForLider(createWsrepAddressForLider());
+		config.setDatabaseClusterAddressForLider(createWsrepClusterAddressForLider());
 		config.setDatabaseClusterName(txtClusterName.getText());
 		config.setDatabaseRootPassword(txtDbRootPwd.getText());
 		config.setDatabaseSstUsername(txtSstUsername.getText());
@@ -407,7 +407,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 	}
 
-	private String createWsrepAddressForLider() {
+	private String createWsrepClusterAddressForLider() {
 		
 		String wsrepClusterAddress = "";
 		
