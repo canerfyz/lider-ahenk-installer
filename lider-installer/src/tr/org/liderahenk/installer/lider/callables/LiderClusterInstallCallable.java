@@ -83,7 +83,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 			try {
 
 				InputStream inputStream = this.getClass().getClassLoader()
-						.getResourceAsStream("lider.tar.gz");
+						.getResourceAsStream("lider-cluster.tar.gz");
 				File karafTar = SetupUtils.streamToFile(inputStream, "lider.tar.gz");
 
 				printMessage(Messages.getString("SENDING_TAR_FILE_TO") + " " + nodeIp, display);
@@ -171,8 +171,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("CREATING_DATASOURCE_CFG_FILE"), display);
 				String liderDatasourceCfg = readFile("tr.org.liderahenk.datasource.cfg");
 				Map<String, String> map = new HashMap<>();
-				map.put("#DBSERVER", config.getLiderDbAddress());
-				map.put("#DBPORT", config.getLiderDbPort().toString());
+				map.put("#DBADDRESS", config.getLiderDbAddress());
 				map.put("#DBDATABASE", config.getLiderDbName());
 				map.put("#DBUSERNAME", config.getLiderDbUsername());
 				map.put("#DBPASSWORD", config.getLiderDbPwd());
