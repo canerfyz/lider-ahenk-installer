@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -48,6 +49,10 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 	private Text liderJid;
 	
 	private NextPageEventType nextPageEventType;
+
+	private Text receiverResource;
+
+	private Text receiveFile;
 	
 	public AhenkConfPage(AhenkSetupConfig config) {
 		super(AhenkConfPage.class.getName(), Messages.getString("AHENK_INSTALLATION"), null);
@@ -103,6 +108,28 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		liderJid.setMessage(Messages.getString("EG_LIDER_JID"));
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("RECEIVER_RESOURCE"));
+		receiverResource = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		receiverResource.setText("Smack");
+		receiverResource.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		receiverResource.setMessage(Messages.getString("EG_RECEIVER_RESOURCE"));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("RECEIVE_FILE"));
+		receiveFile = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		receiveFile.setText("/tmp/");
+		receiveFile.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		receiveFile.setMessage(Messages.getString("EG_RECEIVE_FILE"));
 		
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
 		GUIHelper.createLabel(infoComposite, Messages.getString("AHENK_INSTALLATION_XMPP_CONF_HINT"));
@@ -175,6 +202,8 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		map.put("#HOST", xmppHost.getText());
 		map.put("#LIDERJID", liderJid.getText());
 		map.put("#SERVICENAME", xmppServiceName.getText());
+		map.put("#RECEIVER_RESOURCE", receiverResource.getText());
+		map.put("#RECEIVE_FILE", receiveFile.getText());
 
 		text = SetupUtils.replace(map, text);
 		config.setAhenkConfContent(text);
@@ -258,7 +287,8 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 	}
 	
 	private void updatePageCompleteStatus() {
-		if (!xmppHost.getText().isEmpty() && !xmppServiceName.getText().isEmpty() && !liderJid.getText().isEmpty()) {
+		if (!xmppHost.getText().isEmpty() && !xmppServiceName.getText().isEmpty() && !liderJid.getText().isEmpty()
+				&& !receiverResource.getText().isEmpty() && !receiveFile.getText().isEmpty()) {
 			setPageComplete(true);
 		} else {
 			setPageComplete(false);
