@@ -64,7 +64,6 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 
 	// Database configuration
 	private Text dbServer;
-	private Text dbPort;
 	private Text dbDatabase;
 	private Text dbUsername;
 	private Text dbPassword;
@@ -112,7 +111,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		// LDAP configuration
 		//
 
-		GUIHelper.createLabel(lineCont, "LDAP sucunu adresi");
+		GUIHelper.createLabel(lineCont, "LDAP sunucu adresi");
 		ldapServer = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "LDAP sunucu portu");
@@ -164,9 +163,6 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 
 		GUIHelper.createLabel(lineCont, "Veritabanı sucunu adresi");
 		dbServer = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-
-		GUIHelper.createLabel(lineCont, "Veritabanı sunucu portu");
-		dbPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "Veritabanı adı");
 		dbDatabase = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -317,8 +313,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		// Database configuration
 		String text2 = stDatasourceConfig.getText();
 		Map<String, String> map2 = new HashMap<>();
-		map2.put("#DBSERVER", dbServer.getText());
-		map2.put("#DBPORT", dbPort.getText());
+		map2.put("#DBADDRESS", dbServer.getText());
 		map2.put("#DBDATABASE", dbDatabase.getText());
 		map2.put("#DBUSERNAME", dbUsername.getText());
 		map2.put("#DBPASSWORD", dbPassword.getText());
@@ -352,11 +347,10 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		xmppPingTimeout.setText("3000");
 		xmppFilePath.setText("/tmp/xmpp-files/");
 		if (!config.isDatabaseCluster()) {
-			dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() : "db." + config.getLdapOrgCn());
+			dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() + ":3306" : "db." + config.getLdapOrgCn() + ":3306");
 		} else {
-			dbServer.setText(config.getDatabaseClusterAddressForLider() != null ? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn());
+			dbServer.setText(config.getDatabaseClusterAddressForLider() != null ? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn() + ":3306");
 		}
-		dbPort.setText("3306");
 		dbDatabase.setText("liderdb");
 		dbUsername.setText("root");
 		dbPassword.setText(config.getDatabaseRootPassword() != null && !config.getDatabaseRootPassword().isEmpty()
