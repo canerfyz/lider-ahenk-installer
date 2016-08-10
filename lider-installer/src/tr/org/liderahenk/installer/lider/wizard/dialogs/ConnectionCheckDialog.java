@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Shell;
 
+import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
@@ -80,7 +81,7 @@ public class ConnectionCheckDialog extends Dialog {
 		image.setImage(new Image(Display.getCurrent(), this.getClass().getResourceAsStream("/icons/wait.png")));
 
 		// Message to user
-		message = GUIHelper.createLabel(container, "Checking authentication parameters please wait..", SWT.WRAP);
+		message = GUIHelper.createLabel(container, Messages.getString("CHECKING_AUTHENTICATION_PARAMETERS_PLEASE_WAIT"), SWT.WRAP);
 		GridData gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		gridData.widthHint = 350;
 		message.setLayoutData(gridData);
@@ -130,13 +131,13 @@ public class ConnectionCheckDialog extends Dialog {
 						if (canAuthorize) {
 							image.setImage(new Image(Display.getCurrent(),
 									this.getClass().getResourceAsStream("/icons/success.png")));
-							message.setText("Authentication successfull.");
+							message.setText(Messages.getString("AUTHENTICATION_SUCCESSFULL"));
 							progBar.setVisible(false);
 							okBtn.setVisible(true);
 						} else {
 							image.setImage(new Image(Display.getCurrent(),
 									this.getClass().getResourceAsStream("/icons/fail.png")));
-							message.setText("Authentication failed. Please check connection information..");
+							message.setText(Messages.getString("AUTHENTICATION_FAILED"));
 							progBar.setVisible(false);
 							okBtn.setVisible(true);
 						}
