@@ -59,7 +59,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 	private Text liderConsoleUser;
 	private Text liderConsoleUserPwd;
 	
-	private NextPageEventType nextPageEventType;
+	private NextPageEventType nextPageEventType = NextPageEventType.CLICK_FROM_PREV_PAGE;
 	
 	public LdapConfPage(LiderSetupConfig config) {
 		super(LdapConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -99,7 +99,6 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 
 		GUIHelper.createLabel(lineCont, "Config Admin DN Password");
 		configAdminDnPwd = GUIHelper.createText(lineCont);
-		configAdminDnPwd.setText("secret");
 
 		GUIHelper.createLabel(lineCont, "Admin CN");
 		adminCn = GUIHelper.createText(lineCont);
@@ -107,14 +106,12 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 		
 		GUIHelper.createLabel(lineCont, "Admin CN Password");
 		adminCnPwd = GUIHelper.createText(lineCont);
-		adminCnPwd.setText("secret");
 		
 		GUIHelper.createLabel(lineCont, "Lider IP address");
 		liderIp = GUIHelper.createText(lineCont);
 		
 		GUIHelper.createLabel(lineCont, "Lider Console User Password");
 		liderConsoleUserPwd = GUIHelper.createText(lineCont);
-		liderConsoleUserPwd.setText("p@ssw0rd");
 		
 		GUIHelper.createLabel(lineCont, "Lider Console User");
 		liderConsoleUser = GUIHelper.createText(lineCont);
@@ -272,7 +269,7 @@ public class LdapConfPage extends WizardPage implements ILdapPage, ControlNextEv
 		cname.setText(config.getLdapOrgCn());
 		baseDn.setText(config.getLdapBaseDn());
 		baseCn.setText(config.getLdapBaseCn());
-		if (config.isInstallLider()) {
+		if (config.isInstallLider() && !config.isLiderCluster()) {
 			liderIp.setText(config.getLiderIp());
 		} else {
 			liderIp.setText("lider." + config.getLdapOrgCn());
