@@ -496,6 +496,9 @@ public class XmppClusterInstallationStatus extends WizardPage
 					Messages.getString("SUCCESSFULLY_CREATED_SHARED_ROSTER_GROUP_AT") + " " + firstNode.getNodeIp(),
 					display);
 
+			// TODO check with "srg_get_info everyone SERVICE_NAME".
+			// TODO if not created try again.
+			
 			printMessage(Messages.getString("ADDING_DEFAULT_SRG_BEHAVIOUR_AT") + " " + firstNode.getNodeIp(), display);
 			manager.execCommand(EJABBERD_SRG_ADD_ALL, new Object[] { PropertyReader.property("xmpp.cluster.bin.path"),
 					config.getXmppHostname(), config.getXmppHostname() });
