@@ -237,13 +237,17 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 							// Start Ejabberd at each node
 							for (XmppNodeInfoModel clusterNode : newNodeList) {
-
-								// Send Erlang cookie from first node to others
 								startEjabberd(clusterNode, display);
 							}
-
 							printMessage(Messages.getString("WAITING_EJABBERD_TO_START"), display);
-							Thread.sleep(15000);
+							Thread.sleep(20000);
+
+							// Restart Ejabberd at each node
+							for (XmppNodeInfoModel clusterNode : newNodeList) {
+								restartEjabberd(clusterNode, display);
+							}
+							printMessage(Messages.getString("WAITING_EJABBERD_TO_RESTART"), display);
+							Thread.sleep(20000);
 
 							// Join each node except first node to cluster
 							for (XmppNodeInfoModel clusterNode : newNodeList) {
@@ -257,7 +261,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 									config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
 									config.getXmppNodeInfoMap(), display);
 
-							// Restart Ejabberd at first node
+							// Restart Ejabberd at first node.
 							// Acutally it should not be necessary
 							// but there may be a bug about that.
 							// Because if first node is not restarted after
@@ -265,7 +269,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 							// does not work properly
 							restartEjabberd(firstNode, display);
 
-							if (installedNodeList == null && installedNodeList.isEmpty()) {
+							if (installedNodeList == null || installedNodeList.isEmpty()) {
 								// Create shared roster group and users
 								createSrgAndUsers(firstNode, display);
 							}
@@ -539,8 +543,6 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_USER") + " " + config.getXmppLiderUsername()
 					+ " at " + firstNode.getNodeIp(), display);
 
-			// TODO Restart ejabberd
-
 			logger.log(Level.INFO, "Successfully registered users at {0}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
@@ -713,9 +715,56 @@ public class XmppClusterInstallationStatus extends WizardPage
 					display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-			throw new Exception();
-		}
 
+			boolean joinSuccessfull = false;
+			for (int i = 0; i < 3; i++) {
+				try {
+					printMessage(Messages.getString("NODE_COULD_NOT_JOIN_TO_CLUSTER_AT") + " " + clusterNode.getNodeIp(), display);
+					printMessage(Messages.getString("WILL_RETRY_TO_JOIN_AT") + " " + clusterNode.getNodeIp(), display);
+					
+					printMessage(Messages.getString("STOPPING_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+					manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl stop", new Object[] {});
+					printMessage(Messages.getString("SUCCESSFULLY_STOPPED_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+					
+					printMessage(Messages.getString("STARTING_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+					manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl start", new Object[] {});
+					printMessage(Messages.getString("SUCCESSFULLY_STARTED_EJABBERD_AT") + " " + clusterNode.getNodeIp(), display);
+					
+					printMessage(Messages.getString("WAITING_FOR_EJABBERD_TO_STARTUP_AT") + " " + clusterNode.getNodeIp(), display);
+					Thread.sleep(20000);
+					
+					printMessage(Messages.getString("RETRYING_TO_JOIN_TO_CLUSTER_AT") + " " + clusterNode.getNodeIp(), display);
+					manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl join_cluster 'ejabberd@{0}.{1}'",
+							new Object[] { firstNodeName, config.getXmppHostname() });
+					printMessage(Messages.getString("SUCCESSFULLY_JOINED_TO_CLUSTER_AT") + " " + clusterNode.getNodeIp(),
+							display);
+					joinSuccessfull = true;
+				} catch (CommandExecutionException e2) {
+					joinSuccessfull = false;
+					printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_REJOINING_TO_CLUSTER_AT") + clusterNode.getNodeIp(),
+							display);
+					printMessage(
+							Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+							display);
+					printMessage(Messages.getString("WILL_RETRY_TO_JOIN_AT") + " " + clusterNode.getNodeIp(), display);
+					logger.log(Level.SEVERE, e.getMessage());
+					e.printStackTrace();
+				}
+				
+				if (joinSuccessfull) {
+					break;
+				}
+			}
+			
+			if (joinSuccessfull) {
+				printMessage(Messages.getString("REJOINING_TO_CLUSTER_WAS_SUCCESSFULL_AT") + " " + clusterNode.getNodeIp(),
+						display);
+			} else {
+				printMessage(Messages.getString("REJOINING_TO_CLUSTER_FAILED_AT") + " " + clusterNode.getNodeIp(),
+						display);
+				throw new Exception();
+			}
+		}
 	}
 
 	private void restartEjabberd(XmppNodeInfoModel clusterNode, Display display) throws Exception {
