@@ -1,6 +1,5 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -35,25 +33,25 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author Volkan Şahin <bm.volkansahin@gmail.com> 
+ * @author Volkan Şahin <bm.volkansahin@gmail.com>
  */
 public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 
 	private AhenkSetupConfig config;
 
 	private StyledText stMainConfig;
-	
+
 	// XMPP configuration
 	private Text xmppHost;
 	private Text xmppServiceName;
 	private Text liderJid;
-	
+
 	private NextPageEventType nextPageEventType;
 
 	private Text receiverResource;
 
 	private Text receiveFile;
-	
+
 	public AhenkConfPage(AhenkSetupConfig config) {
 		super(AhenkConfPage.class.getName(), Messages.getString("AHENK_INSTALLATION"), null);
 		setDescription("3.4 " + Messages.getString("AHENK_CONF"));
@@ -65,17 +63,17 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
-		
+
 		container = new ScrolledComposite(container, SWT.V_SCROLL);
 		container.setLayout(new GridLayout(1, false));
 		container.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, true));
-		
+
 		Composite innerContainer = new Composite(container, SWT.NONE);
 		innerContainer.setLayout(new GridLayout(1, false));
 		innerContainer.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
-		
+
 		Composite lineCont = GUIHelper.createComposite(innerContainer, 2);
-		
+
 		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_SERVER_HOST_ADDRESS"));
 		xmppHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppHost.setText(config.getHost() != null ? config.getHost() : "");
@@ -86,7 +84,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		xmppHost.setMessage(Messages.getString("EG_XMPP_HOST"));
-		
+
 		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_SERVER_SERVICE_NAME"));
 		xmppServiceName = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		xmppServiceName.setText(config.getServiceName() != null ? config.getServiceName() : "");
@@ -97,7 +95,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		xmppServiceName.setMessage(Messages.getString("EG_XMPP_SERVICE_NAME"));
-		
+
 		GUIHelper.createLabel(lineCont, Messages.getString("LIDER_XMPP_USERNAME"));
 		liderJid = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		liderJid.setText(config.getLiderJid() != null ? config.getLiderJid() : "");
@@ -108,7 +106,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		liderJid.setMessage(Messages.getString("EG_LIDER_JID"));
-		
+
 		GUIHelper.createLabel(lineCont, Messages.getString("RECEIVER_RESOURCE"));
 		receiverResource = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 		receiverResource.setText("Smack");
@@ -130,11 +128,10 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		receiveFile.setMessage(Messages.getString("EG_RECEIVE_FILE"));
-		
+
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
 		GUIHelper.createLabel(infoComposite, Messages.getString("AHENK_INSTALLATION_XMPP_CONF_HINT"));
-		
-		
+
 		GUIHelper.createLabel(innerContainer, Messages.getString("AHENK_CONF"));
 
 		// Add a text area for configuration.
@@ -153,18 +150,17 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 				}
 			}
 		});
-		
+
 		// Read from file and bring default configuration
 		// in the opening of page
 		readFile("ahenk.conf", stMainConfig);
-		
 
 		((ScrolledComposite) container).setContent(innerContainer);
 		innerContainer.setSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 		((ScrolledComposite) container).setExpandVertical(true);
 		((ScrolledComposite) container).setExpandHorizontal(true);
 		((ScrolledComposite) container).setMinSize(innerContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-		
+
 		setPageComplete(false);
 		updatePageCompleteStatus();
 	}
@@ -176,18 +172,18 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			nextPageEventType = NextPageEventType.NEXT_BUTTON_CLICK;
 			updatePageCompleteStatus();
 		}
-		
+
 		AhenkConfirmPage confPage = (AhenkConfirmPage) super.getNextPage();
 
 		// Set config variables and confirm page labels.
-		if (config.getAhenkInstallMethod()==InstallMethod.APT_GET) {
+		if (config.getAhenkInstallMethod() == InstallMethod.APT_GET) {
 			confPage.getInstallLabel().setText("- " + Messages.getString("USE_REPOSITORY"));
-		} else if (config.getAhenkInstallMethod()==InstallMethod.PROVIDED_DEB) {
+		} else if (config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
 			confPage.getInstallLabel().setText("- " + Messages.getString("USE_GIVEN_DEB"));
 		} else {
 			confPage.getInstallLabel().setText("- " + Messages.getString("USE_GIVEN_URL"));
 		}
-		
+
 		if (config.getAhenkAccessMethod() == AccessMethod.USERNAME_PASSWORD) {
 			confPage.getAccessLabel().setText("- " + Messages.getString("ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 		} else {
@@ -210,7 +206,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		config.setAhenkAbsPathConfFile(writeToFile(text, "ahenk.conf"));
 		return confPage;
 	}
-	
+
 	/**
 	 * Reads file from classpath location for current project and sets it to a
 	 * text in a GUI.
@@ -285,10 +281,10 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 
 		return absPath;
 	}
-	
+
 	private void updatePageCompleteStatus() {
 		if (!xmppHost.getText().isEmpty() && !xmppServiceName.getText().isEmpty() && !liderJid.getText().isEmpty()
-				&& !receiverResource.getText().isEmpty() && !receiveFile.getText().isEmpty()) {
+				&& !receiveFile.getText().isEmpty()) {
 			setPageComplete(true);
 		} else {
 			setPageComplete(false);
