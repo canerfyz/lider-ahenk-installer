@@ -307,6 +307,7 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// This method sets fields enable/disable
 		// according to user's radio button choices
 		organizeFields();
+		organizeClusterButtons();
 		updatePageStatus(false);
 	}
 
@@ -602,17 +603,43 @@ public class LiderLocationOfComponentsPage extends WizardPage {
 		// If a component is not selected
 		// then change its style to disabled.
 		txtDatabaseIp.setEnabled(config.isInstallDatabase());
+		txtDatabasePort.setEnabled(config.isInstallDatabase());
 		txtLdapIp.setEnabled(config.isInstallLdap());
+		txtLdapPort.setEnabled(config.isInstallLdap());
 		txtXmppIp.setEnabled(config.isInstallXmpp());
+		txtXmppPort.setEnabled(config.isInstallXmpp());
 		txtLiderIp.setEnabled(config.isInstallLider());
-
+		txtLiderPort.setEnabled(config.isInstallLider());
+		
+		organizeClusterButtons();
+		
 		organizeFields();
 	}
 
+	private void organizeClusterButtons() {
+		if (config.isInstallDatabase()) {
+			btnDatabaseCluster.setEnabled(true);
+		} else {
+			btnDatabaseCluster.setEnabled(false);
+		}
+		if (config.isInstallXmpp()) {
+			btnXmppCluster.setEnabled(true);
+		} else {
+			btnXmppCluster.setEnabled(false);
+		}
+		if (config.isInstallLider()) {
+			btnLiderCluster.setEnabled(true);
+		} else {
+			btnLiderCluster.setEnabled(false);
+		}
+	}
+	
 	@Override
 	public IWizardPage getNextPage() {
 		setConfigVariables();
 
+		organizeClusterButtons();
+		
 //		((ControlNextEvent) selectNextPage()).setNextPageEventType(
 //				NextPageEventType.CLICK_FROM_PREV_PAGE);
 		
