@@ -162,6 +162,22 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				throw new Exception();
 			}
 
+			// Purge anything about mariadb and mysql
+			try {
+				printMessage(Messages.getString("CLEANING_BEFORE_INSTALLATION_AT") + " " + nodeIp,
+						display);
+				manager.execCommand("apt-get -y --force-yes purge -y mysql-* mariadb-*", new Object[] {});
+				printMessage(Messages.getString("SUCCESSFULLY_CLEANED_BEFORE_INSTALLATION_AT") + " " + nodeIp, display);
+				logger.log(Level.INFO, "Successfully successfully cleaned before installation at: {0}",
+						new Object[] { nodeIp });
+			} catch (CommandExecutionException e) {
+				printMessage(Messages.getString("COULD_NOT_CLEAN_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				logger.log(Level.SEVERE, e.getMessage());
+				e.printStackTrace();
+				throw new Exception();
+			}
+
 			// Install mariadb-server-10.1
 			try {
 				printMessage(Messages.getString("INSTALLING_PACKAGE") + " 'mariadb-server-10.1' to: " + nodeIp,
