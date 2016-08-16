@@ -291,7 +291,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			Thread.sleep(30000);
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + firstNode.getNodeIp(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -335,7 +335,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 					+ clusterNode.getNodeIp(), display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
 					+ clusterNode.getNodeIp(), display);
 			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
 			logger.log(Level.SEVERE, e.getMessage());
@@ -373,7 +373,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 					display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
 					+ clusterNode.getNodeIp(), display);
 			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
 			logger.log(Level.SEVERE, e.getMessage());
@@ -411,7 +411,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO") + " "
+			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
 					+ clusterNode.getNodeIp(), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
