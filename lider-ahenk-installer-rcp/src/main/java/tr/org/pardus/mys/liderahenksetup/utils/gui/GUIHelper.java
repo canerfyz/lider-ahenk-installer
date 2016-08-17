@@ -62,7 +62,7 @@ public class GUIHelper {
 		t.setLayoutData(layoutData);
 		t.setBackground(getApplicationBackground());
 		t.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-		t.setFont(FontProvider.getInstance().get(FontProvider.INPUT_FONT));
+//		t.setFont(FontProvider.getInstance().get(FontProvider.INPUT_FONT));
 		return t;
 	}
 
@@ -78,7 +78,7 @@ public class GUIHelper {
 		t.setLayoutData(layoutData);
 		t.setBackground(getApplicationBackground());
 		t.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_BLACK));
-		t.setFont(FontProvider.getInstance().get(FontProvider.INPUT_FONT));
+//		t.setFont(FontProvider.getInstance().get(FontProvider.INPUT_FONT));
 		return t;
 	}
 
@@ -158,7 +158,7 @@ public class GUIHelper {
 		Button b = new Button(parent, buttonType | SWT.BORDER);
 		b.setText(text);
 		b.setBackground(getApplicationBackground());
-		b.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
+//		b.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		return b;
 	}
 
@@ -181,7 +181,7 @@ public class GUIHelper {
 		Label l = new Label(parent, SWT.NONE);
 		l.setText(text);
 		l.setBackground(getApplicationBackground());
-		l.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
+//		l.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		return l;
 	}
 
@@ -196,7 +196,7 @@ public class GUIHelper {
 		Label l = new Label(parent, style | SWT.NONE);
 		l.setText(text);
 		l.setBackground(getApplicationBackground());
-		l.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
+//		l.setFont(FontProvider.getInstance().get(FontProvider.LABEL_FONT));
 		return l;
 	}
 
