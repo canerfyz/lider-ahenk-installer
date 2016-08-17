@@ -225,7 +225,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 							e.printStackTrace();
 							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"),
 									display);
-							printMessage(Messages.getString("ERROR_MESSAGE" + " " + e.getMessage()), display);
+							printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 							isInstallationFinished = false;
 							// If any error occured user should be
 							// able to go back and change selections
@@ -337,14 +337,14 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
 					+ clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT") + " "
 					+ clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -375,7 +375,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		} catch (SSHConnectionException e) {
 			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
 					+ clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -383,7 +383,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			printMessage(
 					Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_NODE_AT") + " " + clusterNode.getNodeIp(),
 					display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();

@@ -296,7 +296,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 							e.printStackTrace();
 							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"),
 									display);
-							printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+							printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 							isInstallationFinished = false;
 							// If any error occured user should be
 							// able to go back and change selections
@@ -429,7 +429,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",clusterNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -465,7 +465,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",firstNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -509,7 +509,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",firstNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -565,7 +565,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",xmppProxyAddress), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -689,7 +689,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",clusterNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -770,7 +770,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",clusterNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -802,7 +802,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",clusterNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -836,7 +836,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -872,7 +872,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_",clusterNode.getNodeIp()), display);
-			printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
