@@ -133,7 +133,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 						final LiderNodeInfoModel clusterNode = entry.getValue();
 
 						Callable<Boolean> callable = new LiderClusterInstallCallable(clusterNode.getNodeIp(),
-								clusterNode.getNodeRootPwd(), display, config, txtLogConsole);
+								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), display, config,
+								txtLogConsole);
 						Future<Boolean> result = executor.submit(callable);
 						resultList.add(result);
 					}
@@ -175,6 +176,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 								final LiderNodeInfoModel clusterNode = entry.getValue();
 
+								exportJavaHome(clusterNode, display);
+
 								startNode(clusterNode, display);
 							}
 
@@ -185,6 +188,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 								final LiderNodeInfoModel clusterNode = entry.getValue();
 
 								restartNode(clusterNode, display);
+
+								modifyCellarConfig(clusterNode, display);
 							}
 
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
@@ -267,6 +272,76 @@ public class LiderClusterInstallationStatus extends WizardPage
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
 
+	}
+
+	private void modifyCellarConfig(LiderNodeInfoModel clusterNode, Display display) throws Exception {
+
+		SSHManager manager = null;
+
+		// Modify org.apache.karaf.cellar.groups.cfg
+		try {
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
+			manager.connect();
+
+			printMessage(Messages.getString("MODIFYING_CELLAR_CONFIGURATION_AT") + " " + clusterNode.getNodeIp(),
+					display);
+			manager.execCommand(
+					"sed -i '/default.config.sync = cluster/c\\default.config.sync = disabled' /opt/{0}/etc/org.apache.karaf.cellar.groups.cfg",
+					new Object[] { PropertyReader.property("lider.package.name") });
+			printMessage(
+					Messages.getString("SUCCESSFULLY_MODIFIED_CELLAR_CONFIGURATION") + " " + clusterNode.getNodeIp(),
+					display);
+
+			logger.log(Level.INFO, "Successfully modified org.apache.karaf.cellar.groups.cfg at: {0}",
+					new Object[] { clusterNode.getNodeIp() });
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_CELLAR_CONFIGURATION_AT") + " "
+					+ clusterNode.getNodeIp(), display);
+			printMessage(
+					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+					display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
+			}
+		}
+
+	}
+
+	private void exportJavaHome(LiderNodeInfoModel clusterNode, Display display) throws Exception {
+		SSHManager manager = null;
+
+		try {
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
+			manager.connect();
+
+			printMessage(Messages.getString("EXPORTING_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(), display);
+			manager.execCommand(
+					"[ \"$JAVA_HOME\" ] || echo -e '\nexport JAVA_HOME=$(readlink -f /usr/bin/javac | sed \"s:/bin/javac::\")\nexport PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile && source /etc/profile",
+					new Object[] { PropertyReader.property("lider.package.name") });
+			printMessage(Messages.getString("SUCCESSFULLY_EXPORTED_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(),
+					display);
+
+			logger.log(Level.INFO, "Successfully exported Java home at: {0}", new Object[] { clusterNode.getNodeIp() });
+		} catch (CommandExecutionException e) {
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_CELLAR_CONFIGURATION_AT") + " "
+					+ clusterNode.getNodeIp(), display);
+			printMessage(
+					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+					display);
+			logger.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
+			throw new Exception();
+		} finally {
+			if (manager != null) {
+				manager.disconnect();
+			}
+		}
 	}
 
 	private void restartNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
