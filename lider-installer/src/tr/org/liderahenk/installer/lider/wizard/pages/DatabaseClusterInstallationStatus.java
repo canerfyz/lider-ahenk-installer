@@ -240,7 +240,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 						}
 
 					} else {
-						printMessage(Messages.getString("INSTALLER_WONT_CONTINUE_BECAUSE_NO_OF_NODES_SETUP_FAILED"),
+						printMessage(Messages.getString("INSTALLER_WONT_CONTINUE_BECAUSE_ONE_OF_NODES_SETUP_FAILED"),
 								display);
 						isInstallationFinished = false;
 

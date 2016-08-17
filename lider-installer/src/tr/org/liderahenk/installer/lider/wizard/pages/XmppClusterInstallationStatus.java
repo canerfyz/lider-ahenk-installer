@@ -163,7 +163,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 						} catch (Exception e) {
 							allNodesSuccess = false;
 							printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ONE_OF_ALREADY_INSTALLED_NODES"), display);
-							printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(), display);
+							printMessage(Messages.getString("EXCEPTION_MESSAGE_AT",e.getMessage(),clusterNode.getNodeIp()), display);
 							logger.log(Level.SEVERE, e.getMessage());
 							e.printStackTrace();
 						}
@@ -296,7 +296,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 							e.printStackTrace();
 							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"),
 									display);
-							printMessage(Messages.getString("ERROR_MESSAGE" + " " + e.getMessage()), display);
+							printMessage(Messages.getString("ERROR_MESSAGE",e.getMessage()), display);
 							isInstallationFinished = false;
 							// If any error occured user should be
 							// able to go back and change selections
@@ -350,21 +350,21 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		// Check SSH connection
 		try {
-			printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CHECKING_CONNECTION_TO_",clusterNode.getNodeIp()), display);
 
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getXmppPort(), config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_",clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
 					new Object[] { clusterNode.getNodeIp(), "root" });
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_",clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_",clusterNode.getNodeIp()), display);
 			printMessage(
-					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
+					Messages.getString("EXCEPTION_MESSAGE_AT",e.getMessage(),clusterNode.getNodeIp()),
 					display);
 			e.printStackTrace();
 			logger.log(Level.SEVERE, e.getMessage());
@@ -373,7 +373,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		// Modify /etc/hosts
 		try {
-			printMessage(Messages.getString("CONFIGURING_ALREADY_INSTALLED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONFIGURING_ALREADY_INSTALLED_NODE_AT_",clusterNode.getNodeIp()), display);
 
 			// Write each node to /etc/hosts
 			for (XmppNodeInfoModel newNode : newNodeList) {
@@ -381,12 +381,12 @@ public class XmppClusterInstallationStatus extends WizardPage
 						new Object[] { newNode.getNodeIp(), newNode.getNodeName(), config.getXmppHostname() });
 			}
 
-			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ETC_HOSTS_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ETC_HOSTS_AT_",clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully modified /etc/hosts at: {0}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ALREADY_INSTALLED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ALREADY_INSTALLED_NODE_AT",clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT",e.getMessage(),clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();

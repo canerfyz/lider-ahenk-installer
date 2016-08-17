@@ -89,7 +89,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 	public LiderClusterConfPage(LiderSetupConfig config) {
 		super(LiderClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("3.4 " + Messages.getString("LIDER_CLUSTER_CONF"));
+		setDescription(Messages.getString("LIDER_CLUSTER_CONF","3.4"));
 		this.config = config;
 	}
 

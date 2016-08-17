@@ -19,7 +19,7 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 
 	public LiderClusterConfirmPage(LiderSetupConfig config) {
 		super(LiderClusterConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("4.3 " + Messages.getString("KARAF_CLUSTER_CONFIRM"));
+		setDescription(Messages.getString("KARAF_CLUSTER_CONFIRM","4.3"));
 		this.config = config;
 	}
 

@@ -70,7 +70,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 	public LiderClusterInstallationStatus(LiderSetupConfig config) {
 		super(LiderClusterInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription("5.4 " + Messages.getString("LIDER_CLUSTER_INSTALLATION"));
+		setDescription(Messages.getString("LIDER_CLUSTER_INSTALLATION", "5.4"));
 		this.config = config;
 	}
 
@@ -180,19 +180,19 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
-								
+
 								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 								final LiderNodeInfoModel clusterNode = entry.getValue();
-								
+
 								restartNode(clusterNode, display);
 							}
-							
+
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
-								
+
 								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 								final LiderNodeInfoModel clusterNode = entry.getValue();
-								
+
 								defineServiceForNode(clusterNode, display);
 							}
 
@@ -223,7 +223,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 							e.printStackTrace();
 							printMessage(Messages.getString("ERROR_OCCURED_WHILE_STARTING_OR_CONFIGURING_NODE"),
 									display);
-							printMessage(Messages.getString("ERROR_MESSAGE" + " " + e.getMessage()), display);
+							printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 							isInstallationFinished = false;
 							// If any error occured user should be
 							// able to go back and change selections
@@ -238,7 +238,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 						}
 
 					} else {
-						printMessage(Messages.getString("INSTALLER_WONT_CONTINUE_BECAUSE_NO_OF_NODES_SETUP_FAILED"),
+						printMessage(Messages.getString("INSTALLER_WONT_CONTINUE_BECAUSE_ONE_OF_NODES_SETUP_FAILED"),
 								display);
 						isInstallationFinished = false;
 
@@ -268,20 +268,21 @@ public class LiderClusterInstallationStatus extends WizardPage
 		return PageFlowHelper.selectNextPage(config, this);
 
 	}
-	
+
 	private void restartNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
-		
+
 		try {
 			SSHManager.USE_PTY = false;
-			String karafStartCmd = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
+			String karafStartCmd = "nohup /opt/" + PropertyReader.property("lider.package.name")
+					+ "/bin/karaf > /dev/null 2>&1 &";
 
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), config.getLiderPort(),
-					config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("RESTARTING_CELLAR_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("RESTARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
 			try {
 				manager.execCommand("pgrep -f karaf | xargs kill", new Object[] {});
 			} catch (CommandExecutionException e) {
@@ -295,23 +296,24 @@ public class LiderClusterInstallationStatus extends WizardPage
 			});
 
 			Thread.sleep(30000);
-			
-			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_CELLAR_NODE_AT") + " " + clusterNode.getNodeIp(), display);
-			logger.log(Level.INFO, "Successfully restarted Cellar node at {0}", new Object[] { clusterNode.getNodeIp() });
+
+			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
+			logger.log(Level.INFO, "Successfully restarted Cellar node at {0}",
+					new Object[] { clusterNode.getNodeIp() });
 			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_CELLAR_NODE_AT") + clusterNode.getNodeIp(),
+			printMessage(
+					Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -320,47 +322,47 @@ public class LiderClusterInstallationStatus extends WizardPage
 				manager.disconnect();
 			}
 		}
-		
+
 	}
 
 	private void startNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
-		
+
 		try {
 			SSHManager.USE_PTY = false;
-			String karafStartCmd = "nohup /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf > /dev/null 2>&1 &";
+			String karafStartCmd = "nohup /opt/" + PropertyReader.property("lider.package.name")
+					+ "/bin/karaf > /dev/null 2>&1 &";
 
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), config.getLiderPort(),
-					config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("STARTING_CELLAR_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
 			manager.execCommand(karafStartCmd, new Object[] {}, new IOutputStreamProvider() {
 				@Override
 				public byte[] getStreamAsByteArray() {
 					return "\n".getBytes(StandardCharsets.UTF_8);
 				}
 			});
-			
+
 			Thread.sleep(30000);
 
-			printMessage(Messages.getString("SUCCESSFULLY_STARTED_CELLAR_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully started Cellar node at {0}", new Object[] { clusterNode.getNodeIp() });
 			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT") + clusterNode.getNodeIp(),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -369,12 +371,12 @@ public class LiderClusterInstallationStatus extends WizardPage
 				manager.disconnect();
 			}
 		}
-		
+
 	}
-	
+
 	private void defineServiceForNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
 		SSHManager manager = null;
-		
+
 		// Install service wrapper
 		try {
 			SSHManager.USE_PTY = false;
@@ -383,32 +385,33 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager = new SSHManager(clusterNode.getNodeIp(), "karaf", "karaf", 8101, null, null);
 			manager.connect();
 
-			printMessage(Messages.getString("INSTALLING_SERVICE_WRAPPER_AT_NODE") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("INSTALLING_SERVICE_WRAPPER_AT_NODE", clusterNode.getNodeIp()), display);
 			manager.execCommand(wrapperInstallCmd, new Object[] {}, new IOutputStreamProvider() {
 				@Override
 				public byte[] getStreamAsByteArray() {
 					return "\n".getBytes(StandardCharsets.UTF_8);
 				}
 			});
-			
+
 			Thread.sleep(30000);
 
-			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SERVICE_WRAPPER_AT") + " " + clusterNode.getNodeIp(), display);
-			logger.log(Level.INFO, "Successfully installed service wrapper at node {0}", new Object[] { clusterNode.getNodeIp() });
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SERVICE_WRAPPER_AT", clusterNode.getNodeIp()),
+					display);
+			logger.log(Level.INFO, "Successfully installed service wrapper at node {0}",
+					new Object[] { clusterNode.getNodeIp() });
 			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT") + clusterNode.getNodeIp(),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -417,41 +420,41 @@ public class LiderClusterInstallationStatus extends WizardPage
 				manager.disconnect();
 			}
 		}
-		
+
 		try {
 			SSHManager.USE_PTY = false;
-			String serviceDefineCmd = "ln -s /opt/" + PropertyReader.property("lider.package.name") + "/bin/karaf-service /etc/init.d/ && update-rc.d karaf-service defaults";
+			String serviceDefineCmd = "ln -s /opt/" + PropertyReader.property("lider.package.name")
+					+ "/bin/karaf-service /etc/init.d/ && update-rc.d karaf-service defaults";
 
-			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(), config.getLiderPort(),
-					config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("DEFINING_KARAF_SERVICE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("DEFINING_KARAF_SERVICE_AT", clusterNode.getNodeIp()), display);
 			manager.execCommand(serviceDefineCmd, new Object[] {}, new IOutputStreamProvider() {
 				@Override
 				public byte[] getStreamAsByteArray() {
 					return "\n".getBytes(StandardCharsets.UTF_8);
 				}
 			});
-			
+
 			Thread.sleep(30000);
 
-			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });
 			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + clusterNode.getNodeIp(), display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT") + clusterNode.getNodeIp(),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -472,24 +475,22 @@ public class LiderClusterInstallationStatus extends WizardPage
 					config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("INSTALLING_HAPROXY_PACKAGE_TO") + " " + liderProxyAddress, display);
+			printMessage(Messages.getString("INSTALLING_HAPROXY_PACKAGE_TO", liderProxyAddress), display);
 			manager.execCommand("apt-get -y --force-yes install haproxy", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_HAPROXY_PACKAGE_TO") + " " + liderProxyAddress,
-					display);
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_HAPROXY_PACKAGE_TO", liderProxyAddress), display);
 			logger.log(Level.INFO, "Successfully installed HaProxy to {0}", new Object[] { liderProxyAddress });
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + liderProxyAddress, display);
-			printMessage(Messages.getString("ERROR_MESSAGE") + " " + e.getMessage(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", liderProxyAddress), display);
+			printMessage(Messages.getString("ERROR_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_HAPROXY_PACKAGE_AT") + liderProxyAddress,
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_HAPROXY_PACKAGE_AT", liderProxyAddress),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + liderProxyAddress,
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), liderProxyAddress), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -514,34 +515,30 @@ public class LiderClusterInstallationStatus extends WizardPage
 		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
 
 		try {
-			printMessage(Messages.getString("SENDING_HAPROXY_CONFIG_FILE_TO") + " " + liderProxyAddress, display);
+			printMessage(Messages.getString("SENDING_HAPROXY_CONFIG_FILE_TO", liderProxyAddress), display);
 			manager.copyFileToRemote(haproxyCfgFile, "/etc/haproxy/", false);
-			printMessage(Messages.getString("SUCCESSFULLY_SENT_HAPROXY_CONFIG_FILE_TO") + " " + liderProxyAddress,
-					display);
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_HAPROXY_CONFIG_FILE_TO", liderProxyAddress), display);
 			logger.log(Level.INFO, "Successfully sent haproxy.cfg to {0}", new Object[] {});
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_HAPROXY_CFG_TO") + " " + liderProxyAddress,
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_HAPROXY_CFG_TO", liderProxyAddress),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + liderProxyAddress,
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), liderProxyAddress), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		}
 
 		try {
-			printMessage(Messages.getString("RESTARTING_HAPROXY_SERVICE_AT") + " " + liderProxyAddress, display);
+			printMessage(Messages.getString("RESTARTING_HAPROXY_SERVICE_AT", liderProxyAddress), display);
 			manager.execCommand("service haproxy restart", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_HAPROXY_SERVICE_AT") + " " + liderProxyAddress,
-					display);
+			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_HAPROXY_SERVICE_AT", liderProxyAddress), display);
 			logger.log(Level.INFO, "Successfully restarted haproxy service at {0}", new Object[] {});
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_HAPROXY_SERVICE_AT") + " "
-					+ liderProxyAddress, display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + liderProxyAddress,
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_HAPROXY_SERVICE_AT", liderProxyAddress),
 					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), liderProxyAddress), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -551,7 +548,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			}
 		}
 
-		printMessage(Messages.getString("SUCCESSFULLY_COMPLETED_INSTALLATION_OF_HAPROXY_AT") + " " + liderProxyAddress,
+		printMessage(Messages.getString("SUCCESSFULLY_COMPLETED_INSTALLATION_OF_HAPROXY_AT", liderProxyAddress),
 				display);
 		logger.log(Level.INFO, "Successfully completed installation of HaProxy at: {0}",
 				new Object[] { liderProxyAddress });
