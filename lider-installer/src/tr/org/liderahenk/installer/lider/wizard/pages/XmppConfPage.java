@@ -74,27 +74,28 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		setControl(mainContainer);
 
 		// TODO messages
-		Label label = GUIHelper.createLabel(mainContainer,
-				"Hazır gelen değerler daha önceki kurulumlara veya varsayılan değerlere göre getirilmiştir. Lütfen kontrol ediniz.");
+		Label label = GUIHelper.createLabel(mainContainer,Messages.getString("PARAMETERS_CREATED_WITH_DEFAULT_VALUES_PLEASE_CHECK_THEM"));
 		label.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
 		Composite propertyContainer = GUIHelper.createComposite(mainContainer, 1);
 
 		Composite lineCont = GUIHelper.createComposite(propertyContainer, 2);
 
-		GUIHelper.createLabel(lineCont, "Servis Adı");
+		GUIHelper.createLabel(lineCont,Messages.getString("SERVICE_NAME"));
 		host = GUIHelper.createText(lineCont);
 
-		GUIHelper.createLabel(lineCont, "LDAP Sunucu");
+		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_SERVER_ADDRESS"));
 		ldapServer = GUIHelper.createText(lineCont);
 
-		GUIHelper.createLabel(lineCont, "LDAP Admin");
+		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_ADMIN_USER") );
 		ldapRootDn = GUIHelper.createText(lineCont);
 
-		GUIHelper.createLabel(lineCont, "LDAP Admin Parola");
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_ADMIN_USER_PWD"));
 		ldapPassword = GUIHelper.createText(lineCont);
 
-		GUIHelper.createLabel(lineCont, "LDAP Arama Kökü");
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_ROOT_DN"));
 		ldapBase = GUIHelper.createText(lineCont);
 
 		Composite container = GUIHelper.createComposite(mainContainer, 1);
