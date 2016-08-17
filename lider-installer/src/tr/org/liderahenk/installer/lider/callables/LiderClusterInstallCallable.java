@@ -31,19 +31,21 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 
 	private String nodeIp;
 	private String nodeRootPwd;
+	private String nodeXmppResource;
 
 	private Display display;
 	private LiderSetupConfig config;
 	private Text txtLogConsole;
 
-	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, Display display,
-			LiderSetupConfig config, Text txtLogConsole) {
+	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource, Display display, LiderSetupConfig config,
+			Text txtLogConsole) {
 		super();
 		this.nodeIp = nodeIp;
 		this.nodeRootPwd = nodeRootPwd;
 		this.display = display;
 		this.config = config;
 		this.txtLogConsole = txtLogConsole;
+		this.nodeXmppResource = nodeXmppResource;
 	}
 
 	@Override
@@ -82,8 +84,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 			// Send tar file of Karaf
 			try {
 
-				InputStream inputStream = this.getClass().getClassLoader()
-						.getResourceAsStream("lider-cluster.tar.gz");
+				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("lider-cluster.tar.gz");
 				File karafTar = SetupUtils.streamToFile(inputStream, "lider.tar.gz");
 
 				printMessage(Messages.getString("SENDING_TAR_FILE_TO") + " " + nodeIp, display);
@@ -126,11 +127,12 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#LDAPUSERNAME", config.getLiderLdapAdminUser());
 				map.put("#LDAPPASSWORD", config.getLiderLdapAdminPwd());
 				map.put("#LDAPROOTDN", config.getLdapBaseDn());
-				
+
 				map.put("#XMPPHOST", config.getLiderXmppAddress());
 				map.put("#XMPPPORT", config.getLiderXmppPort().toString());
 				map.put("#XMPPUSERNAME", config.getLiderXmppLiderUser());
 				map.put("#XMPPPASSWORD", config.getLiderXmppLiderPwd());
+				map.put("#XMPPRESOURCE", nodeXmppResource);
 				map.put("#XMPPSERVICENAME", config.getLiderXmppServiceName());
 				map.put("#XMPPMAXRETRY", config.getLiderXmppMaxTrials());
 				map.put("#XMPPREPLAYTIMEOUT", config.getLiderXmppPacketTimeout());
@@ -153,12 +155,12 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CFG_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CFG_TO") + " " + nodeIp, display);
-				manager.copyFileToRemote(liderCfgFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
+				manager.copyFileToRemote(liderCfgFile,
+						"/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_CFG_TO") + " " + nodeIp, display);
 				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.cfg to: {0}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CFG_TO") + " " + nodeIp,
-						display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CFG_TO") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
@@ -167,7 +169,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 
 			// Send tr.org.liderahenk.datasource.cfg
 			try {
-				
+
 				printMessage(Messages.getString("CREATING_DATASOURCE_CFG_FILE"), display);
 				String liderDatasourceCfg = readFile("tr.org.liderahenk.datasource.cfg");
 				Map<String, String> map = new HashMap<>();
@@ -175,15 +177,17 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#DBDATABASE", config.getLiderDbName());
 				map.put("#DBUSERNAME", config.getLiderDbUsername());
 				map.put("#DBPASSWORD", config.getLiderDbPwd());
-				
+
 				liderDatasourceCfg = SetupUtils.replace(map, liderDatasourceCfg);
 				File liderDatasourceCfgFile = writeToFile(liderDatasourceCfg, "tr.org.liderahenk.datasource.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_DATASOURCE_CFG_FILE"), display);
-				
+
 				printMessage(Messages.getString("SENDING_DATASOURCE_CFG_TO") + " " + nodeIp, display);
-				manager.copyFileToRemote(liderDatasourceCfgFile, "/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
+				manager.copyFileToRemote(liderDatasourceCfgFile,
+						"/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_DATASOURCE_CFG_TO") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.datasource.cfg to: {0}", new Object[] { nodeIp });
+				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.datasource.cfg to: {0}",
+						new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_DATASOURCE_CFG_TO") + " " + nodeIp,
 						display);
@@ -294,5 +298,5 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 
 		return tempFile;
 	}
-	
+
 }
