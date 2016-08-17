@@ -7,6 +7,7 @@ public class LiderNodeSwtModel {
 	private int nodeNumber;
 	private Text txtNodeIp;
 	private Text txtNodeRootPwd;
+	private Text txtNodeXmppResource;
 	
 	public Text getTxtNodeIp() {
 		return txtNodeIp;
@@ -25,6 +26,12 @@ public class LiderNodeSwtModel {
 	}
 	public void setNodeNumber(int nodeNumber) {
 		this.nodeNumber = nodeNumber;
+	}
+	public Text getTxtNodeXmppResource() {
+		return txtNodeXmppResource;
+	}
+	public void setTxtNodeXmppResource(Text txtNodeXmppResource) {
+		this.txtNodeXmppResource = txtNodeXmppResource;
 	}
 	
 }
