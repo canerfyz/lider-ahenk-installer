@@ -190,14 +190,14 @@ public class LiderClusterInstallationStatus extends WizardPage
 								restartNode(clusterNode, display);
 							}
 
-							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
-									.entrySet().iterator(); iterator.hasNext();) {
-
-								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
-								final LiderNodeInfoModel clusterNode = entry.getValue();
-
-								defineServiceForNode(clusterNode, display);
-							}
+//							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
+//									.entrySet().iterator(); iterator.hasNext();) {
+//
+//								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
+//								final LiderNodeInfoModel clusterNode = entry.getValue();
+//
+//								defineServiceForNode(clusterNode, display);
+//							}
 
 							// After Karaf nodes started, install HaProxy.
 							installHaProxy(config.getLiderProxyAddress(), config.getLiderProxyPwd(),
@@ -428,28 +428,20 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_JDK") + " " + clusterNode.getNodeIp(), display);
 
-			printMessage(Messages.getString("EXPORTING_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(), display);
-			manager.execCommand(
-					"[ \"$JAVA_HOME\" ] || echo -e '\nexport JAVA_HOME=$(readlink -f /usr/bin/javac | sed \"s:/bin/javac::\")\nexport PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile && source /etc/profile",
-					new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_EXPORTED_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(),
-					display);
-
-			printMessage(Messages.getString("SOURCE_PROFILE") + " " + clusterNode.getNodeIp(), display);
-			manager.execCommand("source /etc/profile", new Object[] {});
+//			printMessage(Messages.getString("EXPORTING_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(), display);
+//			manager.execCommand(
+//					"[ \"$JAVA_HOME\" ] || echo -e '\nexport JAVA_HOME=$(readlink -f /usr/bin/javac | sed \"s:/bin/javac::\")\nexport PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile && source /etc/profile",
+//					new Object[] {});
+//			printMessage(Messages.getString("SUCCESSFULLY_EXPORTED_JAVA_HOME_AT") + " " + clusterNode.getNodeIp(),
+//					display);
+//
+//			printMessage(Messages.getString("SOURCE_PROFILE") + " " + clusterNode.getNodeIp(), display);
+//			manager.execCommand("source /etc/profile", new Object[] {});
 			
 			printMessage(Messages.getString("CONNECTING_TO_KARAF_SHELL") + " " + clusterNode.getNodeIp(), display);
-			manager.execCommand("sshpass -p \"karaf\" ssh -p8101 karaf@localhost", new Object[] {});
+			manager.execCommand("sshpass -p \"karaf\" ssh -o StrictHostKeyChecking=no -p8101 karaf@localhost wrapper:install", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO_KARAF_SHELL") + " " + clusterNode.getNodeIp(), display);
 			
-			printMessage(Messages.getString("INSTALLING_WRAPPER_SERVICE") + " " + clusterNode.getNodeIp(), display);
-			String wrapperInstallCmd = "wrapper:install";
-			manager.execCommand(wrapperInstallCmd, new Object[] {}, new IOutputStreamProvider() {
-				@Override
-				public byte[] getStreamAsByteArray() {
-					return "\n".getBytes(StandardCharsets.UTF_8);
-				}
-			});
 			Thread.sleep(3000);
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_WRAPPER_SERVICE") + " " + clusterNode.getNodeIp(), display);
 			
