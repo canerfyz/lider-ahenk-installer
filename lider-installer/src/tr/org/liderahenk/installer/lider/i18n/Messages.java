@@ -20,4 +20,24 @@ public class Messages {
 		}
 	}
 
+	/**
+	 * Returns a formatted string using the specified message string and
+	 * arguments.<br/>
+	 * <br/>
+	 * 
+	 * <b>Example:</b><br/>
+	 * messages_tr.properties:<br/>
+	 * ROSTER_ONLINE=%s çevrimiçi oldu<br/>
+	 * 
+	 * usage:<br/>
+	 * Messages.getString("ROSTER_ONLINE", dn)
+	 * 
+	 * @param key
+	 * @param args
+	 * @return
+	 */
+	public static String getString(String key, Object... args) {
+		return String.format(getString(key), args);
+	}
+
 }
