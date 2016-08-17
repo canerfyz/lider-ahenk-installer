@@ -89,7 +89,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 	public LiderClusterConfPage(LiderSetupConfig config) {
 		super(LiderClusterConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
-		setDescription(Messages.getString("LIDER_CLUSTER_CONF","3.4"));
+		setDescription(Messages.getString("LIDER_CLUSTER_CONF", "3.4"));
 		this.config = config;
 	}
 
@@ -464,6 +464,8 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		lblNodeIp.setLayoutData(gdLabels);
 		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
 		lblNodeRootPwd.setLayoutData(gdLabels);
+		Label lblNodeResource = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_XMPP_RESOURCE"));
+		lblNodeResource.setLayoutData(gdLabels);
 
 		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -586,7 +588,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 	}
 
 	private void createNewNode(Composite cmpNodeList) {
-		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 4);
+		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 5);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		GridData gd = new GridData();
@@ -620,6 +622,17 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			}
 		});
 		clusterNode.setTxtNodeRootPwd(txtNodeRootPwd);
+
+		Text txtXmppResource = GUIHelper.createText(grpClusterNode);
+		txtXmppResource.setLayoutData(gd);
+		txtXmppResource.setMessage(Messages.getString("ENTER_RESOURCE_NAME_FOR_XMPP"));
+		txtXmppResource.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		clusterNode.setTxtNodeXmppResource(txtXmppResource);
 
 		nodeMap.put(nodeNumber, clusterNode);
 	}
@@ -748,7 +761,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 			LiderNodeInfoModel nodeInfo = new LiderNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(),
-					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText());
+					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(), nodeSwt.getTxtNodeXmppResource().getText());
 
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
