@@ -382,7 +382,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager.connect();
 
 			printMessage(Messages.getString("STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
-			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass rsync",
+			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap",
 					new IOutputStreamProvider() {
 						@Override
 						public byte[] getStreamAsByteArray() {
