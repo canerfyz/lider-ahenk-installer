@@ -835,7 +835,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			logger.log(Level.INFO, "Successfully installed sshpass to {0}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO",firstNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
