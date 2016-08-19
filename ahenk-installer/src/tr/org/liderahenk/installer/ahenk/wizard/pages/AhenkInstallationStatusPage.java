@@ -266,17 +266,6 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"rm -rf /opt/ahenk");
 
-											// TODO add --force-overwrite
-//											SetupUtils.installPackage(ip, config.getUsernameCm(),
-//													config.getPasswordCm(), config.getPort(),
-//													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
-//													PackageInstaller.GDEBI);
-//											printMessage("Installing slixmpp", display);
-//											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-//													config.getPasswordCm(), config.getPort(),
-//													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-//													"sudo apt-get install slixmpp");
-											
 											// Adding "--force-overwrite" option, because if files under /etc/ahenk has been removed
 											// manually before this installation, DPKG will not create them again.
 											printMessage("Installing Ahenk", display);
