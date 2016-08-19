@@ -167,11 +167,11 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 
 			// Modify ejabberdctl.cfg
 			try {
-				printMessage(Messages.getString("MODIFYING_EJABBERD_CTL_CFG_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("MODIFYING_EJABBERD_CTL_CFG_AT_", nodeIp), display);
 				manager.execCommand(
 						"sed -i '/#ERLANG_NODE/c\\ERLANG_NODE=ejabberd@{0}.{1}' /opt/ejabberd-16.06/conf/ejabberdctl.cfg",
 						new Object[] { nodeName, config.getXmppHostname() });
-				printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_EJABBERD_CTL_CFG_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_EJABBERD_CTL_CFG_AT_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully modified ejabberdctl.cfg at: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
@@ -185,7 +185,7 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 
 			// Modify /etc/hosts
 			try {
-				printMessage(Messages.getString("MODIFYING_ETC_HOSTS_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("MODIFYING_ETC_HOSTS_AT_", nodeIp), display);
 
 				// Write each node to /etc/hosts
 				for (Iterator<Entry<Integer, XmppNodeInfoModel>> iterator = config.getXmppNodeInfoMap().entrySet()
