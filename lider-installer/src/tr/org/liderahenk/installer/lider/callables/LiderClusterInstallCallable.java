@@ -150,6 +150,15 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#USERLDAPOBJECTCLASSES", config.getLiderUserLdapClasses());
 				map.put("#GROUPLDAPOBJECTCLASSES", config.getLiderUserGroupLdapClasses());
 
+				map.put("#FILE_SERVER_PROTOCOL", config.getLiderFileServerProtocol());
+				map.put("#FILE_SERVER_HOST", config.getLiderFileServerHost());
+				map.put("#FILE_SERVER_PORT", config.getLiderFileServerPort());
+				map.put("#FILE_SERVER_USERNAME", config.getLiderFileServerUsername());
+				map.put("#FILE_SERVER_PWD", config.getLiderFileServerPwd());
+				map.put("#FILE_SERVER_PLUGIN_PATH", config.getLiderFileServerPluginPath());
+				map.put("#FILE_SERVER_AGREEMENT_PATH", config.getLiderFileServerAgreementPath());
+				map.put("#FILE_SERVER_AGENT_FILE_PATH", config.getLiderFileServerAgentFilePath());
+
 				liderCfg = SetupUtils.replace(map, liderCfg);
 				File liderCfgFile = writeToFile(liderCfg, "tr.org.liderahenk.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CFG_FILE"), display);
