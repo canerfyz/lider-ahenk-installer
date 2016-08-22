@@ -129,7 +129,14 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 							
 							printMessage("Copying TAR file to: " + config.getLiderIp());
 							setProgressBar(30);
-
+							
+							printMessage(Messages.getString("INSTALLING_DEPENDENCIES"));
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap");
+							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DEPENDENCIES"));
+							setProgressBar(40);
+							
 							SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), tar,
