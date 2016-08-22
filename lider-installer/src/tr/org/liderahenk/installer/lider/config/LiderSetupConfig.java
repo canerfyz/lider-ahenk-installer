@@ -460,6 +460,15 @@ public class LiderSetupConfig {
 	private String liderUserLdapClasses;
 	private String liderUserGroupLdapClasses;
 	
+	private String liderFileServerProtocol;
+	private String liderFileServerHost;
+	private String liderFileServerPort;
+	private String liderFileServerUsername;
+	private String liderFileServerPwd;
+	private String liderFileServerPluginPath;
+	private String liderFileServerAgreementPath;
+	private String liderFileServerAgentFilePath;
+	
 	private String liderProxyAddress;
 	private Map<Integer, LiderNodeInfoModel> liderNodeInfoMap;
 	
@@ -1484,6 +1493,70 @@ public class LiderSetupConfig {
 
 	public void setLiderCluster(boolean isLiderCluster) {
 		this.isLiderCluster = isLiderCluster;
+	}
+
+	public String getLiderFileServerProtocol() {
+		return liderFileServerProtocol;
+	}
+
+	public void setLiderFileServerProtocol(String liderFileServerProtocol) {
+		this.liderFileServerProtocol = liderFileServerProtocol;
+	}
+
+	public String getLiderFileServerHost() {
+		return liderFileServerHost;
+	}
+
+	public void setLiderFileServerHost(String liderFileServerHost) {
+		this.liderFileServerHost = liderFileServerHost;
+	}
+
+	public String getLiderFileServerPort() {
+		return liderFileServerPort;
+	}
+
+	public void setLiderFileServerPort(String liderFileServerPort) {
+		this.liderFileServerPort = liderFileServerPort;
+	}
+
+	public String getLiderFileServerUsername() {
+		return liderFileServerUsername;
+	}
+
+	public void setLiderFileServerUsername(String liderFileServerUsername) {
+		this.liderFileServerUsername = liderFileServerUsername;
+	}
+
+	public String getLiderFileServerPwd() {
+		return liderFileServerPwd;
+	}
+
+	public void setLiderFileServerPwd(String liderFileServerPwd) {
+		this.liderFileServerPwd = liderFileServerPwd;
+	}
+
+	public String getLiderFileServerPluginPath() {
+		return liderFileServerPluginPath;
+	}
+
+	public void setLiderFileServerPluginPath(String liderFileServerPluginPath) {
+		this.liderFileServerPluginPath = liderFileServerPluginPath;
+	}
+
+	public String getLiderFileServerAgreementPath() {
+		return liderFileServerAgreementPath;
+	}
+
+	public void setLiderFileServerAgreementPath(String liderFileServerAgreementPath) {
+		this.liderFileServerAgreementPath = liderFileServerAgreementPath;
+	}
+
+	public String getLiderFileServerAgentFilePath() {
+		return liderFileServerAgentFilePath;
+	}
+
+	public void setLiderFileServerAgentFilePath(String liderFileServerAgentFilePath) {
+		this.liderFileServerAgentFilePath = liderFileServerAgentFilePath;
 	}
 
 }
