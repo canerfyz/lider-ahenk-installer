@@ -71,6 +71,15 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 	private Text txtUserLdapPrivilegeAttribute;
 	private Text txtUserLdapClasses;
 	private Text txtUserGroupLdapClasses;
+	
+	private Text txtFileServerProtocol;
+	private Text txtFileServerHost;
+	private Text txtFileServerPort;
+	private Text txtFileServerUsername;
+	private Text txtFileServerPwd;
+	private Text txtFileServerPluginPath;
+	private Text txtFileServerAgreementPath;
+	private Text txtFileServerAgentFilePath;
 
 	private Button btnUsePrivateKey;
 	private Text txtPrivateKey;
@@ -386,6 +395,86 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			}
 		});
 
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_PROTOCOL"));
+		txtFileServerProtocol = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerProtocol.setMessage(Messages.getString("ENTER_PROTOCOL_FOR_FILE_SERVER"));
+		txtFileServerProtocol.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_HOST"));
+		txtFileServerHost = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerHost.setMessage(Messages.getString("ENTER_FILE_SERVER_HOST"));
+		txtFileServerHost.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_PORT"));
+		txtFileServerPort = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerPort.setMessage(Messages.getString("ENTER_FILE_SERVER_PORT"));
+		txtFileServerPort.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_USERNAME"));
+		txtFileServerUsername = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerUsername.setMessage(Messages.getString("ENTER_FILE_SERVER_USERNAME"));
+		txtFileServerUsername.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_PASSWORD"));
+		txtFileServerPwd = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerPwd.setMessage(Messages.getString("ENTER_FILE_SERVER_PASSWORD"));
+		txtFileServerPwd.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_PLUGIN_PATH"));
+		txtFileServerPluginPath = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerPluginPath.setMessage(Messages.getString("ENTER_FILE_SERVER_PLUGIN_PATH"));
+		txtFileServerPluginPath.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_AGREEMENT_PATH"));
+		txtFileServerAgreementPath = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerAgreementPath.setMessage(Messages.getString("ENTER_FILE_SERVER_AGREEMENT_PATH"));
+		txtFileServerAgreementPath.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
+		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_AGENT_FILE_PATH"));
+		txtFileServerAgentFilePath = GUIHelper.createText(cmpGeneralInfo);
+		txtFileServerAgentFilePath.setMessage(Messages.getString("ENTER_FILE_SERVER_AGENT_FILE_PATH"));
+		txtFileServerAgentFilePath.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("HAPROXY_ADDRESS"));
 		txtProxyAddress = GUIHelper.createText(cmpGeneralInfo);
 		txtProxyAddress.setMessage(Messages.getString("ENTER_IP_ADDRESS_OF_HAPROXY"));
@@ -516,6 +605,10 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				&& !txtAgentLdapClasses.getText().isEmpty() && !txtUserLdapBaseDn.getText().isEmpty()
 				&& !txtUserLdapIdAttribute.getText().isEmpty() && !txtUserLdapPrivilegeAttribute.getText().isEmpty()
 				&& !txtUserLdapClasses.getText().isEmpty() && !txtUserGroupLdapClasses.getText().isEmpty()
+				&& !txtFileServerProtocol.getText().isEmpty() && !txtFileServerHost.getText().isEmpty()
+				&& !txtFileServerPort.getText().isEmpty() && !txtFileServerUsername.getText().isEmpty()
+				&& !txtFileServerPwd.getText().isEmpty() && !txtFileServerPluginPath.getText().isEmpty()
+				&& !txtFileServerAgreementPath.getText().isEmpty() && !txtFileServerAgentFilePath.getText().isEmpty()
 				&& (btnUsePrivateKey.getSelection() ? true : !txtProxyPwd.getText().isEmpty())) {
 
 			for (Iterator<Entry<Integer, LiderNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
@@ -748,6 +841,15 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			config.setLiderAccessPassphrase(null);
 			config.setLiderProxyPwd(txtProxyPwd.getText());
 		}
+		
+		config.setLiderFileServerProtocol(txtFileServerProtocol.getText());
+		config.setLiderFileServerHost(txtFileServerHost.getText());
+		config.setLiderFileServerPort(txtFileServerPort.getText());
+		config.setLiderFileServerUsername(txtFileServerUsername.getText());
+		config.setLiderFileServerPwd(txtFileServerPwd.getText());
+		config.setLiderFileServerPluginPath(txtFileServerPluginPath.getText());
+		config.setLiderFileServerAgreementPath(txtFileServerAgreementPath.getText());
+		config.setLiderFileServerAgentFilePath(txtFileServerAgentFilePath.getText());
 
 	}
 
@@ -817,6 +919,15 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtUserLdapPrivilegeAttribute.setText("liderPrivilege");
 		txtUserLdapClasses.setText("pardusLider");
 		txtUserGroupLdapClasses.setText("groupOfNames");
+		
+		txtFileServerProtocol.setText("ssh");
+		txtFileServerHost.setText("agem.com.tr");
+		txtFileServerPort.setText("22");
+		txtFileServerUsername.setText("distro");
+		txtFileServerPwd.setText("!Distr0");
+		txtFileServerPluginPath.setText("/plugins/ahenk-{0}_{1}_amd64.deb");
+		txtFileServerAgreementPath.setText("/sample-agreement.txt");
+		txtFileServerAgentFilePath.setText("/agent-files/{0}/");
 	}
 
 	@Override
