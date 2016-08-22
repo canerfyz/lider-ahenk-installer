@@ -192,7 +192,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 								restartNode(clusterNode, display);
 							}
 
-							// TODO test edilecek
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
 
@@ -449,21 +448,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 			manager = new SSHManager(clusterNode.getNodeIp(), "karaf", "karaf", 8101, null, null);
 			manager.connect();
-
-			// printMessage(Messages.getString("INSTALLING_SERVICE_WRAPPER_AT_NODE")
-			// + " " + clusterNode.getNodeIp(),
-			// display);
-			// manager.execCommand("feature:install service-wrapper", new
-			// IOutputStreamProvider() {
-			// @Override
-			// public byte[] getStreamAsByteArray() {
-			// return "\n".getBytes(StandardCharsets.UTF_8);
-			// }
-			// });
-			// printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SERVICE_WRAPPER_AT_NODE")
-			// + " " + clusterNode.getNodeIp(),
-			// display);
-			// Thread.sleep(10000);
 
 			printMessage(Messages.getString("INSTALLING_WRAPPER_AT_NODE") + " " + clusterNode.getNodeIp(), display);
 			manager.execCommand("wrapper:install", new IOutputStreamProvider() {
