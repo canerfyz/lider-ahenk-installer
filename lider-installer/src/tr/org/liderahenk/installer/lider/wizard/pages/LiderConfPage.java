@@ -56,6 +56,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 	private Text xmppPort;
 	private Text xmppUsername;
 	private Text xmppPassword;
+	private Text xmppResource;
 	private Text xmppServiceName;
 	private Text xmppMaxRetryConnCount;
 	private Text xmppPacketReplyTimeout;
@@ -80,6 +81,15 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 	private Text userLdapPrivilegeAttribute;
 	private Text userLdapObjectClasses;
 	private Text groupLdapObjectClasses;
+	
+	private Text txtFileServerProtocol;
+	private Text txtFileServerHost;
+	private Text txtFileServerPort;
+	private Text txtFileServerUsername;
+	private Text txtFileServerPwd;
+	private Text txtFileServerPluginPath;
+	private Text txtFileServerAgreementPath;
+	private Text txtFileServerAgentFilePath;
 
 	public LiderConfPage(LiderSetupConfig config) {
 		super(LiderConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -140,6 +150,9 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 
 		GUIHelper.createLabel(lineCont, "XMPP kullanıcı parolası");
 		xmppPassword = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, "XMPP Resource Adı");
+		xmppResource = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "XMPP servis adı");
 		xmppServiceName = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -211,6 +224,31 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		groupLdapObjectClasses = GUIHelper.createText(lineCont,
 				new GridData(GridData.FILL, GridData.FILL, true, false));
 
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PROTOCOL"));
+		txtFileServerProtocol = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_HOST"));
+		txtFileServerHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PORT"));
+		txtFileServerPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_USERNAME"));
+		txtFileServerUsername = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PASSWORD"));
+		txtFileServerPwd = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PLUGIN_PATH"));
+		txtFileServerPluginPath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_AGREEMENT_PATH"));
+		txtFileServerAgreementPath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_AGENT_FILE_PATH"));
+		txtFileServerAgentFilePath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		
 		GUIHelper.createLabel(innerContainer, "Lider Genel Ayarlar");
 
 		// Add a text area for configuration.
@@ -289,6 +327,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#XMPPPORT", xmppPort.getText());
 		map.put("#XMPPUSERNAME", xmppUsername.getText());
 		map.put("#XMPPPASSWORD", xmppPassword.getText());
+		map.put("#XMPPRESOURCE", xmppResource.getText());
 		map.put("#XMPPSERVICENAME", xmppServiceName.getText());
 		map.put("#XMPPMAXRETRY", xmppMaxRetryConnCount.getText());
 		map.put("#XMPPREPLAYTIMEOUT", xmppPacketReplyTimeout.getText());
@@ -306,6 +345,15 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#USERLDAPOBJECTCLASSES", userLdapObjectClasses.getText());
 		map.put("#GROUPLDAPOBJECTCLASSES", groupLdapObjectClasses.getText());
 
+		map.put("#FILE_SERVER_PROTOCOL", txtFileServerProtocol.getText());
+		map.put("#FILE_SERVER_HOST", txtFileServerHost.getText());
+		map.put("#FILE_SERVER_PORT", txtFileServerPort.getText());
+		map.put("#FILE_SERVER_USERNAME", txtFileServerUsername.getText());
+		map.put("#FILE_SERVER_PWD", txtFileServerPwd.getText());
+		map.put("#FILE_SERVER_PLUGIN_PATH", txtFileServerPluginPath.getText());
+		map.put("#FILE_SERVER_AGREEMENT_PATH", txtFileServerAgreementPath.getText());
+		map.put("#FILE_SERVER_AGENT_FILE_PATH", txtFileServerAgentFilePath.getText());
+		
 		text = SetupUtils.replace(map, text);
 		config.setLiderConfContent(text);
 		config.setLiderAbsPathConfFile(writeToFile(text, "tr.org.liderahenk.cfg"));
@@ -341,6 +389,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		xmppPort.setText("5222");
 		xmppUsername.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
 		xmppPassword.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "asddsa123");
+		xmppResource.setText("Smack");
 		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im." + config.getLdapOrgCn());
 		xmppMaxRetryConnCount.setText("5");
 		xmppPacketReplyTimeout.setText("10000");
@@ -364,6 +413,15 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
 		userLdapObjectClasses.setText("pardusLider");
 		groupLdapObjectClasses.setText("groupOfNames");
+		
+		txtFileServerProtocol.setText("ssh");
+		txtFileServerHost.setText("agem.com.tr");
+		txtFileServerPort.setText("22");
+		txtFileServerUsername.setText("distro");
+		txtFileServerPwd.setText("!Distr0");
+		txtFileServerPluginPath.setText("/plugins/ahenk-{0}_{1}_amd64.deb");
+		txtFileServerAgreementPath.setText("/sample-agreement.txt");
+		txtFileServerAgentFilePath.setText("/agent-files/{0}/");
 	}
 
 	/**
