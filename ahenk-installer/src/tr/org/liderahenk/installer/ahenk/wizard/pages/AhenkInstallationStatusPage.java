@@ -274,12 +274,6 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
 													"Dpkg::Options::='--force-overwrite'");
 
-											printMessage("Stopping Ahenk daemon for configuration", display);
-											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"sudo systemctl stop ahenk.service");
-
 											printMessage("Copying configuration files", display);
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
@@ -292,7 +286,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											SetupUtils.executeCommand(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"sudo systemctl start ahenk.service");
+													"sudo service ahenk start");
 
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
 
