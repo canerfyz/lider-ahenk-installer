@@ -61,7 +61,7 @@ public class SetupUtils {
 	/**
 	 * Add new repository
 	 */
-	private static final String ADD_APP_REPO_CMD = "add-apt-repository -y {0} && sudo apt-get update";
+	private static final String ADD_APP_REPO_CMD = "add-apt-repository -y {0} && apt-get update";
 
 	/**
 	 * Turns off "frontend" (prompts) during installation
