@@ -1,5 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.IOException;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -183,24 +185,22 @@ public class DatabaseInstallationStatus extends WizardPage
 						command = command.replace("{0}", config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
 
 						printMessage("Database created successfully.");
 
 						command = "mysql -uroot -p{0} -e \"GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '{1}';\"";
-						command = command.replace("{0}", config.getDatabaseRootPassword()).replace("{1}", config.getDatabaseRootPassword());
+						command = command.replace("{0}", config.getDatabaseRootPassword()).replace("{1}",
+								config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
-						
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
+
 						command = "mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"";
 						command = command.replace("{0}", config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
 
 						// Remove bind-address
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
@@ -236,6 +236,18 @@ public class DatabaseInstallationStatus extends WizardPage
 					printMessage("Installation finished..");
 
 					setPageCompleteAsync(isInstallationFinished);
+
+					if (!isInstallationFinished) {
+						try {
+							openDownloadUrl();
+						} catch (Exception e) {
+							e.printStackTrace();
+							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+									? txtLogConsole.getText() + "\n" : "")
+									+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+									+ PropertyReader.property("download.url"));
+						}
+					}
 
 				}
 
@@ -311,6 +323,10 @@ public class DatabaseInstallationStatus extends WizardPage
 
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
+	}
+
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("download.url"));
 	}
 
 	/**
