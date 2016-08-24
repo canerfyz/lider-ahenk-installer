@@ -130,8 +130,7 @@ public class DatabaseInstallationStatus extends WizardPage
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-//								"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
-								"echo 'deb [arch=amd64,i386] http://kartolo.sby.datautama.net.id/mariadb/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
+								"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
 						printMessage(Messages.getString("SUCCESSFULLY_ADDED_NEW_REPOSITORY"));
 
 						printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
