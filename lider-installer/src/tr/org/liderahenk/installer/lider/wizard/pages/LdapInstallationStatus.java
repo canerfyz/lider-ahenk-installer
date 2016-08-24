@@ -1,6 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -78,34 +79,34 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 					setPageCompleteAsync(isInstallationFinished);
 					
-					printMessage("Initializing installation...");
+					printMessage(Messages.getString("INITIALIZING_INSTALLATION"));
 					setProgressBar(10);
 
-					printMessage("Setting up parameters for database password.");
+					printMessage(Messages.getString("SETTING_UP_DEBCONF_VALUES"));
 					final String[] debconfValues = generateDebconfValues();
 					setProgressBar(20);
 
-					printMessage("Installing package...");
 
 					if (config.getLdapInstallMethod() == InstallMethod.PROVIDED_DEB) {
 						File deb = new File(config.getLdapDebFileName());
 						try {
+							printMessage(Messages.getString("INSTALLING_SLAPD_PACKAGE"));
 							SetupUtils.installPackageNonInteractively(config.getLdapIp(),
 									config.getLdapAccessUsername(), config.getLdapAccessPasswd(), config.getLdapPort(),
 									config.getLdapAccessKeyPath(), config.getLdapAccessPassphrase(), deb, debconfValues,
 									PackageInstaller.GDEBI);
 							setProgressBar(90);
 							isInstallationFinished = true;
-							printMessage("Successfully installed package: " + deb.getName());
+							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", deb.getName()));
 						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
+							printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 							e.printStackTrace();
 						}
 					} else if (config.getLdapInstallMethod() == InstallMethod.WGET) {
 						try {
-							printMessage("Downloading OpenLDAP .deb package from: " + config.getLdapDownloadUrl());
+							printMessage(Messages.getString("DOWNLOADING_DEB_PACKAGE_FROM", config.getLdapDownloadUrl()));
 
 							// In case of folder name clash use current time as
 							// postfix
@@ -120,34 +121,31 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 							setProgressBar(30);
 
-							printMessage("Successfully downloaded file.");
+							printMessage(Messages.getString("SUCCESSFULLY_DOWNLOADED_PACKAGE"));
 
-							printMessage("OpenLDAP is being installed to: " + config.getLdapIp()
-									+ " from downloaded .deb file.");
+							printMessage(Messages.getString("INSTALLING_DOWNLOADED_PACKAGE"));
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 									config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
 									PackageInstaller.GDEBI);
+							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DOWNLOADED_PACKAGE"));
 
-							printMessage("OpenLDAP has been successfully installed to: " + config.getLdapIp());
 						} catch (CommandExecutionException e) {
 							isInstallationFinished = false;
 							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
+							printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 							e.printStackTrace();
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
+							printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 							e.printStackTrace();
 						}
 
 					} else {
 						isInstallationFinished = false;
-						printMessage("Invalid installation method. Installation cancelled.");
+						printMessage(Messages.getString("INVALID_INSTALLATION_METHOD"));
 					}
-
-					printMessage("LDAP configuration starts.");
 
 					File ldapConfigFile;
 					try {
@@ -158,46 +156,58 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						File liderAhenkLdifFile = SetupUtils.streamToFile(inputStream, "liderahenk.ldif");
 						
 						// Delete previous databases
+						printMessage(Messages.getString("DELETING_PREVIOUS_DATABASES"));
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), "rm -rf /var/ldaps/");
+						printMessage(Messages.getString("SUCCESSFULLY_DELETED_PREVIOUS_DATABASES"));
 
 						// Send liderahenk.ldif
+						printMessage(Messages.getString("SENDING_LIDER_AHENK_LDIF"));
 						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), liderAhenkLdifFile, "/tmp/");
+						printMessage(Messages.getString("SUCCESSFULLY_SENT_LIDER_AHENK_LDIF"));
 
 						// Send LDAP config script
+						printMessage(Messages.getString("SENDING_LDAP_CONFIG"));
 						SetupUtils.copyFile(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), ldapConfigFile, "/tmp/");
+						printMessage(Messages.getString("SUCCESSFULLY_SENT_LDAP_CONFIG"));
 
 						// Maket it executable
+						printMessage(Messages.getString("MODIFYING_LDAP_CONFIG"));
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), "chmod +x /tmp/" + ldapConfigFile.getName());
+						printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_LDAP_CONFIG"));
 						
 						// Install ldap-utils
+						printMessage(Messages.getString("INSTALLING_LDAP_UTILS"));
 						SetupUtils.installPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), "ldap-utils", null);
+						printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_LDAP_UTILS"));
 
 						// Run LDAP config script
+						printMessage(Messages.getString("EXECUTING_LDAP_CONFIG_SCRIPT"));
 						SetupUtils.executeCommand(config.getLdapIp(), config.getLdapAccessUsername(),
 								config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
 								config.getLdapAccessPassphrase(), "/tmp/" + ldapConfigFile.getName());
+						printMessage(Messages.getString("SUCCESSFULLY_EXECUTED_LDAP_CONFIG_SCRIPT"));
 						
 
-						printMessage("LDAP configuration completed successfully.");
+						printMessage(Messages.getString("OPENLDAP_INSTALLATION_COMPLETED_SUCCESSFULLY"));
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
 						canGoBack = true;
-						printMessage("Error occurred: " + e.getMessage());
+						printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 						e.printStackTrace();
 					} catch (CommandExecutionException e) {
 						isInstallationFinished = false;
 						canGoBack = true;
-						printMessage("Error occurred: " + e.getMessage());
+						printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 						e.printStackTrace();
 					}
 
@@ -207,6 +217,18 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 					setPageCompleteAsync(isInstallationFinished);
 
+					if (!isInstallationFinished) {
+						try {
+							openDownloadUrl();
+						} catch (Exception e) {
+							e.printStackTrace();
+							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+									? txtLogConsole.getText() + "\n" : "")
+									+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+									+ PropertyReader.property("troubleshooting.url"));
+						}
+					}
+					
 				}
 
 				/**
@@ -265,6 +287,10 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
+	}
+	
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
 
 	/**
