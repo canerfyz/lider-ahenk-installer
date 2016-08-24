@@ -196,7 +196,8 @@ cn: #LIDERCONSOLEUSER
 sn: #LIDERCONSOLEUSER
 uid: #LIDERCONSOLEUSER
 userPassword: #LIDERCONSOLEPWD
-liderPrivilege: [$BASEDN:ALL:true]
+liderPrivilege: [REPORT:ALL]
+liderPrivilege: [TASK:#BASEDN:ALL]
 EOL
 
 service slapd restart
