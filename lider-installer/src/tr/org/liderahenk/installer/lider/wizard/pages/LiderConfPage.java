@@ -139,10 +139,10 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		//
 		// XMPP configuration
 		//
-		GUIHelper.createLabel(lineCont, "XMPP sucunu adresi");
+		GUIHelper.createLabel(lineCont, "XMPP sunucu adresi");
 		xmppHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
-		GUIHelper.createLabel(lineCont, "XMPP sucunu portu");
+		GUIHelper.createLabel(lineCont, "XMPP sunucu portu");
 		xmppPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "XMPP Lider kullanıcısı");
