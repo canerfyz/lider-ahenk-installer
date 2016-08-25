@@ -24,6 +24,11 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
+ * 
+ */
 public class XmppInstallationStatus extends WizardPage implements IXmppPage, ControlNextEvent, InstallationStatusPage {
 
 	private LiderSetupConfig config;
@@ -114,24 +119,24 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							// WGET
 							//
 							else if (config.getXmppInstallMethod() == InstallMethod.WGET) {
-								
+
 								SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
 										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
 										"rm -rf /tmp/ejabberd-temp && mkdir -p /tmp/ejabberd-temp");
 
-								printMessage(Messages.getString("DOWNLOADING_DEB_PACKAGE_FROM", config.getXmppDownloadUrl()));
+								printMessage(Messages.getString("DOWNLOADING_DEB_PACKAGE_FROM",
+										config.getXmppDownloadUrl()));
 								SetupUtils.downloadPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
-										"ejabberd-temp", "ejabberd.deb", config.getXmppDownloadUrl());
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd.deb",
+										config.getXmppDownloadUrl());
 								printMessage(Messages.getString("SUCCESSFULLY_DOWNLOADED_PACKAGE"));
 
 								printMessage(Messages.getString("INSTALLING_DOWNLOADED_PACKAGE"));
 								SetupUtils.installDownloadedPackage(config.getXmppIp(), config.getXmppAccessUsername(),
 										config.getXmppAccessPasswd(), config.getXmppPort(),
-										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(),
-										"ejabberd-temp", "ejabberd.deb", PackageInstaller.DPKG);
+										config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase(), "ejabberd.deb", PackageInstaller.DPKG);
 								printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DOWNLOADED_PACKAGE"));
 							}
 							setProgressBar(30);
@@ -165,10 +170,11 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 							printMessage(Messages.getString("DEFINING_EJABBERD_AS_SERVICE"));
 							SetupUtils.executeCommand(config.getXmppIp(), config.getXmppAccessUsername(),
 									config.getXmppAccessPasswd(), config.getXmppPort(), config.getXmppAccessKeyPath(),
-									config.getXmppAccessPassphrase(), "ln -s " + PropertyReader.property("xmpp.bin.path")
-									+ "ejabberd.init /etc/init.d/ejabberd && update-rc.d ejabberd defaults");
+									config.getXmppAccessPassphrase(),
+									"ln -s " + PropertyReader.property("xmpp.bin.path")
+											+ "ejabberd.init /etc/init.d/ejabberd && update-rc.d ejabberd defaults");
 							printMessage(Messages.getString("SUCCESSFULLY_DEFINED_EJABBERD_AS_SERVICE_AT"));
-							
+
 							//
 							// Start Ejabberd
 							//
@@ -347,7 +353,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 					setProgressBar(100);
 					config.setInstallationFinished(isInstallationFinished);
 					setPageCompleteAsync(isInstallationFinished);
-					
+
 					if (!isInstallationFinished) {
 						try {
 							openDownloadUrl();
@@ -439,7 +445,7 @@ public class XmppInstallationStatus extends WizardPage implements IXmppPage, Con
 	private void openDownloadUrl() throws IOException {
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
-	
+
 	@Override
 	public IWizardPage getPreviousPage() {
 		// Do not allow to go back from this page if installation completed
