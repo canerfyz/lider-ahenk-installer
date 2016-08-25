@@ -29,6 +29,10 @@ import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage {
 
 	private LiderSetupConfig config;
