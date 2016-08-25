@@ -12,6 +12,10 @@ import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LdapUpdateConfirmPage extends WizardPage implements ILdapPage {
 	
 	private LiderSetupConfig config;
