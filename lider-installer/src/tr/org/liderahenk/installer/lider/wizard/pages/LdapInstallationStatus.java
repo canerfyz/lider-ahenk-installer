@@ -3,8 +3,6 @@ package tr.org.liderahenk.installer.lider.wizard.pages;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -27,6 +25,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LdapInstallationStatus extends WizardPage implements ILdapPage, InstallationStatusPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
@@ -108,15 +110,9 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						try {
 							printMessage(Messages.getString("DOWNLOADING_DEB_PACKAGE_FROM", config.getLdapDownloadUrl()));
 
-							// In case of folder name clash use current time as
-							// postfix
-							Date date = new Date();
-							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
-							String timestamp = dateFormat.format(date);
-
 							SetupUtils.downloadPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
-									config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
+									config.getLdapAccessPassphrase(), "openldap.deb",
 									config.getLdapDownloadUrl());
 
 							setProgressBar(30);
@@ -126,7 +122,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 							printMessage(Messages.getString("INSTALLING_DOWNLOADED_PACKAGE"));
 							SetupUtils.installDownloadedPackage(config.getLdapIp(), config.getLdapAccessUsername(),
 									config.getLdapAccessPasswd(), config.getLdapPort(), config.getLdapAccessKeyPath(),
-									config.getLdapAccessPassphrase(), "openLdapTmp" + timestamp, "openldap.deb",
+									config.getLdapAccessPassphrase(), "openldap.deb",
 									PackageInstaller.GDEBI);
 							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DOWNLOADED_PACKAGE"));
 
