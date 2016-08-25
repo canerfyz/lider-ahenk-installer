@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -19,7 +17,6 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
-import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -28,6 +25,11 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
+ * 
+ */
 public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage {
 
 	private LiderSetupConfig config;
@@ -78,48 +80,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 					printMessage(Messages.getString("INITIALIZING_INSTALLATION"));
 					setProgressBar(10);
 
-					if (config.getLiderInstallMethod() == InstallMethod.APT_GET) {
-						try {
-
-							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
-									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "lider", null);
-							setProgressBar(90);
-							isInstallationFinished = true;
-							printMessage("Successfully installed package: " + config.getLiderPackageName());
-						} catch (SSHConnectionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getLiderInstallMethod() == InstallMethod.PROVIDED_DEB) {
-						File deb = new File(config.getLiderDebFileName());
-						try {
-							SetupUtils.installPackage(config.getLiderIp(), config.getLiderAccessUsername(),
-									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), deb,
-									PackageInstaller.DPKG);
-							setProgressBar(90);
-							isInstallationFinished = true;
-							printMessage("Successfully installed package: " + deb.getName());
-						} catch (SSHConnectionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						} catch (CommandExecutionException e) {
-							isInstallationFinished = false;
-							canGoBack = true;
-							printMessage("Error occurred: " + e.getMessage());
-							e.printStackTrace();
-						}
-					} else if (config.getLiderInstallMethod() == InstallMethod.TAR_GZ) {
+					if (config.getLiderInstallMethod() == InstallMethod.TAR_GZ) {
 						File tar = new File(config.getLiderTarFileName());
 
 						try {
@@ -170,31 +131,24 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						try {
 							printMessage(
 									Messages.getString("DOWNLOADING_TAR_GZ_FILE_FROM", config.getLiderDownloadUrl()));
-							// In case of folder name clash use current time as
-							// postfix
-							Date date = new Date();
-							SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy-HH:mm:ss");
-							String timestamp = dateFormat.format(date);
 
 							SetupUtils.downloadPackage(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"liderTmpDir" + timestamp, "lider.deb", config.getLiderDownloadUrl());
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "lider.tar.gz",
+									config.getLiderDownloadUrl());
 							printMessage(Messages.getString("SUCCESSFULLY_DOWNLOADED_TAR_GZ_FILE_FROM",
 									config.getLiderDownloadUrl()));
 
 							setProgressBar(30);
 
-							// TODO
-							// TODO buranın devamı tar gz'den çıkarma vs olacak
-							printMessage("Lider is being installed to: " + config.getLiderIp()
-									+ " from downloaded .deb file.");
-							SetupUtils.installDownloadedPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+							printMessage(Messages.getString("EXTRACTING_DOWNLOADED_TAR_GZ_FILE"));
+							SetupUtils.extractTarFile(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"liderTmpDir" + timestamp, "lider.deb", PackageInstaller.DPKG);
+									"/tmp/lider.tar.gz", "/opt/");
+							setProgressBar(90);
+							printMessage(Messages.getString("SUCCESSFULLY_EXTRACTED_TAR_GZ_FILE"));
 
-							printMessage("Lider has been successfully installed to: " + config.getLiderIp());
 						} catch (SSHConnectionException e) {
 							isInstallationFinished = false;
 							canGoBack = true;
