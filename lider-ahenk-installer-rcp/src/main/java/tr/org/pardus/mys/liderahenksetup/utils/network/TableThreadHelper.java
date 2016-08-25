@@ -7,6 +7,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 import org.nmap4j.data.nmaprun.Host;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class TableThreadHelper {
 
 	private TableViewer tblVwrSetup;

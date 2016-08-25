@@ -5,6 +5,9 @@ import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
  */
 public class Activator extends AbstractUIPlugin {
 

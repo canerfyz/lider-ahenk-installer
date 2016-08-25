@@ -23,8 +23,9 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
  * SSHManager is responsible for managing SSH connections and executing
  * commands.
  * 
- * @author Emre Akkaya <emre.akkaya@agem.com.tr>
- *
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
  */
 public class SSHManager {
 
