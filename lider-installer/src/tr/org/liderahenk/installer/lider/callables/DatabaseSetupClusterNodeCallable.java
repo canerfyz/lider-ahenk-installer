@@ -25,6 +25,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 
 	private static final Logger logger = Logger.getLogger(DatabaseSetupClusterNodeCallable.class.getName());
