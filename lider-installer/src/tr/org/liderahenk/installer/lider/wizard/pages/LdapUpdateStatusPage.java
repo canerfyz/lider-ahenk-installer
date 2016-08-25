@@ -25,6 +25,10 @@ import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LdapUpdateStatusPage extends WizardPage implements ILdapPage, InstallationStatusPage, ControlNextEvent {
 	
 	private LiderSetupConfig config;
