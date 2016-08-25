@@ -20,8 +20,9 @@ import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
  * installing/un-installing a package, checking version of a package etc.)
  * locally or remotely
  *
- * @author Emre Akkaya <emre.akkaya@agem.com.tr>
- *
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
  */
 public class SetupUtils {
 
@@ -77,7 +78,7 @@ public class SetupUtils {
 	 * Download file with its default file name on the server from provided URL.
 	 * Downloaded file will be in /tmp/{0} folder.
 	 */
-	private static final String DOWNLOAD_PACKAGE = "wget ‐‐directory-prefix=/tmp/{0}/ {1}";
+	private static final String DOWNLOAD_PACKAGE = "wget ‐‐directory-prefix=/tmp/ {0}";
 
 	/**
 	 * Update package list before installing anything
@@ -88,7 +89,7 @@ public class SetupUtils {
 	 * DowNload file with provided file name from provided URL. Downloaded file
 	 * will be in /tmp/{0} folder.
 	 */
-	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget --output-document=/tmp/{0}/{1} {2}";
+	private static final String DOWNLOAD_PACKAGE_WITH_FILENAME = "wget --output-document=/tmp/{0} {1}";
 
 	private static final String INSTALL_PACKAGE_GDEBI = "gdebi -n {0}";
 
@@ -618,7 +619,7 @@ public class SetupUtils {
 	 * @throws CommandExecutionException
 	 */
 	public static void installDownloadedPackage(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final String passphrase, final String tmpDir,
+			final Integer port, final String privateKey, final String passphrase,
 			final String filename, final PackageInstaller packageInstaller)
 					throws SSHConnectionException, CommandExecutionException {
 
@@ -634,15 +635,15 @@ public class SetupUtils {
 		if (packageInstaller == PackageInstaller.DPKG) {
 			// Prepare command
 			if (!"".equals(filename)) {
-				command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+				command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + filename);
 			} else {
-				command = INSTALL_PACKAGE.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+				command = INSTALL_PACKAGE.replace("{0}", "/tmp/*.deb");
 			}
 		} else {
 			if (!"".equals(filename)) {
-				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + tmpDir + "/" + filename);
+				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + filename);
 			} else {
-				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/" + tmpDir + "/*.deb");
+				command = INSTALL_PACKAGE_GDEBI.replace("{0}", "/tmp/*.deb");
 			}
 			manager.execCommand(INSTALL_GDEBI, new Object[] {});
 		}
@@ -654,10 +655,7 @@ public class SetupUtils {
 	}
 
 	/**
-	 * Downloads a file from given URL to given machine. It creates another
-	 * folder with provided name under /tmp to prevent duplication of files.
-	 * (e.g.: If tmpDir parameter is given as "ahenkTmpDir" then downloaded file
-	 * will be under /tmp/ahenkTmpDir/ folder.)
+	 * Downloads a file from given URL to given machine with provided name under /tmp.
 	 * 
 	 * @param ip
 	 * @param username
@@ -671,16 +669,15 @@ public class SetupUtils {
 	 * @throws CommandExecutionException
 	 */
 	public static void downloadPackage(final String ip, final String username, final String password,
-			final Integer port, final String privateKey, final String passphrase, final String tmpDir,
+			final Integer port, final String privateKey, final String passphrase,
 			final String filename, final String downloadUrl) throws SSHConnectionException, CommandExecutionException {
 
 		String command;
 
 		if (filename == null || "".equals(filename)) {
-			command = DOWNLOAD_PACKAGE.replace("{0}", tmpDir).replace("{1}", downloadUrl);
+			command = DOWNLOAD_PACKAGE.replace("{0}", downloadUrl);
 		} else {
-			command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", tmpDir).replace("{1}", filename).replace("{2}",
-					downloadUrl);
+			command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
 		}
 
 		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
@@ -691,7 +688,7 @@ public class SetupUtils {
 
 		manager.execCommand(command, new Object[] {});
 		logger.log(Level.INFO, "Command: '{0}' executed successfully.",
-				new Object[] { DOWNLOAD_PACKAGE.replace("{0}", filename).replace("{1}", downloadUrl) });
+				new Object[] { command });
 
 		manager.disconnect();
 	}
@@ -713,8 +710,7 @@ public class SetupUtils {
 	 * @throws CommandExecutionException
 	 */
 	public static void installDownloadedPackageNonInteractively(final String ip, final String username,
-			final String password, final Integer port, final String privateKey, final String passphrase,
-			final String tmpDir, final String filename, final String[] debconfValues,
+			final String password, final Integer port, final String privateKey, final String passphrase, final String filename, final String[] debconfValues,
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -735,7 +731,7 @@ public class SetupUtils {
 		manager.disconnect();
 
 		// Finally, install the downloaded package
-		SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, tmpDir, filename,
+		SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename,
 				packageInstaller);
 	}
 
