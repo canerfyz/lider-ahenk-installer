@@ -9,6 +9,10 @@ import org.nmap4j.core.nmap.NMapInitializationException;
 import org.nmap4j.data.NMapRun;
 import org.nmap4j.parser.OnePassParser;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class LiderNmap4j extends Nmap4j {
 
 	private LiderNMapProperties nmapProperties;

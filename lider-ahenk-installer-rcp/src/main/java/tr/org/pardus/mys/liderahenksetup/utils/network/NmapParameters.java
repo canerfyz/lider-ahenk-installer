@@ -2,6 +2,10 @@ package tr.org.pardus.mys.liderahenksetup.utils.network;
 
 import java.util.List;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class NmapParameters {
 
 	private String ipRange;

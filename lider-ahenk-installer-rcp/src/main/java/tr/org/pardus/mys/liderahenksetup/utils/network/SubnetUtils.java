@@ -3,6 +3,10 @@ package tr.org.pardus.mys.liderahenksetup.utils.network;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class SubnetUtils {
 
 	private static final String IP_ADDRESS = "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})";

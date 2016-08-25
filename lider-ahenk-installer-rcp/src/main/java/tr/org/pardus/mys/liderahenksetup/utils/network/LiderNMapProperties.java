@@ -1,7 +1,10 @@
 package tr.org.pardus.mys.liderahenksetup.utils.network;
 
 import org.nmap4j.core.nmap.NMapProperties;
-
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class LiderNMapProperties extends NMapProperties {
 
 	private String sudoUser;

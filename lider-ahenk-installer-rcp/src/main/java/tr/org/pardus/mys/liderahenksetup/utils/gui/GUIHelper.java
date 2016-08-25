@@ -14,6 +14,11 @@ import org.eclipse.swt.widgets.Text;
 
 import tr.org.pardus.mys.liderahenksetup.utils.FontProvider;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class GUIHelper {
 
 	/**
