@@ -18,6 +18,13 @@ import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationMethodPag
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkInstallationStatusPage;
 import tr.org.liderahenk.installer.ahenk.wizard.pages.AhenkSetupLocationPage;
 
+
+/**
+ * 
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ *
+ */
 public class AhenkSetupWizard extends Wizard {
 
 	/**
