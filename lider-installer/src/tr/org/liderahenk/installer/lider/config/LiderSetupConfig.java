@@ -432,6 +432,7 @@ public class LiderSetupConfig {
 	private String liderLdapAdminUser;
 	private String liderLdapAdminPwd;
 	private String liderLdapBaseDn;
+	private String liderLdapUseSsl;
 	
 	private String liderXmppAddress;
 	private Integer liderXmppPort;
@@ -441,7 +442,7 @@ public class LiderSetupConfig {
 	private String liderXmppMaxTrials;
 	private String liderXmppPacketTimeout;
 	private String liderXmppPingTimeout;
-	private String liderXmppFileSharingPath;
+	private String liderXmppUseSsl;
 	
 	private String liderDbAddress;
 	private Integer liderDbPort;
@@ -1335,14 +1336,6 @@ public class LiderSetupConfig {
 		this.liderXmppPingTimeout = liderXmppPingTimeout;
 	}
 
-	public String getLiderXmppFileSharingPath() {
-		return liderXmppFileSharingPath;
-	}
-
-	public void setLiderXmppFileSharingPath(String liderXmppFileSharingPath) {
-		this.liderXmppFileSharingPath = liderXmppFileSharingPath;
-	}
-
 	public String getLiderDbAddress() {
 		return liderDbAddress;
 	}
@@ -1557,6 +1550,22 @@ public class LiderSetupConfig {
 
 	public void setLiderFileServerAgentFilePath(String liderFileServerAgentFilePath) {
 		this.liderFileServerAgentFilePath = liderFileServerAgentFilePath;
+	}
+
+	public String getLiderLdapUseSsl() {
+		return liderLdapUseSsl;
+	}
+
+	public void setLiderLdapUseSsl(String liderLdapUseSsl) {
+		this.liderLdapUseSsl = liderLdapUseSsl;
+	}
+
+	public String getLiderXmppUseSsl() {
+		return liderXmppUseSsl;
+	}
+
+	public void setLiderXmppUseSsl(String liderXmppUseSsl) {
+		this.liderXmppUseSsl = liderXmppUseSsl;
 	}
 
 }
