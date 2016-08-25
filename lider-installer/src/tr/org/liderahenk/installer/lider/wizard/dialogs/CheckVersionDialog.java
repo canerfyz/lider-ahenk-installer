@@ -28,6 +28,10 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class CheckVersionDialog extends Dialog {
 
 	private final static String VERSION_URL = "http://www.agem.com.tr/installer-version";
