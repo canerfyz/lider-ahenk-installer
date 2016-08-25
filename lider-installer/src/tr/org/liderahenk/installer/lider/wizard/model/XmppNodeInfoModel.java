@@ -1,5 +1,9 @@
 package tr.org.liderahenk.installer.lider.wizard.model;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class XmppNodeInfoModel {
 
 	private int nodeNumber;
