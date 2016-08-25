@@ -32,6 +32,11 @@ import org.eclipse.swt.widgets.Display;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallerConstants;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 @SuppressWarnings("restriction")
 public class ApplicationWindowManager {
 

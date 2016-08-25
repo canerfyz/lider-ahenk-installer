@@ -2,6 +2,10 @@ package tr.org.pardus.mys.liderahenksetup.main;
 
 import org.eclipse.swt.graphics.Image;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class SetupTableItem {
 	
 	private String description;
