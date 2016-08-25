@@ -45,6 +45,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderClusterInstallationStatus extends WizardPage
 		implements ILiderPage, ControlNextEvent, InstallationStatusPage {
 
@@ -126,15 +130,19 @@ public class LiderClusterInstallationStatus extends WizardPage
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
+					
+					// To identify first node
+					int i = 1;
 					for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap().entrySet()
-							.iterator(); iterator.hasNext();) {
+							.iterator(); iterator.hasNext(); i++) {
 
 						Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 						final LiderNodeInfoModel clusterNode = entry.getValue();
-
+						
 						Callable<Boolean> callable = new LiderClusterInstallCallable(clusterNode.getNodeIp(),
 								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), display, config,
-								txtLogConsole);
+								txtLogConsole, i == 1);
+						
 						Future<Boolean> result = executor.submit(callable);
 						resultList.add(result);
 					}
