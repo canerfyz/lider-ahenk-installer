@@ -10,6 +10,10 @@ import tr.org.liderahenk.installer.lider.wizard.LiderSetupWizard;
 import tr.org.liderahenk.installer.lider.wizard.dialogs.CheckVersionDialog;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderInstallationHandler {
 
 	@Execute
