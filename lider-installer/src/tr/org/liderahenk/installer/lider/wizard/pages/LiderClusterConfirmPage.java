@@ -1,5 +1,8 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.util.Iterator;
+import java.util.Map.Entry;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.layout.GridData;
@@ -8,9 +11,14 @@ import org.eclipse.swt.widgets.Label;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
+import tr.org.liderahenk.installer.lider.wizard.model.LiderNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
@@ -30,7 +38,7 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 		setControl(container);
 
 		GridData gd = new GridData();
-		gd.widthHint = 200;
+		gd.widthHint = 700;
 		gd.minimumWidth = 200;
 		lblIp = GUIHelper.createLabel(container, "localhost");
 		lblIp.setLayoutData(gd);
@@ -43,8 +51,18 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 
 	@Override
 	public IWizardPage getNextPage() {
+		
+		String ipList = "";
+		for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap().entrySet()
+				.iterator(); iterator.hasNext();) {
+
+			Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
+			final LiderNodeInfoModel clusterNode = entry.getValue();
+			ipList += clusterNode.getNodeIp() + ", ";
+		}
+		
 		// Set the IP info in the opening of page
-		lblIp.setText("- IP: " + config.getDatabaseClusterAddress());
+		lblIp.setText("- IP: " + ipList);
 
 		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 
