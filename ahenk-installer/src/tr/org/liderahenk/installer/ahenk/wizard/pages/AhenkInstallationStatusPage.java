@@ -104,7 +104,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 			setProgressBar(10, Display.getCurrent());
 
-			printMessage("Initializing installation...", Display.getCurrent());
+			printMessage(Messages.getString("INITIALIZING_INSTALLATION"), Display.getCurrent());
 
 			// Get display before new main runnable
 			final Display display = Display.getCurrent();
@@ -128,7 +128,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 								@Override
 								public void run() {
 									try {
-										printMessage("Trying to connect to: " + ip, display);
+										printMessage(Messages.getString("TRYING_TO_CONNECT_TO", ip), display);
 
 										// Check authorization before starting
 										// installation
@@ -139,9 +139,9 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// If we can connect to machine install
 										// Ahenk
 										if (canConnect) {
-											printMessage("Successfully connected to: " + ip, display);
+											printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO", ip), display);
 
-											printMessage("Ahenk is being installed to: " + ip + " from catalog.",
+											printMessage(Messages.getString("AHENK_IS_BEING_INSTALLED_TO", ip),
 													display);
 
 											// TODO gedit değiştirilecek
@@ -152,11 +152,11 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											setProgressBar(increment, display);
 
-											printMessage("Ahenk has been successfully installed to: " + ip, display);
+											printMessage(Messages.getString("AHENK_SUCCESSFULLY_INSTALLED_TO", ip),
+													display);
 
 										} else {
-											printMessage(
-													"Could not connect to: " + ip + " | Passing over this machine..",
+											printMessage(Messages.getString("COULD_NOT_CONNECT_TO_PASSING_OVER", ip),
 													display);
 
 											setProgressBar(increment, display);
@@ -174,7 +174,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// etc.
 										canGoBack = true;
 
-										printMessage("Error occurred: " + e.getMessage(), display);
+										printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()), display);
 
 										e.printStackTrace();
 									} catch (CommandExecutionException e) {
@@ -189,7 +189,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// etc.
 										canGoBack = true;
 
-										printMessage("Error occurred: " + e.getMessage(), display);
+										printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()), display);
 
 										e.printStackTrace();
 									}
@@ -216,7 +216,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 								@Override
 								public void run() {
 									try {
-										printMessage("Trying to connect to: " + ip, display);
+										printMessage(Messages.getString("TRYING_TO_CONNECT_TO", ip), display);
 
 										// Check authorization before starting
 										// installation
@@ -227,11 +227,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										// If we can connect to machine install
 										// Ahenk
 										if (canConnect) {
-											printMessage("Successfully connected to: " + ip, display);
-
-											printMessage(
-													"Ahenk is being installed to: " + ip + " from provided DEB file.",
-													display);
+											printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO", ip), display);
 
 											File debPackage = new File(config.getDebFileAbsPath());
 
@@ -239,6 +235,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													.getResourceAsStream("/conf/liderahenk.list");
 											File file = SetupUtils.streamToFile(stream, "liderahenk.list");
 
+											printMessage(Messages.getString("ADDING_REQUIRED_REPO_AT", ip), display);
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
 													config.getPassphrase(), file, "/etc/apt/sources.list.d/");
@@ -252,9 +249,13 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 														config.getPasswordCm(), config.getPort(),
 														config.getPrivateKeyAbsPath(), config.getPassphrase(),
 														"apt-get update");
+												printMessage(
+														Messages.getString("SUCCESSFULLY_ADDED_REQUIRED_REPO_AT", ip),
+														display);
 
 											} catch (Exception e) {
-												printMessage("EXCEPTION about adding new repo", display);
+												printMessage(Messages.getString(
+														"EXCEPTION_OCCURED_WHILE_ADDING_NEW_REPO_AT", ip), display);
 											}
 
 											SetupUtils.executeCommand(ip, config.getUsernameCm(),
@@ -266,41 +267,44 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 													config.getPrivateKeyAbsPath(), config.getPassphrase(),
 													"rm -rf /opt/ahenk");
 
-											// Adding "--force-overwrite" option, because if files under /etc/ahenk has been removed
-											// manually before this installation, DPKG will not create them again.
-											printMessage("Installing Ahenk", display);
+											// Adding "--force-overwrite"
+											// option, because if files under
+											// /etc/ahenk has been removed
+											// manually before this
+											// installation, DPKG will not
+											// create them again.
+											printMessage(Messages.getString("INSTALLING_AHENK_AT", ip), display);
 											SetupUtils.installPackageGdebiWithOpts(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
 													"Dpkg::Options::='--force-overwrite'");
+											printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_AHENK_AT", ip),
+													display);
 
-											printMessage("Stopping Ahenk daemon for configuration", display);
-											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"sudo systemctl stop ahenk.service");
-
-											printMessage("Copying configuration files", display);
+											printMessage(Messages.getString("COPYING_CONFIGURATION_FILES_TO", ip),
+													display);
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
 													config.getPassphrase(), fileConf, "/etc/ahenk/");
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
 													config.getPassphrase(), logConf, "/etc/ahenk/");
+											printMessage(Messages.getString(
+													"SUCCESSFULLY_COPIED_CONFIGURATION_FILES_TO", ip), display);
 
-											printMessage("Starting Ahenk daemon", display);
+											printMessage(Messages.getString("STARTING_AHENK_SERVICE_AT", ip), display);
 											SetupUtils.executeCommand(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"sudo systemctl start ahenk.service");
-
-											printMessage("Ahenk has been successfully installed to: " + ip, display);
+													"service ahenk start");
+											printMessage(
+													Messages.getString("SUCCESSFULLY_STARTED_AHENK_SERVICE_AT", ip),
+													display);
 
 											setProgressBar(increment, display);
 
 										} else {
-											printMessage(
-													"Could not connect to: " + ip + " | Passing over this machine..",
+											printMessage(Messages.getString("COULD_NOT_CONNECT_TO_PASSING_OVER", ip),
 													display);
 
 											setProgressBar(increment, display);
@@ -388,8 +392,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											SetupUtils.downloadPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"ahenkTmpDir" + timestamp, "ahenk.deb",
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
 													config.getAhenkDownloadUrl());
 
 											printMessage("Successfully downloaded file", display);
@@ -399,16 +402,15 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"ahenkTmpDir" + timestamp, "ahenk.deb", PackageInstaller.DPKG);
+													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
+													PackageInstaller.DPKG);
 
 											setProgressBar(increment, display);
 
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
 
 										} else {
-											printMessage(
-													"Could not connect to: " + ip + " | Passing over this machine..",
+											printMessage(Messages.getString("COULD_NOT_CONNECT_TO_PASSING_OVER", ip),
 													display);
 
 											setProgressBar(increment, display);
@@ -479,7 +481,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 					// Set progress bar to complete
 					setProgressBar(100, display);
 
-					printMessage("Installation finished.", display);
+					printMessage(Messages.getString("INSTALLATION_COMPLETED"), display);
 
 					config.setInstallationFinished(isInstallationFinished);
 

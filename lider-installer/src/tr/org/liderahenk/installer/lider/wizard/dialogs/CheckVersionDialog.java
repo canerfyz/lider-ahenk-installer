@@ -28,10 +28,13 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class CheckVersionDialog extends Dialog {
 
 	private final static String VERSION_URL = "http://www.agem.com.tr/installer-version";
-	private final static String DOWNLOAD_URL = "http://www.agem.com.tr/sanayi";
 	private Label image;
 	private Label message;
 	private ProgressBar progBar;
@@ -114,7 +117,7 @@ public class CheckVersionDialog extends Dialog {
 					close();
 				} catch (IOException ex) {
 					ex.printStackTrace();
-					message.setText(Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n" + DOWNLOAD_URL);
+					message.setText(Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n" + PropertyReader.property("download.url"));
 				}
 			}
 
@@ -133,7 +136,7 @@ public class CheckVersionDialog extends Dialog {
 	}
 
 	private void openDownloadUrl() throws IOException {
-		Runtime.getRuntime().exec("xdg-open " + DOWNLOAD_URL);
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("download.url"));
 	}
 
 	private void startVersionCheck() {

@@ -3,6 +3,10 @@ package tr.org.liderahenk.installer.lider.wizard.model;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Text;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseNodeSwtModel {
 	
 	private int nodeNumber;

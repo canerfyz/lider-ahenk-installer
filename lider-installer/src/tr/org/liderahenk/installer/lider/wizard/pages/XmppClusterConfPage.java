@@ -32,6 +32,10 @@ import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeSwtModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 	private LiderSetupConfig config;

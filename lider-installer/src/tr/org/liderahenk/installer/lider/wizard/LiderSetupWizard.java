@@ -49,6 +49,10 @@ import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppInstallationStatus;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderSetupWizard extends Wizard {
 
 	/**

@@ -45,6 +45,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderClusterInstallationStatus extends WizardPage
 		implements ILiderPage, ControlNextEvent, InstallationStatusPage {
 
@@ -126,15 +130,19 @@ public class LiderClusterInstallationStatus extends WizardPage
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
+					
+					// To identify first node
+					int i = 1;
 					for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap().entrySet()
-							.iterator(); iterator.hasNext();) {
+							.iterator(); iterator.hasNext(); i++) {
 
 						Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 						final LiderNodeInfoModel clusterNode = entry.getValue();
-
+						
 						Callable<Boolean> callable = new LiderClusterInstallCallable(clusterNode.getNodeIp(),
 								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), display, config,
-								txtLogConsole);
+								txtLogConsole, i == 1);
+						
 						Future<Boolean> result = executor.submit(callable);
 						resultList.add(result);
 					}
@@ -192,7 +200,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 								restartNode(clusterNode, display);
 							}
 
-							// TODO test edilecek
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
 
@@ -261,6 +268,18 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
+						
+						if (!isInstallationFinished) {
+							try {
+								openDownloadUrl();
+							} catch (Exception e) {
+								e.printStackTrace();
+								txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+										? txtLogConsole.getText() + "\n" : "")
+										+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+										+ PropertyReader.property("troubleshooting.url"));
+							}
+						}
 					}
 
 				}
@@ -273,6 +292,10 @@ public class LiderClusterInstallationStatus extends WizardPage
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
 
+	}
+	
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
 
 	private void modifyCellarConfig(LiderNodeInfoModel clusterNode, Display display) throws Exception {
@@ -449,21 +472,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 			manager = new SSHManager(clusterNode.getNodeIp(), "karaf", "karaf", 8101, null, null);
 			manager.connect();
-
-			// printMessage(Messages.getString("INSTALLING_SERVICE_WRAPPER_AT_NODE")
-			// + " " + clusterNode.getNodeIp(),
-			// display);
-			// manager.execCommand("feature:install service-wrapper", new
-			// IOutputStreamProvider() {
-			// @Override
-			// public byte[] getStreamAsByteArray() {
-			// return "\n".getBytes(StandardCharsets.UTF_8);
-			// }
-			// });
-			// printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SERVICE_WRAPPER_AT_NODE")
-			// + " " + clusterNode.getNodeIp(),
-			// display);
-			// Thread.sleep(10000);
 
 			printMessage(Messages.getString("INSTALLING_WRAPPER_AT_NODE") + " " + clusterNode.getNodeIp(), display);
 			manager.execCommand("wrapper:install", new IOutputStreamProvider() {

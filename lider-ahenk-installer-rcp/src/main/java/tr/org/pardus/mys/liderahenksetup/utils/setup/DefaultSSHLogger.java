@@ -4,6 +4,10 @@ import java.util.Hashtable;
 
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class DefaultSSHLogger implements com.jcraft.jsch.Logger {
 
 	public static Hashtable<Integer, String> name = null;

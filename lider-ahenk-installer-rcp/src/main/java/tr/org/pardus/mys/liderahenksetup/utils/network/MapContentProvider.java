@@ -5,6 +5,10 @@ import java.util.LinkedHashMap;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class MapContentProvider extends ArrayContentProvider {
 	
     /**

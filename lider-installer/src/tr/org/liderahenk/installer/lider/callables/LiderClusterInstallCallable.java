@@ -25,6 +25,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class LiderClusterInstallCallable implements Callable<Boolean> {
 
 	private static final Logger logger = Logger.getLogger(LiderClusterInstallCallable.class.getName());
@@ -36,9 +40,10 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 	private Display display;
 	private LiderSetupConfig config;
 	private Text txtLogConsole;
+	private boolean firstNode;
 
 	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource, Display display, LiderSetupConfig config,
-			Text txtLogConsole) {
+			Text txtLogConsole, boolean firstNode) {
 		super();
 		this.nodeIp = nodeIp;
 		this.nodeRootPwd = nodeRootPwd;
@@ -46,6 +51,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 		this.config = config;
 		this.txtLogConsole = txtLogConsole;
 		this.nodeXmppResource = nodeXmppResource;
+		this.firstNode = firstNode;
 	}
 
 	@Override
@@ -127,6 +133,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#LDAPUSERNAME", config.getLiderLdapAdminUser());
 				map.put("#LDAPPASSWORD", config.getLiderLdapAdminPwd());
 				map.put("#LDAPROOTDN", config.getLdapBaseDn());
+				map.put("#LDAP_SSL", config.getLiderLdapUseSsl());
 
 				map.put("#XMPPHOST", config.getLiderXmppAddress());
 				map.put("#XMPPPORT", config.getLiderXmppPort().toString());
@@ -137,7 +144,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#XMPPMAXRETRY", config.getLiderXmppMaxTrials());
 				map.put("#XMPPREPLAYTIMEOUT", config.getLiderXmppPacketTimeout());
 				map.put("#XMPPPINGTIMEOUT", config.getLiderXmppPingTimeout());
-				map.put("#XMPPFILEPATH", config.getLiderXmppFileSharingPath());
+				map.put("#XMPP_SSL", config.getLiderXmppUseSsl());
 
 				map.put("#AGENTLDAPBASEDN", config.getLiderAgentLdapBaseDn());
 				map.put("#AGENTLDAPIDATTR", config.getLiderAgentLdapIdAttribute());
@@ -149,6 +156,24 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#USERLDAPPRIVILEGEATTR", config.getLiderUserLdapPrivilegeAttribute());
 				map.put("#USERLDAPOBJECTCLASSES", config.getLiderUserLdapClasses());
 				map.put("#GROUPLDAPOBJECTCLASSES", config.getLiderUserGroupLdapClasses());
+
+				if (firstNode) {
+					map.put("#CHECK_FUTURE_TASK", "true");
+					map.put("#ALARM_CHECK_REPORT", "true");
+				} else {
+					map.put("#CHECK_FUTURE_TASK", "false");
+					map.put("#ALARM_CHECK_REPORT", "false");
+				}
+				
+				
+				map.put("#FILE_SERVER_PROTOCOL", config.getLiderFileServerProtocol());
+				map.put("#FILE_SERVER_HOST", config.getLiderFileServerHost());
+				map.put("#FILE_SERVER_PORT", config.getLiderFileServerPort());
+				map.put("#FILE_SERVER_USERNAME", config.getLiderFileServerUsername());
+				map.put("#FILE_SERVER_PWD", config.getLiderFileServerPwd());
+				map.put("#FILE_SERVER_PLUGIN_PATH", config.getLiderFileServerPluginPath());
+				map.put("#FILE_SERVER_AGREEMENT_PATH", config.getLiderFileServerAgreementPath());
+				map.put("#FILE_SERVER_AGENT_FILE_PATH", config.getLiderFileServerAgentFilePath());
 
 				liderCfg = SetupUtils.replace(map, liderCfg);
 				File liderCfgFile = writeToFile(liderCfg, "tr.org.liderahenk.cfg");

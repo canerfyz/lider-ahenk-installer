@@ -1,5 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.IOException;
+
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -39,7 +41,7 @@ public class DatabaseInstallationStatus extends WizardPage
 	// TODO database parametric
 	private final static String CREATE_DATABASE = "mysql -uroot -p{0} -e 'CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci'";
 
-	private final static String GRANT_PRIVILEGES = "mysql -uroot -p{0} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{1}' WITH GRANT OPTION;\" && service mysql restart";
+	private final static String GRANT_PRIVILEGES = "mysql -uroot -p{0} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '{1}' WITH GRANT OPTION;\"";
 
 	private final static String REPLACE_BIND_ADDRESS = "sed -i 's/^bind-address/#&/' /etc/mysql/my.cnf";
 
@@ -91,50 +93,59 @@ public class DatabaseInstallationStatus extends WizardPage
 					clearLogConsole();
 					setProgressBar(0);
 
-					printMessage("Initializing installation...");
+					printMessage(Messages.getString("INITIALIZING_INSTALLATION"));
 					setProgressBar(10);
 
-					printMessage("Setting up parameters for database password.");
-					setProgressBar(20);
-
-					printMessage("Installing package...");
-
 					try {
-
+						
+						printMessage(Messages.getString("CLEANING_OLD_DATABASES"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"rm -rf /var/lib/mysql/");
+						printMessage(Messages.getString("SUCCESSFULLY_CLEANED_OLD_DATABASES"));
 
+						printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"apt-get update");
+						printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
+						printMessage(Messages.getString("INSTALLING_PREREQUISITES"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"apt-get -y --force-yes install software-properties-common");
+						printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PREREQUISITES"));
 
+						printMessage(Messages.getString("ADDING_KEY_SERVER"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db");
+						printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEY_SERVER"));
 
+						printMessage(Messages.getString("ADDING_NEW_REPOSITORY"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
+						printMessage(Messages.getString("SUCCESSFULLY_ADDED_NEW_REPOSITORY"));
 
+						printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"apt-get update");
+						printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
+						printMessage(Messages.getString("SETTING_DEBIAN_FRONTEND_TO_NONINTERACTIVE"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"export DEBIAN_FRONTEND='noninteractive'");
+						printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_TO_NONINTERACTIVE"));
 
 						final String[] debconfValues = generateDebconfValues();
 
@@ -145,87 +156,82 @@ public class DatabaseInstallationStatus extends WizardPage
 									config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 									config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), cmd);
 						}
-
+						
+						printMessage(Messages.getString("INSTALLING_MARIADB_SERVER"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"apt-get -y --force-yes install mariadb-server-10.1");
-
-						setProgressBar(90);
-
-						isInstallationFinished = true;
-
-					} catch (Exception e) {
-						isInstallationFinished = false;
-						// If any error occured user should be able to go
-						// back and change selections etc.
-						canGoBack = true;
-						printMessage("Error occurred: " + e.getMessage());
-						e.printStackTrace();
-					}
-
-					try {
-						printMessage("Creating database.");
+						printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_MARIADB_SERVER"));
 
 						// Grant privileges
+						printMessage(Messages.getString("GRANTING_PRIVILEGES"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								GRANT_PRIVILEGES.replace("{0}", config.getDatabaseRootPassword()).replace("{1}",
 										config.getDatabaseRootPassword()));
 
+						printMessage(Messages.getString("CREATING_DATABASE"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								CREATE_DATABASE.replace("{0}", config.getDatabaseRootPassword()));
 
+						printMessage(Messages.getString("DELETING_DEFAULT_USERS"));
 						String command = "mysql -uroot -p{0} -e \"DELETE FROM mysql.user WHERE user='';\"";
 						command = command.replace("{0}", config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
 
-						printMessage("Database created successfully.");
-
+						printMessage(Messages.getString("GRANTING_OTHER_PRIVILEGES"));
 						command = "mysql -uroot -p{0} -e \"GRANT ALL ON *.* TO 'root'@'%' IDENTIFIED BY '{1}';\"";
-						command = command.replace("{0}", config.getDatabaseRootPassword()).replace("{1}", config.getDatabaseRootPassword());
+						command = command.replace("{0}", config.getDatabaseRootPassword()).replace("{1}",
+								config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
-						
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
+
+						printMessage(Messages.getString("FLUSHING_PRIVILEGES"));
 						command = "mysql -uroot -p{0} -e \"FLUSH PRIVILEGES;\"";
 						command = command.replace("{0}", config.getDatabaseRootPassword());
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
-								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								command);
+								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(), command);
 
 						// Remove bind-address
+						printMessage(Messages.getString("REMOVING_BIND_ADDRESS_PARAMETER"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								REPLACE_BIND_ADDRESS);
 
+						printMessage(Messages.getString("RESTARTING_MYSQL_SERVICE"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
 								"service mysql restart");
+
+						printMessage(Messages.getString("MARIADB_INSTALLATION_SUCCESSFULLY_COMPLETED"));
+						
+						setProgressBar(90);
+
+						isInstallationFinished = true;
 
 					} catch (CommandExecutionException e) {
 						isInstallationFinished = false;
 						// If any error occured user should be able to go
 						// back and change selections etc.
 						canGoBack = true;
-						printMessage("Error occurred: " + e.getMessage());
+						printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 						e.printStackTrace();
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
 						// If any error occured user should be able to go
 						// back and change selections etc.
 						canGoBack = true;
-						printMessage("Error occurred: " + e.getMessage());
+						printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 						e.printStackTrace();
 					}
 
@@ -233,9 +239,19 @@ public class DatabaseInstallationStatus extends WizardPage
 
 					config.setInstallationFinished(isInstallationFinished);
 
-					printMessage("Installation finished..");
-
 					setPageCompleteAsync(isInstallationFinished);
+
+					if (!isInstallationFinished) {
+						try {
+							openDownloadUrl();
+						} catch (Exception e) {
+							e.printStackTrace();
+							txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+									? txtLogConsole.getText() + "\n" : "")
+									+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+									+ PropertyReader.property("troubleshooting.url"));
+						}
+					}
 
 				}
 
@@ -311,6 +327,10 @@ public class DatabaseInstallationStatus extends WizardPage
 
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
+	}
+
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
 
 	/**

@@ -20,6 +20,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
@@ -34,6 +35,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Volkan Şahin <bm.volkansahin@gmail.com>
+ * @author Caner Feyzullahoglu <caner.feyzullahoglu@agem.com.tr>
  */
 public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 
@@ -51,6 +53,8 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 	private Text receiverResource;
 
 	private Text receiveFile;
+
+	private Combo cmbUseSsl;
 
 	public AhenkConfPage(AhenkSetupConfig config) {
 		super(AhenkConfPage.class.getName(), Messages.getString("AHENK_INSTALLATION"), null);
@@ -128,6 +132,12 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		receiveFile.setMessage(Messages.getString("EG_RECEIVE_FILE"));
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("AHENK_USE_SSL"));
+		cmbUseSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cmbUseSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		cmbUseSsl.setItems("false", "true");
+		cmbUseSsl.select(0);
 
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
 		GUIHelper.createLabel(infoComposite, Messages.getString("AHENK_INSTALLATION_XMPP_CONF_HINT"));
@@ -200,6 +210,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		map.put("#SERVICENAME", xmppServiceName.getText());
 		map.put("#RECEIVER_RESOURCE", receiverResource.getText());
 		map.put("#RECEIVE_FILE", receiveFile.getText());
+		map.put("#USE_TLS", cmbUseSsl.getText());
 
 		text = SetupUtils.replace(map, text);
 		config.setAhenkConfContent(text);

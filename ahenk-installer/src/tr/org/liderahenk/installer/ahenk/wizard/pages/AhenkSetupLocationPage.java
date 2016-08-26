@@ -25,6 +25,11 @@ import tr.org.liderahenk.installer.ahenk.wizard.AhenkSetupWizard;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
+/**
+ * 
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ *
+ */
 public class AhenkSetupLocationPage extends WizardPage {
 
 	private AhenkSetupConfig config;

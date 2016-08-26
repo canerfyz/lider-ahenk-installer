@@ -28,7 +28,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 /**
  * Utility class which provides common network methods (such as
  * finding IP addresses, scanning network etc.) 
- *
+ * 
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
  */
 public class NetworkUtils {
 	

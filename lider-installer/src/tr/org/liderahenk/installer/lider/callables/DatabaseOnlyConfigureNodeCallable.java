@@ -24,6 +24,10 @@ import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 
 	private static final Logger logger = Logger.getLogger(DatabaseOnlyConfigureNodeCallable.class.getName());

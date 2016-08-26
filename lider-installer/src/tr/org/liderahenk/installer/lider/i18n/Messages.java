@@ -3,6 +3,10 @@ package tr.org.liderahenk.installer.lider.i18n;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class Messages {
 
 	private static final String BUNDLE_NAME = "tr.org.liderahenk.installer.lider.i18n.messages";

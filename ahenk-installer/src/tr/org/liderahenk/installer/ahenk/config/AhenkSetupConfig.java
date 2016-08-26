@@ -7,7 +7,8 @@ import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 
 /**
  * Contains configuration variables used throughout the whole setup process.
- *
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
  */
 public class AhenkSetupConfig {
 

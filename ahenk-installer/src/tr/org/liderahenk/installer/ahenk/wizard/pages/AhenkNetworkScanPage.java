@@ -57,6 +57,12 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.NmapParameters;
 import tr.org.pardus.mys.liderahenksetup.utils.network.RunnableNmap4j;
 import tr.org.pardus.mys.liderahenksetup.utils.network.TableThreadHelper;
 
+/**
+ * 
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ *
+ */
 public class AhenkNetworkScanPage extends WizardPage {
 
 	private static final Logger logger = Logger.getLogger(AhenkNetworkScanPage.class.getName());

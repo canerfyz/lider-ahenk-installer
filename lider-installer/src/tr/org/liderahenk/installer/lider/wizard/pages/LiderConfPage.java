@@ -20,9 +20,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -50,17 +50,19 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 	private Text ldapUsername;
 	private Text ldapPassword;
 	private Text ldapRootDn;
+	private Combo cmbLdapSsl;
 
 	// XMPP configuration
 	private Text xmppHost;
 	private Text xmppPort;
 	private Text xmppUsername;
 	private Text xmppPassword;
+	private Text xmppResource;
 	private Text xmppServiceName;
 	private Text xmppMaxRetryConnCount;
 	private Text xmppPacketReplyTimeout;
 	private Text xmppPingTimeout;
-	private Text xmppFilePath;
+	private Combo cmbXmppSsl;
 
 	// Database configuration
 	private Text dbServer;
@@ -80,6 +82,19 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 	private Text userLdapPrivilegeAttribute;
 	private Text userLdapObjectClasses;
 	private Text groupLdapObjectClasses;
+	
+//	private Combo cmbCheckFutureTask;
+//	private Combo cmbAlarmCheckReport;
+	
+	private Text txtFileServerProtocol;
+	private Text txtFileServerHost;
+	private Text txtFileServerPort;
+	private Text txtFileServerUsername;
+	private Text txtFileServerPwd;
+	private Text txtFileServerPluginPath;
+	private Text txtFileServerAgreementPath;
+	private Text txtFileServerAgentFilePath;
+
 
 	public LiderConfPage(LiderSetupConfig config) {
 		super(LiderConfPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -126,13 +141,19 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		GUIHelper.createLabel(lineCont, "LDAP kök DN");
 		ldapRootDn = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
+		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_USE_SSL"));
+		cmbLdapSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cmbLdapSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		cmbLdapSsl.setItems("false", "true");
+		cmbLdapSsl.select(0);
+		
 		//
 		// XMPP configuration
 		//
-		GUIHelper.createLabel(lineCont, "XMPP sucunu adresi");
+		GUIHelper.createLabel(lineCont, "XMPP sunucu adresi");
 		xmppHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
-		GUIHelper.createLabel(lineCont, "XMPP sucunu portu");
+		GUIHelper.createLabel(lineCont, "XMPP sunucu portu");
 		xmppPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "XMPP Lider kullanıcısı");
@@ -140,6 +161,9 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 
 		GUIHelper.createLabel(lineCont, "XMPP kullanıcı parolası");
 		xmppPassword = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, "XMPP Resource Adı");
+		xmppResource = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		GUIHelper.createLabel(lineCont, "XMPP servis adı");
 		xmppServiceName = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -154,9 +178,12 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		GUIHelper.createLabel(lineCont, "XMPP ping zamanaşımı süresi");
 		xmppPingTimeout = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
-		GUIHelper.createLabel(lineCont, "XMPP dosya transferi yolu");
-		xmppFilePath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
-
+		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_USE_SSL"));
+		cmbXmppSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
+		cmbXmppSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
+		cmbXmppSsl.setItems("false", "true");
+		cmbXmppSsl.select(0);
+		
 		//
 		// Database configuration
 		//
@@ -210,7 +237,31 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		GUIHelper.createLabel(lineCont, "Kullanıcı grubu LDAP sınıfları");
 		groupLdapObjectClasses = GUIHelper.createText(lineCont,
 				new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PROTOCOL"));
+		txtFileServerProtocol = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
 
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_HOST"));
+		txtFileServerHost = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PORT"));
+		txtFileServerPort = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_USERNAME"));
+		txtFileServerUsername = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PASSWORD"));
+		txtFileServerPwd = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_PLUGIN_PATH"));
+		txtFileServerPluginPath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_AGREEMENT_PATH"));
+		txtFileServerAgreementPath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		
+		GUIHelper.createLabel(lineCont, Messages.getString("FILE_SERVER_AGENT_FILE_PATH"));
+		txtFileServerAgentFilePath = GUIHelper.createText(lineCont, new GridData(GridData.FILL, GridData.FILL, true, false));
+		
 		GUIHelper.createLabel(innerContainer, "Lider Genel Ayarlar");
 
 		// Add a text area for configuration.
@@ -284,16 +335,18 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#LDAPUSERNAME", ldapUsername.getText());
 		map.put("#LDAPPASSWORD", ldapPassword.getText());
 		map.put("#LDAPROOTDN", ldapRootDn.getText());
+		map.put("#LDAP_SSL", cmbLdapSsl.getText());
 		// XMPP configuration
 		map.put("#XMPPHOST", xmppHost.getText());
 		map.put("#XMPPPORT", xmppPort.getText());
 		map.put("#XMPPUSERNAME", xmppUsername.getText());
 		map.put("#XMPPPASSWORD", xmppPassword.getText());
+		map.put("#XMPPRESOURCE", xmppResource.getText());
 		map.put("#XMPPSERVICENAME", xmppServiceName.getText());
 		map.put("#XMPPMAXRETRY", xmppMaxRetryConnCount.getText());
 		map.put("#XMPPREPLAYTIMEOUT", xmppPacketReplyTimeout.getText());
 		map.put("#XMPPPINGTIMEOUT", xmppPingTimeout.getText());
-		map.put("#XMPPFILEPATH", xmppFilePath.getText());
+		map.put("#XMPP_SSL", cmbXmppSsl.getText());
 		// Agent configuration
 		map.put("#AGENTLDAPBASEDN", agentLdapBaseDn.getText());
 		map.put("#AGENTLDAPIDATTR", agentLdapIdAttribute.getText());
@@ -306,6 +359,18 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#USERLDAPOBJECTCLASSES", userLdapObjectClasses.getText());
 		map.put("#GROUPLDAPOBJECTCLASSES", groupLdapObjectClasses.getText());
 
+		map.put("#CHECK_FUTURE_TASK", "true");
+		map.put("#ALARM_CHECK_REPORT", "true");
+
+		map.put("#FILE_SERVER_PROTOCOL", txtFileServerProtocol.getText());
+		map.put("#FILE_SERVER_HOST", txtFileServerHost.getText());
+		map.put("#FILE_SERVER_PORT", txtFileServerPort.getText());
+		map.put("#FILE_SERVER_USERNAME", txtFileServerUsername.getText());
+		map.put("#FILE_SERVER_PWD", txtFileServerPwd.getText());
+		map.put("#FILE_SERVER_PLUGIN_PATH", txtFileServerPluginPath.getText());
+		map.put("#FILE_SERVER_AGREEMENT_PATH", txtFileServerAgreementPath.getText());
+		map.put("#FILE_SERVER_AGENT_FILE_PATH", txtFileServerAgentFilePath.getText());
+		
 		text = SetupUtils.replace(map, text);
 		config.setLiderConfContent(text);
 		config.setLiderAbsPathConfFile(writeToFile(text, "tr.org.liderahenk.cfg"));
@@ -341,11 +406,11 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		xmppPort.setText("5222");
 		xmppUsername.setText(config.getXmppLiderUsername() != null ? config.getXmppLiderUsername() : "lider_sunucu");
 		xmppPassword.setText(config.getXmppLiderPassword() != null ? config.getXmppLiderPassword() : "asddsa123");
+		xmppResource.setText("Smack");
 		xmppServiceName.setText(config.getXmppHostname() != null ? config.getXmppHostname() : "im." + config.getLdapOrgCn());
 		xmppMaxRetryConnCount.setText("5");
 		xmppPacketReplyTimeout.setText("10000");
 		xmppPingTimeout.setText("3000");
-		xmppFilePath.setText("/tmp/xmpp-files/");
 		if (!config.isDatabaseCluster()) {
 			dbServer.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() + ":3306" : "db." + config.getLdapOrgCn() + ":3306");
 		} else {
@@ -364,6 +429,15 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
 		userLdapObjectClasses.setText("pardusLider");
 		groupLdapObjectClasses.setText("groupOfNames");
+		
+		txtFileServerProtocol.setText("ssh");
+		txtFileServerHost.setText("agem.com.tr");
+		txtFileServerPort.setText("22");
+		txtFileServerUsername.setText("distro");
+		txtFileServerPwd.setText("!Distr0");
+		txtFileServerPluginPath.setText("/plugins/ahenk-{0}_{1}_amd64.deb");
+		txtFileServerAgreementPath.setText("/sample-agreement.txt");
+		txtFileServerAgentFilePath.setText("/agent-files/{0}/");
 	}
 
 	/**

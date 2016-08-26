@@ -9,6 +9,10 @@ import org.nmap4j.data.nmaprun.Host;
 
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class RunnableNmap4j implements Runnable {
 
 	private TableThreadHelper tableHelper;

@@ -44,6 +44,10 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class XmppClusterInstallationStatus extends WizardPage
 		implements IXmppPage, ControlNextEvent, InstallationStatusPage {
 
@@ -337,6 +341,18 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
+						
+						if (!isInstallationFinished) {
+							try {
+								openDownloadUrl();
+							} catch (Exception e) {
+								e.printStackTrace();
+								txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+										? txtLogConsole.getText() + "\n" : "")
+										+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+										+ PropertyReader.property("troubleshooting.url"));
+							}
+						}
 					}
 
 				}
@@ -351,6 +367,10 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 	}
 
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
+	}
+	
 	private void onlyConfigureNode(XmppNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;

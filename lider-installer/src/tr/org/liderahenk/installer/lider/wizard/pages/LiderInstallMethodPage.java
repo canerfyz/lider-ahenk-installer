@@ -38,12 +38,9 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 	private LiderSetupConfig config;
 
 	// private Button btnAptGet;
-	private Button btnDebPackage;
 	private Button btnWget;
 	private Button btnTar;
-	private Text txtFileName;
 	private Text txtTarFileName;
-	private Button btnFileSelect;
 	private Button btnTarFileSelect;
 	private FileDialog dialog;
 
@@ -67,91 +64,6 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 		setControl(mainContainer);
 
 		Composite subcontainer = GUIHelper.createComposite(mainContainer, 1);
-
-		// Ask user if Karaf will be installed from a .deb package or via
-		// apt-get
-		// btnAptGet = GUIHelper.createButton(subcontainer, SWT.RADIO,
-		// Messages.getString("LIDER_SETUP_METHOD_APT_GET"));
-		// btnAptGet.addSelectionListener(new SelectionListener() {
-		// @Override
-		// public void widgetSelected(SelectionEvent e) {
-		// downloadUrlTxt.setEnabled(false);
-		// updateConfig();
-		// updatePageCompleteStatus();
-		// }
-		//
-		// @Override
-		// public void widgetDefaultSelected(SelectionEvent e) {
-		// }
-		// });
-		// btnAptGet.setSelection(true);
-
-		btnDebPackage = GUIHelper.createButton(subcontainer, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_DEB"));
-		btnDebPackage.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				downloadUrlTxt.setEnabled(false);
-				updateConfig();
-				// Enable btnFileSelect only if btnDebPackage is selected
-				btnFileSelect.setEnabled(btnDebPackage.getSelection());
-				updatePageCompleteStatus();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
-		Group grpDebPackage = GUIHelper.createGroup(subcontainer, new GridLayout(2, false),
-				new GridData(SWT.FILL, SWT.FILL, false, false));
-
-		txtFileName = GUIHelper.createText(grpDebPackage, new GridData(SWT.FILL, SWT.FILL, true, false));
-		txtFileName.setEnabled(false); // do not let user to change it! It will
-										// be updated on file selection
-
-		// Upload deb package if necessary
-		btnFileSelect = GUIHelper.createButton(grpDebPackage, SWT.NONE, Messages.getString("SELECT_FILE"));
-		btnFileSelect.addSelectionListener(new SelectionListener() {
-
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-
-				dialog = new FileDialog(getShell(), SWT.OPEN);
-				dialog.setFilterExtensions(new String[] { "*.deb" });
-				dialog.setFilterNames(new String[] { "DEB" });
-
-				String debFileName = dialog.open();
-				if (debFileName != null) {
-
-					txtFileName.setText(debFileName);
-					File deb = new File(debFileName);
-					debContent = new byte[(int) deb.length()];
-
-					FileInputStream stream;
-					try {
-						stream = new FileInputStream(deb);
-						stream.read(debContent);
-						stream.close();
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-
-					// Set deb file
-					config.setLiderDebFileName(debFileName);
-					config.setLiderDebFileContent(debContent);
-				}
-
-				updatePageCompleteStatus();
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-		btnFileSelect.setEnabled(false);
 
 		btnTar = GUIHelper.createButton(subcontainer, SWT.RADIO, Messages.getString("LIDER_SETUP_METHOD_TAR"));
 		btnTar.addSelectionListener(new SelectionListener() {
@@ -262,8 +174,6 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 			public void widgetSelected(SelectionEvent e) {
 				if (btnWget.getSelection()) {
 					downloadUrlTxt.setEnabled(true);
-					txtFileName.setEnabled(false);
-					btnFileSelect.setEnabled(false);
 					updateConfig();
 					updatePageCompleteStatus();
 				}
@@ -306,12 +216,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 	}
 
 	private void updatePageCompleteStatus() {
-		// if (btnAptGet.getSelection()) {
-		// setPageComplete(true);
-		// }
-		if (btnDebPackage.getSelection()) {
-			setPageComplete(checkDebFile());
-		} else if (btnTar.getSelection()) {
+		if (btnTar.getSelection()) {
 			setPageComplete(checkTarFile());
 		} else {
 			setPageComplete(!"".equals(downloadUrlTxt.getText()));
@@ -319,24 +224,12 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 	}
 
-	private boolean checkDebFile() {
-		return config.getLiderDebFileName() != null && config.getLiderDebFileContent() != null;
-	}
-
 	private boolean checkTarFile() {
 		return config.getLiderTarFileName() != null && config.getLiderTarFileContent() != null;
 	}
 
 	private void updateConfig() {
-		if (btnDebPackage.getSelection()) {
-			config.setLiderInstallMethod(InstallMethod.PROVIDED_DEB);
-			config.setLiderPackageName(null);
-		}
-		// else if (btnAptGet.getSelection()) {
-		// config.setLiderInstallMethod(InstallMethod.APT_GET);
-		// config.setLiderPackageName(PropertyReader.property("lider.package.name"));
-		// }
-		else if (btnTar.getSelection()) {
+		if (btnTar.getSelection()) {
 			config.setLiderInstallMethod(InstallMethod.TAR_GZ);
 			config.setLiderPackageName(null);
 		} else {

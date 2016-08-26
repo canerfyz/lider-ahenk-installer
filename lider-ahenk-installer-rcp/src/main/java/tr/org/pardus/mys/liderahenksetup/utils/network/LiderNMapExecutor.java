@@ -15,6 +15,10 @@ import org.nmap4j.core.nmap.NMapInitializationException;
 
 import tr.org.pardus.mys.liderahenksetup.utils.StringUtils;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class LiderNMapExecutor extends NMapExecutor {
 	
 	private static final Logger logger = Logger.getLogger(LiderNMapExecutor.class

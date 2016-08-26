@@ -66,7 +66,8 @@ cn: ladmin
 sn: ladmin
 uid: ladmin
 userPassword: $LADMIN_PASSWORD
-liderPrivilege: [$BASE_DN:ALL:true]
+liderPrivilege: [TASK:$BASE_DN:ALL]
+liderPrivilege: [REPORT:ALL]
 EOL
 
 service slapd restart

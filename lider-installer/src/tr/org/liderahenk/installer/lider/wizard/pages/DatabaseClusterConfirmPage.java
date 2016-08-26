@@ -11,6 +11,10 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseClusterConfirmPage extends WizardPage implements IDatabasePage {
 	private LiderSetupConfig config;
 
@@ -29,7 +33,7 @@ public class DatabaseClusterConfirmPage extends WizardPage implements IDatabaseP
 		setControl(container);
 
 		GridData gd = new GridData();
-		gd.widthHint = 200;
+		gd.widthHint = 700;
 		gd.minimumWidth = 200;
 		lblIp = GUIHelper.createLabel(container, "localhost");
 		lblIp.setLayoutData(gd);

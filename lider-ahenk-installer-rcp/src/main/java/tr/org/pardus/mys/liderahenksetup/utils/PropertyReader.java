@@ -8,6 +8,10 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
+ */
 public class PropertyReader {
 
 	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());

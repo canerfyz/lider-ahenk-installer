@@ -1,5 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,9 +31,14 @@ import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 
+/**
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * 
+ */
 public class DatabaseClusterInstallationStatus extends WizardPage
 		implements IDatabasePage, ControlNextEvent, InstallationStatusPage {
 
@@ -257,6 +263,18 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
+						
+						if (!isInstallationFinished) {
+							try {
+								openDownloadUrl();
+							} catch (Exception e) {
+								e.printStackTrace();
+								txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+										? txtLogConsole.getText() + "\n" : "")
+										+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+										+ PropertyReader.property("troubleshooting.url"));
+							}
+						}
 					}
 
 				}
@@ -267,6 +285,10 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		}
 		// Select next page.
 		return PageFlowHelper.selectNextPage(config, this);
+	}
+	
+	private void openDownloadUrl() throws IOException {
+		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
 
 	private void startFirstNode(DatabaseNodeInfoModel firstNode, Display display) throws Exception {

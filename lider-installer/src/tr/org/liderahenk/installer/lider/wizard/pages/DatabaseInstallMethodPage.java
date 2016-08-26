@@ -88,8 +88,8 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		// Copy mariadb.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader()
-				.getResourceAsStream("mariadb-server_default_10_0_23.deb");
-		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server_default_10_0_23.deb");
+				.getResourceAsStream("mariadb-server-10.1_10.1.16+maria-1-jessie_amd64.deb");
+		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server-10.1_10.1.16+maria-1-jessie_amd64.deb");
 		txtFileName.setText(mariadbDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes
@@ -203,7 +203,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 
 		GUIHelper.createLabel(passwordComp, Messages.getString("DATABASE_ROOT_PASSWORD"));
 
-		txtDatabaseRootPassword = GUIHelper.createPasswordText(passwordComp);
+		txtDatabaseRootPassword = GUIHelper.createText(passwordComp);
 		GridData gdRootPasswdTxt = new GridData();
 		gdRootPasswdTxt.widthHint = 200;
 		txtDatabaseRootPassword.setLayoutData(gdRootPasswdTxt);
