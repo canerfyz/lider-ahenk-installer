@@ -314,7 +314,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			cellarCfg = SetupUtils.streamToFile(inputStream, "org.apache.karaf.cellar.groups.cfg");
 			printMessage(Messages.getString("SUCCESSFULLY_CREATED_CELLAR_CFG_FILE"), display);
 
-			String copyPath = "/opt/" + PropertyReader.property("lider.package.name") + "/etc";
+			String copyPath = "/opt/" + PropertyReader.property("lider.package.name") + "/etc/";
 
 			printMessage(Messages.getString("SENDING_CELLAR_CFG_FILE_TO", clusterNode.getNodeIp()), display);
 			manager.copyFileToRemote(cellarCfg, copyPath, false);
