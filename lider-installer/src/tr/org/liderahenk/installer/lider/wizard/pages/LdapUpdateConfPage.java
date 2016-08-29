@@ -1,9 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -332,39 +329,9 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 
 		// Set config variables before going to next page
 		config.setLdapConfContent(text);
-		config.setLdapAbsPathConfFile(writeToFile(text, "update_ldap"));
+		config.setLdapAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "update_ldap"));
 	}
 	
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns absolute path of created temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return absolute path of created temp file
-	 */
-	private String writeToFile(String content, String fileName) {
-
-		String absPath = null;
-
-		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-			absPath = temp.getAbsolutePath();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return absPath;
-	}
-
 	public void updatePageCompleteStatus() {
 		if (!txtCnConfigDn.getText().isEmpty() &&
 				!txtCnConfigPwd.getText().isEmpty() &&
