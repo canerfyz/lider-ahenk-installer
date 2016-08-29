@@ -1,8 +1,6 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -205,7 +203,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 						// Calculate progress bar increment size
 						final Integer increment = (Integer) (90 / config.getIpList().size());
 
-						final File fileConf = new File(writeToFile(config.getAhenkConfContent(), "ahenk.conf"));
+						final File fileConf = new File(config.getAhenkAbsPathConfFile());
 
 						final File logConf = new File(config.getAhenkLogConfAbsPath());
 
@@ -573,34 +571,4 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 		this.nextPageEventType = nextPageEventType;
 	}
 
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns absolute path of created temp file.
-	 * 
-	 * @param content
-	 * @param namePrefix
-	 * @param nameSuffix
-	 * @return absolute path of created temp file
-	 */
-	private String writeToFile(String content, String fileName) {
-
-		String absPath = null;
-
-		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-			absPath = temp.getAbsolutePath();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return absPath;
-	}
 }
