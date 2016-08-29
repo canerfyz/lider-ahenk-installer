@@ -1,8 +1,10 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -99,6 +101,66 @@ public class SetupUtils {
 
 	private static final String INSTALL_GDEBI = "apt-get install -y gdebi";
 
+	
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns the created file.
+	 * 
+	 * @param content
+	 * @param fileName
+	 * @return created file
+	 */
+	public static synchronized File writeToFile(String content, String fileName) {
+
+		File tempFile = null;
+
+		try {
+			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+
+			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return tempFile;
+	}
+	
+	/**
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param fileName
+	 * @return absolute path of created temp file
+	 */
+	public static String writeToFileReturnPath(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return absPath;
+	}
+	
 	/**
 	 * Tries to connect via SSH. It uses username-password pair to connect.
 	 * 
