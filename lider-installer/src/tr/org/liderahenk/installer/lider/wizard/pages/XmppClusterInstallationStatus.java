@@ -658,7 +658,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 		map.put("#CLUSTER_SERVERS", propertyMap.get("CLUSTER_SERVERS"));
 
 		haproxyCfg = SetupUtils.replace(map, haproxyCfg);
-		File haproxyCfgFile = writeToFile(haproxyCfg, "haproxy.cfg");
+		File haproxyCfgFile = SetupUtils.writeToFile(haproxyCfg, "haproxy.cfg");
 		printMessage(Messages.getString("SUCCESSFULLY_CREATED_HAPROXY_CONFIG_FILE"), display);
 		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
 
@@ -1032,35 +1032,6 @@ public class XmppClusterInstallationStatus extends WizardPage
 		}
 
 		return readingText;
-	}
-
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns the temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return created temp file
-	 */
-	private File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
-		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
 	}
 
 	@Override
