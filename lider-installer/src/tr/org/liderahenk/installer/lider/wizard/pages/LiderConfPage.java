@@ -1,9 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -373,7 +370,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		
 		text = SetupUtils.replace(map, text);
 		config.setLiderConfContent(text);
-		config.setLiderAbsPathConfFile(writeToFile(text, "tr.org.liderahenk.cfg"));
+		config.setLiderAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "tr.org.liderahenk.cfg"));
 
 		// Database configuration
 		String text2 = stDatasourceConfig.getText();
@@ -385,7 +382,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 
 		text2 = SetupUtils.replace(map2, text2);
 		config.setDatasourceConfContent(text2);
-		config.setDatasourceAbsPathConfFile(writeToFile(text2, "tr.org.liderahenk.datasource.cfg"));
+		config.setDatasourceAbsPathConfFile(SetupUtils.writeToFileReturnPath(text2, "tr.org.liderahenk.datasource.cfg"));
 
 		return super.getNextPage();
 	}
@@ -482,37 +479,6 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns absolute path of created temp file.
-	 * 
-	 * @param content
-	 * @param namePrefix
-	 * @param nameSuffix
-	 * @return absolute path of created temp file
-	 */
-	private String writeToFile(String content, String fileName) {
-
-		String absPath = null;
-
-		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
-
-			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-			absPath = temp.getAbsolutePath();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return absPath;
 	}
 
 	@Override
