@@ -183,10 +183,11 @@ public class LiderClusterInstallationStatus extends WizardPage
 								final LiderNodeInfoModel clusterNode = entry.getValue();
 
 								installDependenciesToNode(clusterNode, display);
+
+								sendCellarConfig(clusterNode, display);
 								
 								startNode(clusterNode, display);
 
-								modifyCellarConfig(clusterNode, display);
 							}
 
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
@@ -296,29 +297,33 @@ public class LiderClusterInstallationStatus extends WizardPage
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
 
-	private void modifyCellarConfig(LiderNodeInfoModel clusterNode, Display display) throws Exception {
+	private void sendCellarConfig(LiderNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
+		File cellarCfg;
+		InputStream inputStream;
 
-		// Modify org.apache.karaf.cellar.groups.cfg
+		// Send org.apache.karaf.cellar.groups.cfg
 		try {
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
+			
+			printMessage(Messages.getString("CREATING_CELLAR_CFG_FILE"), display);
+			inputStream = this.getClass().getClassLoader().getResourceAsStream("org.apache.karaf.cellar.groups.cfg");
+			cellarCfg = SetupUtils.streamToFile(inputStream, "org.apache.karaf.cellar.groups.cfg");
+			printMessage(Messages.getString("SUCCESSFULLY_CREATED_CELLAR_CFG_FILE"), display);
 
-			printMessage(Messages.getString("MODIFYING_CELLAR_CONFIGURATION_AT") + " " + clusterNode.getNodeIp(),
-					display);
-			manager.execCommand(
-					"sed -i '/default.config.sync = cluster/c\\default.config.sync = disabled' /opt/{0}/etc/org.apache.karaf.cellar.groups.cfg",
-					new Object[] { PropertyReader.property("lider.package.name") });
-			printMessage(
-					Messages.getString("SUCCESSFULLY_MODIFIED_CELLAR_CONFIGURATION") + " " + clusterNode.getNodeIp(),
-					display);
+			String copyPath = "/opt/" + PropertyReader.property("lider.package.name") + "/etc";
 
-			logger.log(Level.INFO, "Successfully modified org.apache.karaf.cellar.groups.cfg at: {0}",
+			printMessage(Messages.getString("SENDING_CELLAR_CFG_FILE_TO", clusterNode.getNodeIp()), display);
+			manager.copyFileToRemote(cellarCfg, copyPath, false);
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_CELLAR_CFG_FILE_TO", clusterNode.getNodeIp()), display);
+			
+			logger.log(Level.INFO, "Successfully sent org.apache.karaf.cellar.groups.cfg to: {0}",
 					new Object[] { clusterNode.getNodeIp() });
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_CELLAR_CONFIGURATION_AT") + " "
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CELLAR_CFG_AT") + " "
 					+ clusterNode.getNodeIp(), display);
 			printMessage(
 					Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + clusterNode.getNodeIp(),
