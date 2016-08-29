@@ -1,9 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -560,7 +558,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("DEFINING_KARAF_SERVICE_AT") + " " + clusterNode.getNodeIp(), display);
 
 			manager.execCommand(
-					"ln -s /opt/" + PropertyReader.property("lider.package.name")
+					"ln -fs /opt/" + PropertyReader.property("lider.package.name")
 							+ "/bin/karaf-service /etc/init.d/ && update-rc.d karaf-service defaults",
 					new IOutputStreamProvider() {
 						@Override
@@ -649,7 +647,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 		map.put("#CLUSTER_SERVERS", propertyMap.get("CLUSTER_SERVERS"));
 
 		haproxyCfg = SetupUtils.replace(map, haproxyCfg);
-		File haproxyCfgFile = writeToFile(haproxyCfg, "haproxy.cfg");
+		File haproxyCfgFile = SetupUtils.writeToFile(haproxyCfg, "haproxy.cfg");
 		printMessage(Messages.getString("SUCCESSFULLY_CREATED_HAPROXY_CONFIG_FILE"), display);
 		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
 
@@ -817,34 +815,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 		return readingText;
 	}
 
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns the temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return created temp file
-	 */
-	private File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
-		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
-	}
 
 	@Override
 	public IWizardPage getPreviousPage() {
