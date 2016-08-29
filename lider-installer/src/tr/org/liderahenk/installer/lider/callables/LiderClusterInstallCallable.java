@@ -1,9 +1,7 @@
 package tr.org.liderahenk.installer.lider.callables;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -176,7 +174,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#FILE_SERVER_AGENT_FILE_PATH", config.getLiderFileServerAgentFilePath());
 
 				liderCfg = SetupUtils.replace(map, liderCfg);
-				File liderCfgFile = writeToFile(liderCfg, "tr.org.liderahenk.cfg");
+				File liderCfgFile = SetupUtils.writeToFile(liderCfg, "tr.org.liderahenk.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CFG_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CFG_TO") + " " + nodeIp, display);
@@ -204,7 +202,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#DBPASSWORD", config.getLiderDbPwd());
 
 				liderDatasourceCfg = SetupUtils.replace(map, liderDatasourceCfg);
-				File liderDatasourceCfgFile = writeToFile(liderDatasourceCfg, "tr.org.liderahenk.datasource.cfg");
+				File liderDatasourceCfgFile = SetupUtils.writeToFile(liderDatasourceCfg, "tr.org.liderahenk.datasource.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_DATASOURCE_CFG_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_DATASOURCE_CFG_TO") + " " + nodeIp, display);
@@ -293,35 +291,6 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 		}
 
 		return readingText;
-	}
-
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns the temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return created temp file
-	 */
-	private File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
-		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
 	}
 
 }
