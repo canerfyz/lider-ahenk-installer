@@ -1,9 +1,7 @@
 package tr.org.liderahenk.installer.lider.callables;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -254,7 +252,8 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				map.put("#NODE_NAME", nodeName);
 
 				galeraCnf = SetupUtils.replace(map, galeraCnf);
-				File galeraCnfFile = writeToFile(galeraCnf, "galera.cnf");
+				
+				File galeraCnfFile = SetupUtils.writeToFile(galeraCnf, "galera.cnf");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CNF_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CNF_FILE_TO") + " " + nodeIp, display);
@@ -353,35 +352,6 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 		}
 
 		return readingText;
-	}
-
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns the temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return created temp file
-	 */
-	private File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
-		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
 	}
 
 }
