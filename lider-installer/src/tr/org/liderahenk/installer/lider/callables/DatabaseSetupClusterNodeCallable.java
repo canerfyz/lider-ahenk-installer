@@ -104,11 +104,10 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			// Add keyserver
 			// Add repository
 			try {
-				printMessage(Messages.getString("INSTALLING_PACKAGE") + " 'software-properties-common' to: " + nodeIp,
+				printMessage(Messages.getString("INSTALLING_PACKAGE_", "software-properties-common", nodeIp),
 						display);
 				manager.execCommand("apt-get -y --force-yes install software-properties-common", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE") + " 'software-properties-common' to: "
-						+ nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", "software-properties-common", nodeIp), display);
 
 				printMessage(Messages.getString("ADDING_KEYSERVER_TO") + " " + nodeIp, display);
 				manager.execCommand("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db",
