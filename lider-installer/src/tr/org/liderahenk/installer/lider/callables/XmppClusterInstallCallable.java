@@ -1,9 +1,7 @@
 package tr.org.liderahenk.installer.lider.callables;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -153,7 +151,7 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				map.put("#LDAP_BASE_DN", config.getXmppLdapBaseDn());
 
 				ejabberdYml = SetupUtils.replace(map, ejabberdYml);
-				File ejabberdYmlFile = writeToFile(ejabberdYml, "ejabberd.yml");
+				File ejabberdYmlFile = SetupUtils.writeToFile(ejabberdYml, "ejabberd.yml");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_YML_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_EJABBERD_YML_TO") + " " + nodeIp, display);
@@ -302,32 +300,4 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 		return readingText;
 	}
 
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns the temp file.
-	 * 
-	 * @param content
-	 * @param fileName
-	 * @return created temp file
-	 */
-	private File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
-		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return tempFile;
-	}
 }
