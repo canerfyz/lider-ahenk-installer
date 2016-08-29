@@ -1,9 +1,6 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -296,7 +293,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		text = SetupUtils.replace(map, text);
 		config.setXmppConfContent(text);
 		// Write configuration to file
-		config.setXmppAbsPathConfFile(writeToFile(text, "ejabberd.yml"));
+		config.setXmppAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "ejabberd.yml"));
 
 		return super.getNextPage();
 	}
@@ -357,37 +354,6 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Creates file under temporary file directory and writes configuration to
-	 * it. Returns absolute path of created temp file.
-	 * 
-	 * @param content
-	 * @param namePrefix
-	 * @param nameSuffix
-	 * @return absolute path of created temp file
-	 */
-	private String writeToFile(String content, String fileName) {
-
-		String absPath = null;
-
-		try {
-			File temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-			absPath = temp.getAbsolutePath();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return absPath;
 	}
 
 	public NextPageEventType getNextPageEventType() {
