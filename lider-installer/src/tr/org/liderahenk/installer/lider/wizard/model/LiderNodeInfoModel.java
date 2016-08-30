@@ -10,13 +10,15 @@ public class LiderNodeInfoModel {
 	private String nodeIp;
 	private String nodeRootPwd;
 	private String nodeXmppResource;
+	private String nodeXmppPresencePriority;
 	
-	public LiderNodeInfoModel(int nodeNumber, String nodeIp, String nodeRootPwd, String nodeXmppResource) {
+	public LiderNodeInfoModel(int nodeNumber, String nodeIp, String nodeRootPwd, String nodeXmppResource, String nodeXmppPresencePriority) {
 		super();
 		this.nodeNumber = nodeNumber;
 		this.nodeIp = nodeIp;
 		this.nodeRootPwd = nodeRootPwd;
 		this.nodeXmppResource = nodeXmppResource;
+		this.nodeXmppPresencePriority = nodeXmppPresencePriority;
 	}
 	
 	public int getNodeNumber() {
@@ -42,5 +44,13 @@ public class LiderNodeInfoModel {
 	}
 	public void setNodeXmppResource(String nodeXmppResource) {
 		this.nodeXmppResource = nodeXmppResource;
+	}
+
+	public String getNodeXmppPresencePriority() {
+		return nodeXmppPresencePriority;
+	}
+
+	public void setNodeXmppPresencePriority(String nodeXmppPresencePriority) {
+		this.nodeXmppPresencePriority = nodeXmppPresencePriority;
 	}
 }
