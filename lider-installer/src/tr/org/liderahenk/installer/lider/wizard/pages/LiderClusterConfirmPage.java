@@ -5,9 +5,10 @@ import java.util.Map.Entry;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -23,7 +24,7 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 
 	private LiderSetupConfig config;
 
-	private Label lblIp;
+	private StyledText ipTextArea;
 
 	public LiderClusterConfirmPage(LiderSetupConfig config) {
 		super(LiderClusterConfirmPage.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -37,11 +38,16 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 		Composite container = GUIHelper.createComposite(parent, 1);
 		setControl(container);
 
-		GridData gd = new GridData();
-		gd.widthHint = 700;
-		gd.minimumWidth = 200;
-		lblIp = GUIHelper.createLabel(container, "localhost");
-		lblIp.setLayoutData(gd);
+		// IP list label
+		GUIHelper.createLabel(container, Messages.getString("MACHINES_THAT_LIDER_CLUSTER_WILL_BE_INSTALLED"));
+		// Add a text area for IP list
+		ipTextArea = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+
+		GridData txtAreaGd = new GridData(SWT.FILL, SWT.FILL, true, false);
+		txtAreaGd.heightHint = 100;
+
+		ipTextArea.setEditable(false);
+		ipTextArea.setLayoutData(txtAreaGd);
 
 		GUIHelper.createLabel(container, "- " + Messages.getString("USE_DEFAULT_REPOSITORY"));
 
@@ -52,17 +58,18 @@ public class LiderClusterConfirmPage extends WizardPage implements ILiderPage {
 	@Override
 	public IWizardPage getNextPage() {
 		
-		String ipList = "";
-		for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap().entrySet()
-				.iterator(); iterator.hasNext();) {
+		// Set the IP info in the opening of page
+		String allIps = "";
+		for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
+				.entrySet().iterator(); iterator.hasNext();) {
 
 			Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 			final LiderNodeInfoModel clusterNode = entry.getValue();
-			ipList += clusterNode.getNodeIp() + ", ";
+
+			allIps += "-" + clusterNode.getNodeIp() + "\n";
+			
 		}
-		
-		// Set the IP info in the opening of page
-		lblIp.setText("- IP: " + ipList);
+		ipTextArea.setText(allIps);
 
 		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 
