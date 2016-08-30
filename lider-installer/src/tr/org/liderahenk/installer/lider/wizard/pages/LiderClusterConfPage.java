@@ -34,7 +34,8 @@ import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class LiderClusterConfPage extends WizardPage implements ILiderPage {
@@ -77,7 +78,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 	private Text txtUserLdapPrivilegeAttribute;
 	private Text txtUserLdapClasses;
 	private Text txtUserGroupLdapClasses;
-	
+
 	private Text txtFileServerProtocol;
 	private Text txtFileServerHost;
 	private Text txtFileServerPort;
@@ -180,7 +181,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				updatePageCompleteStatus();
 			}
 		});
-		
+
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LDAP_USE_SSL"));
 		cmbLdapSsl = new Combo(cmpGeneralInfo, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbLdapSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -266,7 +267,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				updatePageCompleteStatus();
 			}
 		});
-		
+
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("XMPP_USE_SSL"));
 		cmbXmppSsl = new Combo(cmpGeneralInfo, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbXmppSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
@@ -452,7 +453,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				updatePageCompleteStatus();
 			}
 		});
-		
+
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("FILE_SERVER_PLUGIN_PATH"));
 		txtFileServerPluginPath = GUIHelper.createText(cmpGeneralInfo);
 		txtFileServerPluginPath.setMessage(Messages.getString("ENTER_FILE_SERVER_PLUGIN_PATH"));
@@ -563,6 +564,8 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		lblNodeRootPwd.setLayoutData(gdLabels);
 		Label lblNodeResource = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_XMPP_RESOURCE"));
 		lblNodeResource.setLayoutData(gdLabels);
+		Label lblNodePriority = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_XMPP_PRIORITY"));
+		lblNodePriority.setLayoutData(gdLabels);
 
 		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
@@ -605,8 +608,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 				&& !txtXmppPort.getText().isEmpty() && !txtXmppLiderUser.getText().isEmpty()
 				&& !txtXmppLiderPwd.getText().isEmpty() && !txtXmppServiceName.getText().isEmpty()
 				&& !txtXmppMaxTrials.getText().isEmpty() && !txtXmppPacketTimeout.getText().isEmpty()
-				&& !txtXmppPingTimeout.getText().isEmpty()
-				&& !txtDatabaseAddress.getText().isEmpty() 
+				&& !txtXmppPingTimeout.getText().isEmpty() && !txtDatabaseAddress.getText().isEmpty()
 				&& !txtDatabaseName.getText().isEmpty() && !txtDatabaseUsername.getText().isEmpty()
 				&& !txtDatabasePwd.getText().isEmpty() && !txtAgentLdapBaseDn.getText().isEmpty()
 				&& !txtAgentLdapIdAttribute.getText().isEmpty() && !txtAgentLdapJidAttribute.getText().isEmpty()
@@ -735,6 +737,17 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		});
 		clusterNode.setTxtNodeXmppResource(txtXmppResource);
 
+		Text txtXmppPresencePriority = GUIHelper.createText(grpClusterNode);
+		txtXmppPresencePriority.setLayoutData(gd);
+		txtXmppPresencePriority.setMessage(Messages.getString("ENTER_PRESENCE_PRIORITY_FOR_XMPP"));
+		txtXmppPresencePriority.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		clusterNode.setTxtNodeXmppPresencePriority(txtXmppPresencePriority);
+
 		nodeMap.put(nodeNumber, clusterNode);
 	}
 
@@ -850,7 +863,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			config.setLiderAccessPassphrase(null);
 			config.setLiderProxyPwd(txtProxyPwd.getText());
 		}
-		
+
 		config.setLiderFileServerProtocol(txtFileServerProtocol.getText());
 		config.setLiderFileServerHost(txtFileServerHost.getText());
 		config.setLiderFileServerPort(txtFileServerPort.getText());
@@ -872,7 +885,8 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 			LiderNodeInfoModel nodeInfo = new LiderNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(),
-					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(), nodeSwt.getTxtNodeXmppResource().getText());
+					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
+					nodeSwt.getTxtNodeXmppResource().getText(), nodeSwt.getTxtNodeXmppPresencePriority().getText());
 
 			nodeInfoMap.put(nodeSwt.getNodeNumber(), nodeInfo);
 		}
@@ -907,8 +921,8 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtXmppPingTimeout.setText("3000");
 
 		if (!config.isDatabaseCluster()) {
-			txtDatabaseAddress
-					.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() + ":3306" : "db." + config.getLdapOrgCn() + ":3306");
+			txtDatabaseAddress.setText(config.getDatabaseIp() != null ? config.getDatabaseIp() + ":3306"
+					: "db." + config.getLdapOrgCn() + ":3306");
 		} else {
 			txtDatabaseAddress.setText(config.getDatabaseClusterAddressForLider() != null
 					? config.getDatabaseClusterAddressForLider() : "db." + config.getLdapOrgCn() + ":3306");
@@ -925,9 +939,9 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtUserLdapBaseDn.setText(config.getLdapBaseDn());
 		txtUserLdapIdAttribute.setText("uid");
 		txtUserLdapPrivilegeAttribute.setText("liderPrivilege");
-		txtUserLdapClasses.setText("pardusLider");
+		txtUserLdapClasses.setText("pardusAccount,pardusLider");
 		txtUserGroupLdapClasses.setText("groupOfNames");
-		
+
 		txtFileServerProtocol.setText("ssh");
 		txtFileServerHost.setText("agem.com.tr");
 		txtFileServerPort.setText("22");
