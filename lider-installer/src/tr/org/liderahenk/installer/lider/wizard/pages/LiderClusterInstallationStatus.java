@@ -112,6 +112,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 			// Get display before new main runnable
 			final Display display = Display.getCurrent();
 
+			setPageCompleteAsync(isInstallationFinished, display);
+			
 			clearLogConsole(display);
 
 			// Create a thread pool
