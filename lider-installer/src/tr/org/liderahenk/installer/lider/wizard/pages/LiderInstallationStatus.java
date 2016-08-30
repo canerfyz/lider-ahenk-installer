@@ -73,10 +73,13 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 		if (super.isCurrentPage() && !isInstallationFinished) {
 
 			final Display display = Display.getCurrent();
+			
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 
+					setPageCompleteAsync(isInstallationFinished);
+					
 					printMessage(Messages.getString("INITIALIZING_INSTALLATION"));
 					setProgressBar(10);
 
