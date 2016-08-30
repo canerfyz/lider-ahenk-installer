@@ -195,6 +195,8 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 						
 
 						printMessage(Messages.getString("OPENLDAP_INSTALLATION_COMPLETED_SUCCESSFULLY"));
+						
+						isInstallationFinished = true;
 					} catch (SSHConnectionException e) {
 						isInstallationFinished = false;
 						canGoBack = true;
