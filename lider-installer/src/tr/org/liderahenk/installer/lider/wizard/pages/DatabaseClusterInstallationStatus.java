@@ -96,6 +96,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 			// Get display before new main runnable
 			final Display display = Display.getCurrent();
 
+			setPageCompleteAsync(isInstallationFinished, display);
+
 			clearLogConsole(display);
 
 			// Create a thread pool
@@ -224,7 +226,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 							config.setInstallationFinished(isInstallationFinished);
 
-							// To enable finish button
 							setPageCompleteAsync(isInstallationFinished, display);
 
 						} catch (Exception e) {
@@ -261,7 +262,6 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 							}
 						});
 
-						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
 						
 						if (!isInstallationFinished) {
