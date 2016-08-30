@@ -34,13 +34,14 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 	private String nodeIp;
 	private String nodeRootPwd;
 	private String nodeXmppResource;
+	private String nodeXmppPresencePriority;
 
 	private Display display;
 	private LiderSetupConfig config;
 	private Text txtLogConsole;
 	private boolean firstNode;
 
-	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource, Display display, LiderSetupConfig config,
+	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource, String nodeXmppPresencePriority, Display display, LiderSetupConfig config,
 			Text txtLogConsole, boolean firstNode) {
 		super();
 		this.nodeIp = nodeIp;
@@ -50,6 +51,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 		this.txtLogConsole = txtLogConsole;
 		this.nodeXmppResource = nodeXmppResource;
 		this.firstNode = firstNode;
+		this.nodeXmppPresencePriority = nodeXmppPresencePriority;
 	}
 
 	@Override
@@ -143,6 +145,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#XMPPREPLAYTIMEOUT", config.getLiderXmppPacketTimeout());
 				map.put("#XMPPPINGTIMEOUT", config.getLiderXmppPingTimeout());
 				map.put("#XMPP_SSL", config.getLiderXmppUseSsl());
+				map.put("#XMPP_PRESENCE_PRIORITY", nodeXmppPresencePriority);
 
 				map.put("#AGENTLDAPBASEDN", config.getLiderAgentLdapBaseDn());
 				map.put("#AGENTLDAPIDATTR", config.getLiderAgentLdapIdAttribute());
