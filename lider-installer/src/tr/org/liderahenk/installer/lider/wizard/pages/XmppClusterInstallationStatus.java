@@ -1,9 +1,7 @@
 package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -122,6 +120,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 			// Get display before new main runnable
 			final Display display = Display.getCurrent();
 
+			setPageCompleteAsync(isInstallationFinished, display);
+			
 			clearLogConsole(display);
 
 			// Create a thread pool
@@ -300,7 +300,6 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 							config.setInstallationFinished(isInstallationFinished);
 
-							// To enable finish button
 							setPageCompleteAsync(isInstallationFinished, display);
 
 						} catch (Exception e) {
@@ -339,7 +338,6 @@ public class XmppClusterInstallationStatus extends WizardPage
 							}
 						});
 
-						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
 						
 						if (!isInstallationFinished) {
