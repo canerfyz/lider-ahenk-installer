@@ -12,6 +12,7 @@ public class LiderNodeSwtModel {
 	private Text txtNodeIp;
 	private Text txtNodeRootPwd;
 	private Text txtNodeXmppResource;
+	private Text txtNodeXmppPresencePriority;
 	
 	public Text getTxtNodeIp() {
 		return txtNodeIp;
@@ -36,6 +37,12 @@ public class LiderNodeSwtModel {
 	}
 	public void setTxtNodeXmppResource(Text txtNodeXmppResource) {
 		this.txtNodeXmppResource = txtNodeXmppResource;
+	}
+	public Text getTxtNodeXmppPresencePriority() {
+		return txtNodeXmppPresencePriority;
+	}
+	public void setTxtNodeXmppPresencePriority(Text txtNodeXmppPresencePriority) {
+		this.txtNodeXmppPresencePriority = txtNodeXmppPresencePriority;
 	}
 	
 }
