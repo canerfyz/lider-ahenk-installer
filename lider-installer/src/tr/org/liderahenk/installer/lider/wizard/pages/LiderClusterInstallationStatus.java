@@ -140,7 +140,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 						final LiderNodeInfoModel clusterNode = entry.getValue();
 						
 						Callable<Boolean> callable = new LiderClusterInstallCallable(clusterNode.getNodeIp(),
-								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), display, config,
+								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), clusterNode.getNodeXmppPresencePriority(), display, config,
 								txtLogConsole, i == 1);
 						
 						Future<Boolean> result = executor.submit(callable);
