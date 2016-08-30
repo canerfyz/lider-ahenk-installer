@@ -18,7 +18,6 @@ import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterConfirmPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseClusterInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseConfirmPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallMethodPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.DatabaseInstallationStatus;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LdapConfPage;
