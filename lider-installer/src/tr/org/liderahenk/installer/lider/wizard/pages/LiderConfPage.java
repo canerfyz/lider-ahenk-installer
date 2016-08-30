@@ -344,6 +344,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#XMPPREPLAYTIMEOUT", xmppPacketReplyTimeout.getText());
 		map.put("#XMPPPINGTIMEOUT", xmppPingTimeout.getText());
 		map.put("#XMPP_SSL", cmbXmppSsl.getText());
+		map.put("#XMPP_PRESENCE_PRIORITY", "1");
 		// Agent configuration
 		map.put("#AGENTLDAPBASEDN", agentLdapBaseDn.getText());
 		map.put("#AGENTLDAPIDATTR", agentLdapIdAttribute.getText());
@@ -424,7 +425,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		userLdapBaseDn.setText(config.getLdapBaseDn());
 		userLdapUidAttribute.setText("uid");
 		userLdapPrivilegeAttribute.setText("liderPrivilege");
-		userLdapObjectClasses.setText("pardusLider");
+		userLdapObjectClasses.setText("pardusAccount,pardusLider");
 		groupLdapObjectClasses.setText("groupOfNames");
 		
 		txtFileServerProtocol.setText("ssh");
