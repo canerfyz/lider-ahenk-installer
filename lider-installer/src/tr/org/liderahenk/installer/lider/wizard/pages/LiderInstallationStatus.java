@@ -254,7 +254,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
 								config.getLiderAccessPassphrase(),
-								"ln -s /opt/" + PropertyReader.property("lider.package.name")
+								"ln -fs /opt/" + PropertyReader.property("lider.package.name")
 										+ "/bin/karaf-service /etc/init.d/ && update-rc.d karaf-service defaults",
 								new IOutputStreamProvider() {
 									@Override
