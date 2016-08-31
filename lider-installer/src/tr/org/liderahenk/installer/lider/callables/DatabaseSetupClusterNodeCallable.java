@@ -64,19 +64,19 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 		try {
 			// Check SSH connection
 			try {
-				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("CHECKING_CONNECTION_TO_", nodeIp), display);
 
 				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
-				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
 				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
 						new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
-				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + nodeIp, display);
-				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + nodeIp), display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", nodeIp), display);
+				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				e.printStackTrace();
 				logger.log(Level.SEVERE, e.getMessage());
 				throw new Exception();
@@ -84,17 +84,17 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 
 			// Update package list
 			try {
-				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
 
-				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully updated package list of {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("COULD_NOT_UPDATE_PACKAGE_LIST_OF") + " " + nodeIp, display);
-				printMessage(Messages.getString("CHECK_INTERNET_CONNECTION_OF") + " " + nodeIp, display);
-				printMessage(Messages.getString("CHECK_REPOSITORY_LISTS_OF") + " " + nodeIp, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				printMessage(Messages.getString("COULD_NOT_UPDATE_PACKAGE_LIST_OF_", nodeIp), display);
+				printMessage(Messages.getString("CHECK_INTERNET_CONNECTION_OF_", nodeIp), display);
+				printMessage(Messages.getString("CHECK_REPOSITORY_LISTS_OF_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
 				throw new Exception();
@@ -109,31 +109,29 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				manager.execCommand("apt-get -y --force-yes install software-properties-common", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", "software-properties-common", nodeIp), display);
 
-				printMessage(Messages.getString("ADDING_KEYSERVER_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("ADDING_KEYSERVER_TO_", nodeIp), display);
 				manager.execCommand("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db",
 						new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO", nodeIp), display);
 
 				printMessage(
-						Messages.getString("ADDING_REPOSITORY")
-								+ " 'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' to " + nodeIp,
+						Messages.getString("ADDING_REPOSITORY_", "'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp),
 						display);
 				manager.execCommand(
 						"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list",
 						new Object[] {});
 				printMessage(
-						Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY")
-								+ " 'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' to " + nodeIp,
+						Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY_", "'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp),
 						display);
 
-				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully done prerequiste part at: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUISITES_AT") + " " + nodeIp, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUISITES_AT_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
 				throw new Exception();
@@ -142,9 +140,9 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			// Set frontend as noninteractive
 			// Set debconf values
 			try {
-				printMessage(Messages.getString("SETTING_DEBIAN_FRONTEND_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("SETTING_DEBIAN_FRONTEND_AT_", nodeIp), display);
 				manager.execCommand("export DEBIAN_FRONTEND='noninteractive'", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_AT_", nodeIp), display);
 
 				final String[] debconfValues = generateDebconfValues();
 
