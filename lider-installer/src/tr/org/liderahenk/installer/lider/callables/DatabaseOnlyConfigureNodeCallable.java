@@ -63,19 +63,19 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 		try {
 			// Check SSH connection
 			try {
-				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("CHECKING_CONNECTION_TO_", nodeIp), display);
 
 				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
-				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
 				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
 						new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
-				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + nodeIp, display);
-				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + nodeIp), display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", nodeIp), display);
+				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				e.printStackTrace();
 				logger.log(Level.SEVERE, e.getMessage());
 				throw new Exception();
@@ -84,9 +84,9 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 			// Stop mysql service
 			// Send galera.cnf
 			try {
-				printMessage(Messages.getString("STOPPING_MYSQL_SERVICE_AT") + nodeIp, display);
+				printMessage(Messages.getString("STOPPING_MYSQL_SERVICE_AT_", nodeIp), display);
 				manager.execCommand("service mysql stop", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_STOPPED_MYSQL_SERVICE_AT") + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_STOPPED_MYSQL_SERVICE_AT_", nodeIp), display);
 
 				printMessage(Messages.getString("CREATING_CNF_FILE"), display);
 				String galeraCnf = readFile("galera.cnf");
@@ -102,24 +102,24 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 				File galeraCnfFile = SetupUtils.writeToFile(galeraCnf, "galera.cnf");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CNF_FILE"), display);
 
-				printMessage(Messages.getString("SENDING_CNF_FILE_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("SENDING_CNF_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(galeraCnfFile, "/etc/mysql/conf.d/", false);
-				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully sent galera.cnf to: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_MYSQL_AT") + " " + nodeIp, display);
-				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_MYSQL_AT_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
 				throw new Exception();
 			}
 
-			printMessage(Messages.getString("CONFIGURATION_COMPLETED_SUCCESSFULLY_AT") + " " + nodeIp, display);
+			printMessage(Messages.getString("CONFIGURATION_COMPLETED_SUCCESSFULLY_AT_", nodeIp), display);
 			successfullSetup = true;
 
 		} catch (Exception e) {
-			printMessage(Messages.getString("CONFIGURATION_FAILED_AT") + " " + nodeIp, display);
+			printMessage(Messages.getString("CONFIGURATION_FAILED_AT_", nodeIp), display);
 			e.printStackTrace();
 		} finally {
 			if (manager != null) {
