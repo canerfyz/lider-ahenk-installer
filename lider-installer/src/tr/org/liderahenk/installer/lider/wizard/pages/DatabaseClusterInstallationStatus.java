@@ -296,32 +296,32 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		SSHManager manager = null;
 
 		try {
-			printMessage(Messages.getString("CONNECTING_TO") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTING_TO_", firstNode.getNodeIp()), display);
 			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(),
 					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
-			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO_", firstNode.getNodeIp()), display);
 
-			printMessage(Messages.getString("STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("STARTING_FIRST_NODE_AT_", firstNode.getNodeIp()), display);
 			manager.execCommand("galera_new_cluster", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT", firstNode.getNodeIp()),
 					display);
 
 			printMessage(
-					Messages.getString("WAITING_FOR_A_FEW_SECONDS_UNTIL_MYSQL_UP_AT") + " " + firstNode.getNodeIp(),
+					Messages.getString("WAITING_FOR_A_FEW_SECONDS_UNTIL_MYSQL_UP_AT_", firstNode.getNodeIp()),
 					display);
 			Thread.sleep(30000);
 
 		} catch (SSHConnectionException e) {
-			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", firstNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(
-					Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT") + " " + firstNode.getNodeIp(),
+					Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT_", firstNode.getNodeIp()),
 					display);
-			printMessage(Messages.getString("EXCEPTION_MESSAGE") + e.getMessage(), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -338,34 +338,30 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		SSHManager manager = null;
 
 		try {
-			printMessage(Messages.getString("CONNECTING_TO") + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTING_TO_", firstNode.getNodeIp()), display);
 			manager = new SSHManager(firstNode.getNodeIp(), "root", firstNode.getNodeRootPwd(),
 					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
-			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO_", firstNode.getNodeIp()), display);
 
-			printMessage(Messages.getString("INSTALLING_SSHPASS_TO") + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("INSTALLING_SSHPASS_TO_", firstNode.getNodeIp()), display);
 			manager.execCommand("apt-get -y --force-yes install sshpass", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO") + firstNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_TO_", firstNode.getNodeIp()), display);
 
-			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM") + firstNode.getNodeIp() + " to "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM_", firstNode.getNodeIp(), clusterNode.getNodeIp()), display);
 			manager.execCommand(
 					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
 					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
-			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM") + " " + firstNode.getNodeIp() + " to "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM_", firstNode.getNodeIp(), clusterNode.getNodeIp()), display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT") + " "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
@@ -383,27 +379,26 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 
-			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTING_TO_", clusterNode.getNodeIp()), display);
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
-			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO_", clusterNode.getNodeIp()), display);
 
-			printMessage(Messages.getString("MODIFYING_DEBIAN_CNF_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("MODIFYING_DEBIAN_CNF_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("sed -i '/password/c\\password = 1' /etc/mysql/debian.cnf", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_DEBIAN_CNF_AT") + " " + clusterNode.getNodeIp(),
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_DEBIAN_CNF_AT_", clusterNode.getNodeIp()),
 					display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(
-					Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_NODE_AT") + " " + clusterNode.getNodeIp(),
+					Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_NODE_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
@@ -422,24 +417,23 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		try {
 
-			printMessage(Messages.getString("CONNECTING_TO") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("CONNECTING_TO_", clusterNode.getNodeIp()), display);
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 			manager.connect();
-			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO") + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO_", clusterNode.getNodeIp()), display);
 
-			printMessage(Messages.getString("STARTING_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("STARTING_NODE_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("service mysql start", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT") + " " + clusterNode.getNodeIp(), display);
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_NODE_AT_", clusterNode.getNodeIp()), display);
 
 		} catch (SSHConnectionException e) {
-			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " "
-					+ clusterNode.getNodeIp(), display);
+			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT") + " " + clusterNode.getNodeIp(),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT_", clusterNode.getNodeIp()),
 					display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
