@@ -66,7 +66,7 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 		try {
 			// Check SSH connection
 			try {
-				printMessage(Messages.getString("CHECKING_CONNECTION_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("CHECKING_CONNECTION_TO_", nodeIp), display);
 
 				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getXmppPort(),
 						config.getXmppAccessKeyPath(), config.getXmppAccessPassphrase());
