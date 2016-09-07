@@ -166,7 +166,6 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 					map.put("#CHECK_FUTURE_TASK", "false");
 				}
 				
-				
 				map.put("#FILE_SERVER_PROTOCOL", config.getLiderFileServerProtocol());
 				map.put("#FILE_SERVER_HOST", config.getLiderFileServerHost());
 				map.put("#FILE_SERVER_PORT", config.getLiderFileServerPort());
