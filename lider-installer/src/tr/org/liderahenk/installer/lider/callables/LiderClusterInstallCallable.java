@@ -158,12 +158,12 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#USERLDAPOBJECTCLASSES", config.getLiderUserLdapClasses());
 				map.put("#GROUPLDAPOBJECTCLASSES", config.getLiderUserGroupLdapClasses());
 
+				map.put("#ALARM_CHECK_REPORT", "true");
+
 				if (firstNode) {
 					map.put("#CHECK_FUTURE_TASK", "true");
-					map.put("#ALARM_CHECK_REPORT", "true");
 				} else {
 					map.put("#CHECK_FUTURE_TASK", "false");
-					map.put("#ALARM_CHECK_REPORT", "false");
 				}
 				
 				
