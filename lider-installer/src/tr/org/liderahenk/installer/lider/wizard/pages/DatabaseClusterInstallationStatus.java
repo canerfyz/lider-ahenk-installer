@@ -304,7 +304,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 			printMessage(Messages.getString("STARTING_FIRST_NODE_AT_", firstNode.getNodeIp()), display);
 			manager.execCommand("galera_new_cluster", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT", firstNode.getNodeIp()),
+			printMessage(Messages.getString("SUCCESSFULLY_STARTED_FIRST_NODE_AT_", firstNode.getNodeIp()),
 					display);
 
 			printMessage(
