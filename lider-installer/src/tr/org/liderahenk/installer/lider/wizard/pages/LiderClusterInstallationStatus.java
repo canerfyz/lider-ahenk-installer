@@ -201,6 +201,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 								restartNode(clusterNode, display);
 							}
 
+							Thread.sleep(20000);
+							
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
 

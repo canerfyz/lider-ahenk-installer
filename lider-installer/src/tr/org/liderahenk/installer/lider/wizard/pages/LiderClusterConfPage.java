@@ -185,7 +185,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("LDAP_USE_SSL"));
 		cmbLdapSsl = new Combo(cmpGeneralInfo, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbLdapSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbLdapSsl.setItems("false", "true");
+		cmbLdapSsl.setItems(new String[] {"false", "true"});
 		cmbLdapSsl.select(0);
 
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("XMPP_SERVER_ADDRESS"));
@@ -271,7 +271,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("XMPP_USE_SSL"));
 		cmbXmppSsl = new Combo(cmpGeneralInfo, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbXmppSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbXmppSsl.setItems("false", "true");
+		cmbXmppSsl.setItems(new String[] {"false", "true"});
 		cmbXmppSsl.select(0);
 
 		GUIHelper.createLabel(cmpGeneralInfo, Messages.getString("DATABASE_SERVER_ADDRESS"));
