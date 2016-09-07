@@ -130,7 +130,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		});
 		receiveFile.setMessage(Messages.getString("EG_RECEIVE_FILE"));
 		
-		GUIHelper.createLabel(lineCont, Messages.getString("AHENK_USE_SSL"));
+		GUIHelper.createLabel(lineCont, Messages.getString("AHENK_USE_TLS"));
 		cmbUseSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbUseSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
 		cmbUseSsl.setItems("false", "true");
