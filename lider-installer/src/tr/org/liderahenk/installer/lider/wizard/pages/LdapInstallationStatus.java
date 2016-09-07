@@ -99,7 +99,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 									PackageInstaller.GDEBI);
 							setProgressBar(90);
 							isInstallationFinished = true;
-							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", deb.getName()));
+							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE", deb.getName()));
 						} catch (Exception e) {
 							isInstallationFinished = false;
 							canGoBack = true;
