@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -41,14 +39,10 @@ public class AhenkSetupLocationPage extends WizardPage {
 	private Button btnLocal;
 	private Text txtRemoteIp;
 
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
-
 	public AhenkSetupLocationPage(AhenkSetupConfig config) {
 		super(AhenkSetupLocationPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
 		setDescription(Messages.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK"));
 		this.config = config;
-		ipStatus = new Status(IStatus.OK, "not_used", "");
 	}
 
 	@Override
@@ -159,18 +153,13 @@ public class AhenkSetupLocationPage extends WizardPage {
 		// Create IP list for config
 		List<String> remoteIpList = new ArrayList<String>();
 
-		Status status = new Status(IStatus.OK, "not_used", 0, "", null);
-
 		if (remoteIps == null || remoteIps.toString().isEmpty()) {
-			status = new Status(IStatus.ERROR, "not_used", 0, Messages.getString("EMPTY_IP_ERROR"), null);
+			// TODO
 		} else {
 			for (int i = 0; i < remoteIps.length; i++) {
 				if (!NetworkUtils.isIpValid(remoteIps[i])) {
-					status = new Status(IStatus.ERROR, "not_used", 0,
-							Messages.getString("INVALID_IP_FORMAT_ERROR") + ": " + remoteIps[i], null);
 					return false;
 				}
-
 				// Add to list
 				// it will be used for IP list in config
 				remoteIpList.add(remoteIps[i]);
@@ -180,38 +169,8 @@ public class AhenkSetupLocationPage extends WizardPage {
 		// Set the IP list in config
 		config.setIpList(remoteIpList);
 
-		ipStatus = status;
-		applyToStatusLine(ipStatus);
 		getWizard().getContainer().updateButtons();
-
 		return true;
-	}
-
-	/**
-	 * Applies the status to the status line of a dialog page.
-	 */
-	private void applyToStatusLine(IStatus status) {
-		String message = status.getMessage();
-		if (message.length() == 0)
-			message = null;
-		switch (status.getSeverity()) {
-		case IStatus.OK:
-			setErrorMessage(null);
-			setMessage(message);
-			break;
-		case IStatus.WARNING:
-			setErrorMessage(null);
-			setMessage(message, WizardPage.WARNING);
-			break;
-		case IStatus.INFO:
-			setErrorMessage(null);
-			setMessage(message, WizardPage.INFORMATION);
-			break;
-		default:
-			setErrorMessage(message);
-			setMessage(null);
-			break;
-		}
 	}
 
 	protected void updatePageCompleteStatus() {

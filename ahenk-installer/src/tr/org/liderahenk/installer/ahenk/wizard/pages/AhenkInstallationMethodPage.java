@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -49,17 +47,10 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	private Text downloadUrlTxt = null;
 	private byte[] debContent;
 
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
-
 	public AhenkInstallationMethodPage(AhenkSetupConfig config) {
 		super(AhenkInstallationMethodPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
-
 		setDescription(Messages.getString("BY_WHICH_WAY_WOULD_YOU_LIKE_TO_INSTALL_AHENK"));
-
 		this.config = config;
-
-		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
 	}
 
 	@Override

@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -68,9 +66,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 	private AhenkSetupConfig config = null;
 
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
-
 	// Widgets
 	private TableViewer tblVwrSetup;
 	private ProgressBar bar;
@@ -91,7 +86,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 	// Host colours
 	Color HOST_UP_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_GREEN);
 	Color HOST_DOWN_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED);
-
 	// Progress bar colour
 	Color PROGRESS_BAR_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE);
 
@@ -113,7 +107,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 		super(AhenkNetworkScanPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
 		setDescription(Messages.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK_(NETWORK_SCAN)"));
 		this.config = config;
-		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
 		setPageComplete(true);
 	}
 

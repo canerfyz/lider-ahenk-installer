@@ -1,7 +1,5 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -35,40 +33,24 @@ public class AhenkConnectionMethodPage extends WizardPage {
 	private Composite usernameContainer = null;
 	private Composite privateKeyContainer = null;
 	private Composite passphraseContainer = null;
-
 	private Button userPassBtn = null;
-
 	private Label userName = null;
 	private Text userNameTxt = null;
-
 	private Label password = null;
 	private Text passwordTxt = null;
-
 	private Button usePrivateKey = null;
-
 	private Text fileDialogText = null;
 	private Button fileDialogBtn = null;
-
 	private Label passphrase = null;
 	private Text passphraseTxt = null;
-
 	private FileDialog fileDialog = null;
-
 	private String fileDialogResult = null;
-
 	private Text portTxt;
-
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
 
 	public AhenkConnectionMethodPage(AhenkSetupConfig config) {
 		super(AhenkConnectionMethodPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
-
 		setDescription(Messages.getString("HOW_TO_ACCESS_TO_SELECTED_COMPUTERS"));
-
 		this.config = config;
-
-		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
 	}
 
 	@Override
