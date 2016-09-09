@@ -30,11 +30,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 import tr.org.pardus.mys.liderahenksetup.constants.InstallerConstants;
-import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
+import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 @SuppressWarnings("restriction")
@@ -80,7 +81,7 @@ public class ApplicationWindowManager {
 					final String icon = e.getAttribute("icon");
 
 					Image image = new Image(Display.getCurrent(), getInputStream(icon));
-					LiderAhenkUtils.imageButton(comp, image, image, new MouseListener() {
+					GUIHelper.imageButton(comp, image, image, new MouseListener() {
 						@Override
 						public void mouseUp(MouseEvent e) {
 

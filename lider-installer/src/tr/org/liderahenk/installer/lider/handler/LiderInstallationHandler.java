@@ -8,10 +8,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import tr.org.liderahenk.installer.lider.wizard.LiderSetupWizard;
 import tr.org.liderahenk.installer.lider.wizard.dialogs.CheckVersionDialog;
-import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
+import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class LiderInstallationHandler {
@@ -24,7 +25,7 @@ public class LiderInstallationHandler {
 		versionDialog.open();
 
 		if (versionDialog.isContinueInstallation()) {
-			WizardDialog wizardDialog = LiderAhenkUtils.WizardDialog(Display.getCurrent().getActiveShell(),
+			WizardDialog wizardDialog = GUIHelper.createDialog(Display.getCurrent().getActiveShell(),
 					new LiderSetupWizard(), new Point(1000, 600));
 			wizardDialog.open();
 		}

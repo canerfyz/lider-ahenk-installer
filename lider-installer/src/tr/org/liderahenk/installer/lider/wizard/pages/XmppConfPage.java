@@ -33,8 +33,8 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -290,10 +290,10 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		map.put("#HOST_IP", config.getXmppIp());
 		map.put("#LIDER_USERNAME", liderUserTxt.getText());
 
-		text = SetupUtils.replace(map, text);
+		text = LiderAhenkUtils.replace(map, text);
 		config.setXmppConfContent(text);
 		// Write configuration to file
-		config.setXmppAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "ejabberd.yml"));
+		config.setXmppAbsPathConfFile(LiderAhenkUtils.writeToFileReturnPath(text, "ejabberd.yml"));
 
 		return super.getNextPage();
 	}

@@ -27,8 +27,8 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -106,7 +106,7 @@ public class XmppInstallMethodPage extends WizardPage implements IXmppPage {
 
 		// Copy ejabberd.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ejabberd_16.06-0_amd64.deb");
-		File ejabberdDeb = SetupUtils.streamToFile(inputStream, "ejabberd_16.06-0_amd64.deb");
+		File ejabberdDeb = LiderAhenkUtils.streamToFile(inputStream, "ejabberd_16.06-0_amd64.deb");
 		txtFileName.setText(ejabberdDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes

@@ -19,8 +19,8 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
@@ -98,8 +98,8 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 				map.put("#NODE_ADDRESS", nodeIp);
 				map.put("#NODE_NAME", nodeName);
 
-				galeraCnf = SetupUtils.replace(map, galeraCnf);
-				File galeraCnfFile = SetupUtils.writeToFile(galeraCnf, "galera.cnf");
+				galeraCnf = LiderAhenkUtils.replace(map, galeraCnf);
+				File galeraCnfFile = LiderAhenkUtils.writeToFile(galeraCnf, "galera.cnf");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CNF_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CNF_FILE_TO_", nodeIp), display);

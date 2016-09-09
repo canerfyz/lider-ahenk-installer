@@ -19,12 +19,13 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class LiderClusterInstallCallable implements Callable<Boolean> {
@@ -41,8 +42,9 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 	private Text txtLogConsole;
 	private boolean firstNode;
 
-	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource, String nodeXmppPresencePriority, Display display, LiderSetupConfig config,
-			Text txtLogConsole, boolean firstNode) {
+	public LiderClusterInstallCallable(String nodeIp, String nodeRootPwd, String nodeXmppResource,
+			String nodeXmppPresencePriority, Display display, LiderSetupConfig config, Text txtLogConsole,
+			boolean firstNode) {
 		super();
 		this.nodeIp = nodeIp;
 		this.nodeRootPwd = nodeRootPwd;
@@ -91,7 +93,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 			try {
 
 				InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("lider-cluster.tar.gz");
-				File karafTar = SetupUtils.streamToFile(inputStream, "lider.tar.gz");
+				File karafTar = LiderAhenkUtils.streamToFile(inputStream, "lider.tar.gz");
 
 				printMessage(Messages.getString("SENDING_TAR_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(karafTar, "/tmp/", false);
@@ -114,8 +116,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				logger.log(Level.INFO, "Successfully tar file at: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_EXTRACTING_TAR_FILE_AT_", nodeIp),
-						display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_EXTRACTING_TAR_FILE_AT_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
@@ -165,7 +166,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				} else {
 					map.put("#CHECK_FUTURE_TASK", "false");
 				}
-				
+
 				map.put("#FILE_SERVER_PROTOCOL", config.getLiderFileServerProtocol());
 				map.put("#FILE_SERVER_HOST", config.getLiderFileServerHost());
 				map.put("#FILE_SERVER_PORT", config.getLiderFileServerPort());
@@ -175,8 +176,8 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#FILE_SERVER_AGREEMENT_PATH", config.getLiderFileServerAgreementPath());
 				map.put("#FILE_SERVER_AGENT_FILE_PATH", config.getLiderFileServerAgentFilePath());
 
-				liderCfg = SetupUtils.replace(map, liderCfg);
-				File liderCfgFile = SetupUtils.writeToFile(liderCfg, "tr.org.liderahenk.cfg");
+				liderCfg = LiderAhenkUtils.replace(map, liderCfg);
+				File liderCfgFile = LiderAhenkUtils.writeToFile(liderCfg, "tr.org.liderahenk.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CFG_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CFG_TO_", nodeIp), display);
@@ -203,8 +204,9 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				map.put("#DBUSERNAME", config.getLiderDbUsername());
 				map.put("#DBPASSWORD", config.getLiderDbPwd());
 
-				liderDatasourceCfg = SetupUtils.replace(map, liderDatasourceCfg);
-				File liderDatasourceCfgFile = SetupUtils.writeToFile(liderDatasourceCfg, "tr.org.liderahenk.datasource.cfg");
+				liderDatasourceCfg = LiderAhenkUtils.replace(map, liderDatasourceCfg);
+				File liderDatasourceCfgFile = LiderAhenkUtils.writeToFile(liderDatasourceCfg,
+						"tr.org.liderahenk.datasource.cfg");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_DATASOURCE_CFG_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_DATASOURCE_CFG_TO_", nodeIp), display);
@@ -214,8 +216,7 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.datasource.cfg to: {0}",
 						new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_DATASOURCE_CFG_TO_", nodeIp),
-						display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_DATASOURCE_CFG_TO_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();

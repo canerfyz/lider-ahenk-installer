@@ -1,19 +1,19 @@
 package tr.org.pardus.mys.liderahenksetup.utils;
 
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class LiderAhenkUtils {
@@ -21,89 +21,102 @@ public class LiderAhenkUtils {
 	/**
 	 * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
 	 * @param str
-	 * @return Returns true if parameter 
-	 * <strong><i>str</i></strong> is 
-	 * <strong>null</strong> or 
-	 * <strong>"" (empty string)</strong>.
+	 * @return Returns true if parameter <strong><i>str</i></strong> is
+	 *         <strong>null</strong> or <strong>"" (empty string)</strong>.
 	 */
 	public static boolean isEmpty(String str) {
-		if (str == null || "".equals(str) || 
-				str.isEmpty() || !(str.trim().length() > 0)) {
+		if (str == null || "".equals(str) || str.isEmpty() || !(str.trim().length() > 0)) {
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
-	
+
+	public static String replace(Map<String, String> map, String text) {
+		for (Entry<String, String> entry : map.entrySet()) {
+			text = text.replaceAll(entry.getKey().replaceAll("#", "\\#"), entry.getValue());
+		}
+		return text;
+	}
+
 	/**
-	 * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
-	 * @param parent 
-	 * @param image
-	 * @param mouseOverImage
-	 * @param mouseListener
-	 * @return Creates a label with a custom image (ImageButton) 
-	 * which works like a SWT.PUSH button and changes its display when mouse over. 
-	 * <strong><i>mouseOverImage</i></strong> and
-	 * <strong>mouseListener</strong> parameters can be passed as <strong>null</strong>
-	 * if handling such event is not needed.
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns absolute path of created temp file.
+	 * 
+	 * @param content
+	 * @param fileName
+	 * @return absolute path of created temp file
 	 */
-	public static Label imageButton(Composite parent, final Image image, 
-			final Image mouseOverImage, MouseListener mouseListener) {
-		
-		final Label imageButton = new Label(parent, SWT.NONE);
-		
-		if (imageButton != null) {
-			imageButton.setImage(image);
+	public static String writeToFileReturnPath(String content, String fileName) {
+
+		String absPath = null;
+
+		try {
+			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
+
+			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+			absPath = temp.getAbsolutePath();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		if (mouseOverImage != null) {
-			imageButton.addListener(SWT.MouseEnter, new Listener() {
-				@Override
-				public void handleEvent(Event event) {
-					imageButton.setImage(mouseOverImage);
-				}
-			});
-			
-			imageButton.addListener(SWT.MouseExit, new Listener() {
-				@Override
-				public void handleEvent(Event event) {
-					imageButton.setImage(image);
-				}
-			});
+
+		return absPath;
+	}
+
+	public static File streamToFile(InputStream stream, String filename) {
+		try {
+			File file = new File(System.getProperty("java.io.tmpdir") + File.separator + filename);
+			OutputStream outputStream = new FileOutputStream(file);
+			int read = 0;
+			byte[] bytes = new byte[1024];
+
+			while ((read = stream.read(bytes)) != -1) {
+				outputStream.write(bytes, 0, read);
+			}
+
+			outputStream.close();
+			return file;
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		
-		if (mouseListener != null) {
-			imageButton.addMouseListener(mouseListener);
-		}
-		
 		return null;
 	}
-	
+
 	/**
-	 * Creates a new wizard dialog for the given wizard.
-	 * And as an extra option to standard <strong>WizardDialog</strong> constructor,
-	 * size of dialog can be given with a <strong>Point</point>.
-	 * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
-	 * @param parentShell
-	 * 		- the parent shell
-	 * @param newWizard
-	 * 		- the wizard this dialog is working on
-	 * @param size
-	 * 		- size of the dialog 
-	 * 		(x coordinate : width, y coordinate : height)	 
+	 * Creates file under temporary file directory and writes configuration to
+	 * it. Returns the created file.
+	 * 
+	 * @param content
+	 * @param fileName
+	 * @return created file
 	 */
-	public static WizardDialog WizardDialog(Shell parentShell, 
-			IWizard newWizard, Point size) {
-		if (size == null) {
-			return new WizardDialog(parentShell, newWizard);
+	public static synchronized File writeToFile(String content, String fileName) {
+
+		File tempFile = null;
+
+		try {
+			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+
+			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
+
+			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
+
+			buffWriter.write(content);
+			buffWriter.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		else {
-			WizardDialog wd = new WizardDialog(parentShell, newWizard);
-			// TODO setMinimumPageSize does not work.
-			wd.setMinimumPageSize(size);
-			wd.setPageSize(size);
-			return wd;
-		}
+
+		return tempFile;
 	}
+
 }

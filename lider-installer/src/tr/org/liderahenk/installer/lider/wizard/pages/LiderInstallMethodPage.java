@@ -27,8 +27,8 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -93,7 +93,7 @@ public class LiderInstallMethodPage extends WizardPage implements ILiderPage {
 
 		// Copy ejabberd.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("lider.tar.gz");
-		File liderTar = SetupUtils.streamToFile(inputStream, "lider.tar.gz");
+		File liderTar = LiderAhenkUtils.streamToFile(inputStream, "lider.tar.gz");
 		txtTarFileName.setText(liderTar.getAbsolutePath());
 
 		// Set file to config as array of bytes

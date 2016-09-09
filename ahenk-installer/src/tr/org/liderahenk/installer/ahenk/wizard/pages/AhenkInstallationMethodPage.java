@@ -28,7 +28,7 @@ import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 
 /**
  * @author caner Caner Feyzullahoğlu caner.feyzullahoglu@agem.com.tr
@@ -40,23 +40,13 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	// Widgets
 	private Composite mainContainer = null;
 	private Composite fileDialogContainer = null;
-
-//	private Button useAptGetBtn = null;
-
 	private Button useDebBtn = null;
-	
 	private Button useWgetBtn = null;
-
 	private FileDialog fileDialog = null;
-
 	private Text fileDialogText = null;
-
 	private Button fileDialogBtn = null;
-
 	private String fileDialogResult = null;
-	
 	private Text downloadUrlTxt = null;
-	
 	private byte[] debContent;
 
 	// Status variable for the possible errors on this page
@@ -80,33 +70,9 @@ public class AhenkInstallationMethodPage extends WizardPage {
 		mainContainer.setLayout(new GridLayout(1, false));
 		setControl(mainContainer);
 
-		// Install by apt-get
-//		useAptGetBtn = new Button(mainContainer, SWT.RADIO);
-//
-//		useAptGetBtn.setText(Messages.getString("INSTALL_USING_CATALOG(BY_APT-GET)"));
-//		useAptGetBtn.setSelection(true);
-//
-//		useAptGetBtn.addSelectionListener(new SelectionListener() {
-//			@Override
-//			public void widgetSelected(SelectionEvent e) {
-//				if (useAptGetBtn.getSelection()) {
-//					fileDialogText.setEnabled(false);
-//					fileDialogBtn.setEnabled(false);
-//					downloadUrlTxt.setEnabled(false);
-//					updatePageCompleteStatus();
-//				}
-//			}
-//
-//			@Override
-//			public void widgetDefaultSelected(SelectionEvent e) {
-//			}
-//		});
-
 		// Install by given .deb package
 		useDebBtn = new Button(mainContainer, SWT.RADIO);
-
 		useDebBtn.setText(Messages.getString("INSTALL_FROM_GIVEN_DEB_PACKAGE"));
-
 		useDebBtn.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -152,12 +118,12 @@ public class AhenkInstallationMethodPage extends WizardPage {
 
 		// Copy ahenk.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("ahenk_1.0_amd64.deb");
-		File ahenkDeb = SetupUtils.streamToFile(inputStream, "ahenk_1.0_amd64.deb");
+		File ahenkDeb = LiderAhenkUtils.streamToFile(inputStream, "ahenk_1.0_amd64.deb");
 		fileDialogText.setText(ahenkDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes
 		debContent = new byte[(int) ahenkDeb.length()];
-		
+
 		FileInputStream stream = null;
 		try {
 			stream = new FileInputStream(ahenkDeb);
@@ -173,15 +139,15 @@ public class AhenkInstallationMethodPage extends WizardPage {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		config.setDebFileAbsPath(fileDialogText.getText());
-		
+
 		InputStream input = this.getClass().getClassLoader().getResourceAsStream("log.conf");
-		File logConf = SetupUtils.streamToFile(input, "log.conf");
-		
+		File logConf = LiderAhenkUtils.streamToFile(input, "log.conf");
+
 		// Set file to config as array of bytes
 		debContent = new byte[(int) logConf.length()];
-		
+
 		FileInputStream inStream = null;
 		try {
 			inStream = new FileInputStream(logConf);
@@ -197,9 +163,9 @@ public class AhenkInstallationMethodPage extends WizardPage {
 				e1.printStackTrace();
 			}
 		}
-		
+
 		config.setAhenkLogConfAbsPath(logConf.getAbsolutePath());
-		
+
 		// Upload Ahenk .deb push button
 		fileDialogBtn = new Button(fileDialogContainer, SWT.PUSH);
 		fileDialogBtn.setText(Messages.getString("UPLOAD_AHENK"));
@@ -227,7 +193,7 @@ public class AhenkInstallationMethodPage extends WizardPage {
 		// Install by given URL
 		useWgetBtn = new Button(mainContainer, SWT.RADIO);
 		useWgetBtn.setText(Messages.getString("INSTALL_FROM_GIVEN_URL"));
-		
+
 		useWgetBtn.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -243,70 +209,47 @@ public class AhenkInstallationMethodPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		Composite downloadUrlContainer = new Composite(mainContainer, SWT.NONE);
 		GridLayout glDownloadUrl = new GridLayout(1, false);
 		downloadUrlContainer.setLayout(glDownloadUrl);
-		
+
 		downloadUrlTxt = new Text(downloadUrlContainer, SWT.BORDER);
 		GridData gdDownloadUrlTxt = new GridData();
 		gdDownloadUrlTxt.widthHint = 350;
 		downloadUrlTxt.setLayoutData(gdDownloadUrlTxt);
 		downloadUrlTxt.setEnabled(false);
-		
+
 		downloadUrlTxt.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				updatePageCompleteStatus();
 			}
 		});
-		
+
 		Composite warningComp = new Composite(downloadUrlContainer, SWT.NONE);
 		warningComp.setLayout(new GridLayout(1, false));
 		new Label(warningComp, SWT.NONE);
-		
+
 		Label label1 = new Label(warningComp, SWT.NONE);
-		label1.setText("Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.\nHazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
+		label1.setText(
+				"Kuruluma uygun deb dosyası varsayılan olarak getirilmiştir.\nHazır getirilen deb dosyasıyla kuruluma devam edebilirsiniz.");
 		label1.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 	}
 
 	private void updatePageCompleteStatus() {
-
-		// If apt-get is selected can go to next page
-//		if (useAptGetBtn.getSelection()) {
-//			setPageComplete(true);
-//		}
-//		// If install from deb is selected path of .deb file must be given
-//		else if (useDebBtn.getSelection()) {
-//			if (fileDialogText.getText() != null && !"".equals(fileDialogText.getText())) {
-//				setPageComplete(true);
-//			}
-//			else {
-//				setPageComplete(false);
-//			}
-//		} else {
-//			// If install from URL is selected URL must be given
-//			if (downloadUrlTxt.getText() != null && !"".equals(downloadUrlTxt.getText())) {
-//				setPageComplete(true);
-//			}
-//			else {
-//				setPageComplete(false);
-//			}
-//		}
 		// If install from deb is selected path of .deb file must be given
 		if (useDebBtn.getSelection()) {
 			if (fileDialogText.getText() != null && !"".equals(fileDialogText.getText())) {
 				setPageComplete(true);
-			}
-			else {
+			} else {
 				setPageComplete(false);
 			}
 		} else {
 			// If install from URL is selected URL must be given
 			if (downloadUrlTxt.getText() != null && !"".equals(downloadUrlTxt.getText())) {
 				setPageComplete(true);
-			}
-			else {
+			} else {
 				setPageComplete(false);
 			}
 		}
@@ -315,10 +258,6 @@ public class AhenkInstallationMethodPage extends WizardPage {
 	@Override
 	public IWizardPage getNextPage() {
 
-		// Set config variables and confirm page labels.
-//		if (useAptGetBtn.getSelection()) {
-//			config.setAhenkInstallMethod(InstallMethod.APT_GET);
-//		} 
 		if (useDebBtn.getSelection()) {
 			config.setAhenkInstallMethod(InstallMethod.PROVIDED_DEB);
 			config.setDebFileAbsPath(fileDialogText.getText());
@@ -326,13 +265,13 @@ public class AhenkInstallationMethodPage extends WizardPage {
 			config.setAhenkInstallMethod(InstallMethod.WGET);
 			config.setAhenkDownloadUrl(downloadUrlTxt.getText());
 		}
-		
+
 		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 
 		AhenkConfPage confPage = ((AhenkConfPage) super.getNextPage());
 		confPage.getNextPage();
 		confPage.setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
-		
+
 		return confPage;
 	}
 

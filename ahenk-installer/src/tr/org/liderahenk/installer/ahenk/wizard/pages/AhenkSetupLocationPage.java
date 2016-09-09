@@ -27,7 +27,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.NetworkUtils;
 
 /**
  * 
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  *
  */
 public class AhenkSetupLocationPage extends WizardPage {
@@ -44,36 +45,28 @@ public class AhenkSetupLocationPage extends WizardPage {
 	IStatus ipStatus;
 
 	public AhenkSetupLocationPage(AhenkSetupConfig config) {
-		super(AhenkSetupLocationPage.class.getName(), Messages
-				.getString("INSTALLATION_OF_AHENK"), null);
-		setDescription(Messages
-				.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK"));
+		super(AhenkSetupLocationPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
+		setDescription(Messages.getString("WHERE_WOULD_YOU_LIKE_TO_INSTALL_AHENK"));
 		this.config = config;
 		ipStatus = new Status(IStatus.OK, "not_used", "");
 	}
 
 	@Override
 	public void createControl(final Composite parent) {
-		
-		Composite container = GUIHelper.createComposite(parent,
-				new GridLayout(1, false), new GridData(GridData.FILL,
-						GridData.FILL, false, false));
-		
+
+		Composite container = GUIHelper.createComposite(parent, new GridLayout(1, false),
+				new GridData(GridData.FILL, GridData.FILL, false, false));
+
 		setControl(container);
 
-		Composite containerForButtons = GUIHelper.createComposite(container,
-				new GridLayout(1, false), new GridData(GridData.FILL,
-						GridData.FILL, true, false));
-		Composite containerForGivenIp = GUIHelper.createComposite(container,
-				new GridLayout(2, false), new GridData(GridData.FILL,
-						GridData.FILL, true, false));
+		Composite containerForButtons = GUIHelper.createComposite(container, new GridLayout(1, false),
+				new GridData(GridData.FILL, GridData.FILL, true, false));
+		Composite containerForGivenIp = GUIHelper.createComposite(container, new GridLayout(2, false),
+				new GridData(GridData.FILL, GridData.FILL, true, false));
 
 		// Perform network scan
-		btnNetworkScan = GUIHelper
-				.createButton(
-						containerForButtons,
-						SWT.RADIO,
-						Messages.getString("I_WANT_TO_CHOOSE_IP_ADDRESSES_VIA_NETWORK_SCANNING"));
+		btnNetworkScan = GUIHelper.createButton(containerForButtons, SWT.RADIO,
+				Messages.getString("I_WANT_TO_CHOOSE_IP_ADDRESSES_VIA_NETWORK_SCANNING"));
 		btnNetworkScan.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -92,15 +85,12 @@ public class AhenkSetupLocationPage extends WizardPage {
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		btnNetworkScan.setSelection(true);
 
 		// Install locally
-		btnLocal = GUIHelper
-				.createButton(
-						containerForButtons,
-						SWT.RADIO,
-						Messages.getString("I_WANT_TO_INSTALL_TO_COMPUTER_WHICH_I_AM_ALREADY_WORKING_ON(LOCAL)"));
+		btnLocal = GUIHelper.createButton(containerForButtons, SWT.RADIO,
+				Messages.getString("I_WANT_TO_INSTALL_TO_COMPUTER_WHICH_I_AM_ALREADY_WORKING_ON(LOCAL)"));
 		btnLocal.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -166,39 +156,28 @@ public class AhenkSetupLocationPage extends WizardPage {
 
 		String[] remoteIps = txtRemoteIpValue.split(", ");
 
-		//Create IP list for config
+		// Create IP list for config
 		List<String> remoteIpList = new ArrayList<String>();
-		
+
 		Status status = new Status(IStatus.OK, "not_used", 0, "", null);
 
 		if (remoteIps == null || remoteIps.toString().isEmpty()) {
-			status = new Status(IStatus.ERROR, "not_used", 0,
-					Messages.getString("EMPTY_IP_ERROR"), null);
-		} 
-		else {
+			status = new Status(IStatus.ERROR, "not_used", 0, Messages.getString("EMPTY_IP_ERROR"), null);
+		} else {
 			for (int i = 0; i < remoteIps.length; i++) {
 				if (!NetworkUtils.isIpValid(remoteIps[i])) {
 					status = new Status(IStatus.ERROR, "not_used", 0,
-							Messages.getString("INVALID_IP_FORMAT_ERROR")
-									+ ": " + remoteIps[i], null);
+							Messages.getString("INVALID_IP_FORMAT_ERROR") + ": " + remoteIps[i], null);
 					return false;
 				}
-				
-				//Add to list
-				//it will be used for IP list in config
+
+				// Add to list
+				// it will be used for IP list in config
 				remoteIpList.add(remoteIps[i]);
-				
-				//There is no need to check if the IP is reacheable. It delays the screen a few seconds.
-//				if (!NetworkUtils.isIpReachable(remoteIpList[i])) {
-//					status = new Status(IStatus.ERROR, "not_used", 0,
-//							Messages.getString("IP_UNREACHABLE_ERROR") + ": "
-//									+ remoteIpList[i], null);
-//					return false;
-//				}
 			}
 		}
 
-		//Set the IP list in config
+		// Set the IP list in config
 		config.setIpList(remoteIpList);
 
 		ipStatus = status;
@@ -236,32 +215,26 @@ public class AhenkSetupLocationPage extends WizardPage {
 	}
 
 	protected void updatePageCompleteStatus() {
-		setPageComplete(btnLocal.getSelection()
-				|| (btnNetworkScan.getSelection())
-				// Check if entered ip list is valid.
-				|| (btnGivenIp.getSelection() && isRemoteIpListValid(txtRemoteIp
-						.getText())));
+		// Check if entered ip list is valid.
+		setPageComplete(btnLocal.getSelection() || (btnNetworkScan.getSelection())
+				|| (btnGivenIp.getSelection() && isRemoteIpListValid(txtRemoteIp.getText())));
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		LinkedList<IWizardPage> pagesList = ((AhenkSetupWizard) this
-				.getWizard()).getPagesList();
+		LinkedList<IWizardPage> pagesList = ((AhenkSetupWizard) this.getWizard()).getPagesList();
 		if (this.btnNetworkScan.getSelection()) {
-			if (!AhenkNetworkScanPage.class.getName().equals(
-					pagesList.get(1).getName())) {
-				AhenkNetworkScanPage secondPage = new AhenkNetworkScanPage(
-						config);
+			if (!AhenkNetworkScanPage.class.getName().equals(pagesList.get(1).getName())) {
+				AhenkNetworkScanPage secondPage = new AhenkNetworkScanPage(config);
 				secondPage.setWizard(getWizard());
 				pagesList.add(1, secondPage);
 			}
-		} else if (AhenkNetworkScanPage.class.getName().equals(
-				pagesList.get(1).getName())) {
+		} else if (AhenkNetworkScanPage.class.getName().equals(pagesList.get(1).getName())) {
 			pagesList.remove(1);
 		}
-		
+
 		if (btnLocal.getSelection()) {
-			//Create IP list for config
+			// Create IP list for config
 			List<String> remoteIpList = new ArrayList<String>();
 			remoteIpList.add("localhost");
 			config.setIpList(remoteIpList);

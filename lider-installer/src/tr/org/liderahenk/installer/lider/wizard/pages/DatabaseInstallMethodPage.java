@@ -27,8 +27,8 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -89,7 +89,7 @@ public class DatabaseInstallMethodPage extends WizardPage implements IDatabasePa
 		// Copy mariadb.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader()
 				.getResourceAsStream("mariadb-server-10.1_10.1.16+maria-1-jessie_amd64.deb");
-		File mariadbDeb = SetupUtils.streamToFile(inputStream, "mariadb-server-10.1_10.1.16+maria-1-jessie_amd64.deb");
+		File mariadbDeb = LiderAhenkUtils.streamToFile(inputStream, "mariadb-server-10.1_10.1.16+maria-1-jessie_amd64.deb");
 		txtFileName.setText(mariadbDeb.getAbsolutePath());
 
 		// Set file to config as array of bytes

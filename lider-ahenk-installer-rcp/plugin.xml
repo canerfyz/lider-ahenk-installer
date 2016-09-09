@@ -17,7 +17,7 @@
          </property>
          <property
                name="windowImages"
-               value="/tr.org.liderahenk.installer.rcp/icons/LiderConsole_16.png">
+               value="icons/LiderConsole_16.png">
          </property>
       </product>
    </extension>

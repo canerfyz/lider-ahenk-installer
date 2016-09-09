@@ -26,8 +26,8 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -369,9 +369,9 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map.put("#FILE_SERVER_AGREEMENT_PATH", txtFileServerAgreementPath.getText());
 		map.put("#FILE_SERVER_AGENT_FILE_PATH", txtFileServerAgentFilePath.getText());
 		
-		text = SetupUtils.replace(map, text);
+		text = LiderAhenkUtils.replace(map, text);
 		config.setLiderConfContent(text);
-		config.setLiderAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "tr.org.liderahenk.cfg"));
+		config.setLiderAbsPathConfFile(LiderAhenkUtils.writeToFileReturnPath(text, "tr.org.liderahenk.cfg"));
 
 		// Database configuration
 		String text2 = stDatasourceConfig.getText();
@@ -381,9 +381,9 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		map2.put("#DBUSERNAME", dbUsername.getText());
 		map2.put("#DBPASSWORD", dbPassword.getText());
 
-		text2 = SetupUtils.replace(map2, text2);
+		text2 = LiderAhenkUtils.replace(map2, text2);
 		config.setDatasourceConfContent(text2);
-		config.setDatasourceAbsPathConfFile(SetupUtils.writeToFileReturnPath(text2, "tr.org.liderahenk.datasource.cfg"));
+		config.setDatasourceAbsPathConfFile(LiderAhenkUtils.writeToFileReturnPath(text2, "tr.org.liderahenk.datasource.cfg"));
 
 		return super.getNextPage();
 	}

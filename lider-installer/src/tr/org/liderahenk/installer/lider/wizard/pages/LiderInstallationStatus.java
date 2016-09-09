@@ -19,6 +19,7 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
@@ -177,7 +178,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						liderConfigFile = new File(config.getLiderAbsPathConfFile());
 						datasourceConfigFile = new File(config.getDatasourceAbsPathConfFile());
 						inputStream = this.getClass().getClassLoader().getResourceAsStream("setenv");
-						setEnvFile = SetupUtils.streamToFile(inputStream, "setenv");
+						setEnvFile = LiderAhenkUtils.streamToFile(inputStream, "setenv");
 
 						// Copy tr.org.liderahenk.cfg
 						printMessage(Messages.getString("SENDING_LIDER_CFG"));

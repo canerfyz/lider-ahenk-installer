@@ -2,8 +2,6 @@ package tr.org.liderahenk.installer.lider.wizard.pages;
 
 import java.io.File;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -17,11 +15,10 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.utils.PageFlowHelper;
-import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
-import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
@@ -90,7 +87,7 @@ public class LdapUpdateStatusPage extends WizardPage implements ILdapPage, Insta
 						
 						InputStream inputStream = this.getClass().getClassLoader()
 								.getResourceAsStream("liderahenk.ldif");
-						File liderAhenkLdifFile = SetupUtils.streamToFile(inputStream, "liderahenk.ldif");
+						File liderAhenkLdifFile = LiderAhenkUtils.streamToFile(inputStream, "liderahenk.ldif");
 						setProgressBar(25);
 						
 						printMessage(Messages.getString("SENDING_LDIF"));

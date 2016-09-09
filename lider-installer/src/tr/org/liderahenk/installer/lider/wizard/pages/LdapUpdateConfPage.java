@@ -31,8 +31,8 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
@@ -325,11 +325,11 @@ public class LdapUpdateConfPage extends WizardPage implements ILdapPage, Control
 		map.put("#LIDER_SERVER_ADDR", txtLiderIp.getText());
 		map.put("#LADMIN_PWD", txtLiderAdminPwd.getText());
 		
-		text = SetupUtils.replace(map, text);
+		text = LiderAhenkUtils.replace(map, text);
 
 		// Set config variables before going to next page
 		config.setLdapConfContent(text);
-		config.setLdapAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "update_ldap"));
+		config.setLdapAbsPathConfFile(LiderAhenkUtils.writeToFileReturnPath(text, "update_ldap"));
 	}
 	
 	public void updatePageCompleteStatus() {

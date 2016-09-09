@@ -37,13 +37,14 @@ import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class XmppClusterInstallationStatus extends WizardPage
@@ -121,7 +122,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			final Display display = Display.getCurrent();
 
 			setPageCompleteAsync(isInstallationFinished, display);
-			
+
 			clearLogConsole(display);
 
 			// Create a thread pool
@@ -339,16 +340,17 @@ public class XmppClusterInstallationStatus extends WizardPage
 						});
 
 						setPageCompleteAsync(isInstallationFinished, display);
-						
+
 						if (!isInstallationFinished) {
 							try {
 								openDownloadUrl();
 							} catch (Exception e) {
 								e.printStackTrace();
-								txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
-										? txtLogConsole.getText() + "\n" : "")
-										+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
-										+ PropertyReader.property("troubleshooting.url"));
+								txtLogConsole
+										.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+												? txtLogConsole.getText() + "\n" : "")
+												+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+												+ PropertyReader.property("troubleshooting.url"));
 							}
 						}
 					}
@@ -368,7 +370,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 	private void openDownloadUrl() throws IOException {
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
-	
+
 	private void onlyConfigureNode(XmppNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
@@ -451,8 +453,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_EJABBERD_AS_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
 
-			logger.log(Level.INFO, "Successfully defined service at {0}",
-					new Object[] { clusterNode.getNodeIp() });
+			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
@@ -462,8 +463,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(
-					Messages.getString("EXCEPTION_RAISED_WHILE_DEFINING_SERVICE_AT_", clusterNode.getNodeIp()),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_DEFINING_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
@@ -655,8 +655,8 @@ public class XmppClusterInstallationStatus extends WizardPage
 		map.put("#CLUSTER_CLIENTS_SSL", propertyMap.get("CLUSTER_CLIENTS_SSL"));
 		map.put("#CLUSTER_SERVERS", propertyMap.get("CLUSTER_SERVERS"));
 
-		haproxyCfg = SetupUtils.replace(map, haproxyCfg);
-		File haproxyCfgFile = SetupUtils.writeToFile(haproxyCfg, "haproxy.cfg");
+		haproxyCfg = LiderAhenkUtils.replace(map, haproxyCfg);
+		File haproxyCfgFile = LiderAhenkUtils.writeToFile(haproxyCfg, "haproxy.cfg");
 		printMessage(Messages.getString("SUCCESSFULLY_CREATED_HAPROXY_CONFIG_FILE"), display);
 		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
 

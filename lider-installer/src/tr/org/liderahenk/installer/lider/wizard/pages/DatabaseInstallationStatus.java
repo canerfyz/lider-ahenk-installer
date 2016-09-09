@@ -102,49 +102,49 @@ public class DatabaseInstallationStatus extends WizardPage
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"rm -rf /var/lib/mysql/");
+								"sudo rm -rf /var/lib/mysql/");
 						printMessage(Messages.getString("SUCCESSFULLY_CLEANED_OLD_DATABASES"));
 
 						printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"apt-get update");
+								"sudo apt-get update");
 						printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
 						printMessage(Messages.getString("INSTALLING_PREREQUISITES"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"apt-get -y --force-yes install software-properties-common");
+								"sudo apt-get -y --force-yes install software-properties-common");
 						printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PREREQUISITES"));
 
 						printMessage(Messages.getString("ADDING_KEY_SERVER"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db");
+								"sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db");
 						printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEY_SERVER"));
 
 						printMessage(Messages.getString("ADDING_NEW_REPOSITORY"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
+								"sudo echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list");
 						printMessage(Messages.getString("SUCCESSFULLY_ADDED_NEW_REPOSITORY"));
 
 						printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"apt-get update");
+								"sudo apt-get update");
 						printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
 						printMessage(Messages.getString("SETTING_DEBIAN_FRONTEND_TO_NONINTERACTIVE"));
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"export DEBIAN_FRONTEND='noninteractive'");
+								"sudo export DEBIAN_FRONTEND='noninteractive'");
 						printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_TO_NONINTERACTIVE"));
 
 						final String[] debconfValues = generateDebconfValues();

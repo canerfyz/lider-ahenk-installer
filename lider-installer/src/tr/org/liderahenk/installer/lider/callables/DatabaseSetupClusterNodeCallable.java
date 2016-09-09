@@ -19,12 +19,13 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
@@ -66,7 +67,8 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			try {
 				printMessage(Messages.getString("CHECKING_CONNECTION_TO_", nodeIp), display);
 
-				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(),
+						config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
@@ -104,25 +106,24 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			// Add keyserver
 			// Add repository
 			try {
-				printMessage(Messages.getString("INSTALLING_PACKAGE_", "software-properties-common", nodeIp),
-						display);
+				printMessage(Messages.getString("INSTALLING_PACKAGE_", "software-properties-common", nodeIp), display);
 				manager.execCommand("apt-get -y --force-yes install software-properties-common", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", "software-properties-common", nodeIp), display);
+				printMessage(
+						Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE_", "software-properties-common", nodeIp),
+						display);
 
 				printMessage(Messages.getString("ADDING_KEYSERVER_TO_", nodeIp), display);
 				manager.execCommand("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db",
 						new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO", nodeIp), display);
 
-				printMessage(
-						Messages.getString("ADDING_REPOSITORY_", "'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp),
-						display);
+				printMessage(Messages.getString("ADDING_REPOSITORY_",
+						"'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp), display);
 				manager.execCommand(
 						"echo 'deb [arch=amd64,i386] ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main' > /etc/apt/sources.list.d/galera.list",
 						new Object[] {});
-				printMessage(
-						Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY_", "'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp),
-						display);
+				printMessage(Messages.getString("SUCCESSFULLY_ADDED_REPOSITORY_",
+						"'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp), display);
 
 				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
@@ -163,8 +164,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 
 			// Purge anything about mariadb and mysql
 			try {
-				printMessage(Messages.getString("CLEANING_BEFORE_INSTALLATION_AT") + " " + nodeIp,
-						display);
+				printMessage(Messages.getString("CLEANING_BEFORE_INSTALLATION_AT") + " " + nodeIp, display);
 				manager.execCommand("apt-get -y --force-yes purge -y mysql-* mariadb-*", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_CLEANED_BEFORE_INSTALLATION_AT") + " " + nodeIp, display);
 				logger.log(Level.INFO, "Successfully successfully cleaned before installation at: {0}",
@@ -248,9 +248,9 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				map.put("#NODE_ADDRESS", nodeIp);
 				map.put("#NODE_NAME", nodeName);
 
-				galeraCnf = SetupUtils.replace(map, galeraCnf);
-				
-				File galeraCnfFile = SetupUtils.writeToFile(galeraCnf, "galera.cnf");
+				galeraCnf = LiderAhenkUtils.replace(map, galeraCnf);
+
+				File galeraCnfFile = LiderAhenkUtils.writeToFile(galeraCnf, "galera.cnf");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CNF_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_CNF_FILE_TO") + " " + nodeIp, display);
@@ -297,7 +297,8 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				}
 				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 						? txtLogConsole.getText() + "\n" : "") + message);
-				txtLogConsole.setSelection(txtLogConsole.getCharCount() - 1);			}
+				txtLogConsole.setSelection(txtLogConsole.getCharCount() - 1);
+			}
 		});
 	}
 

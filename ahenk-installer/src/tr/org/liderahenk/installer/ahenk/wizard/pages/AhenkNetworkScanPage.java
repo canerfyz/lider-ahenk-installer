@@ -17,8 +17,6 @@ import java.util.logging.Logger;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.CheckboxCellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -60,7 +58,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.TableThreadHelper;
 /**
  * 
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  *
  */
 public class AhenkNetworkScanPage extends WizardPage {
@@ -246,10 +245,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 		btnScan.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
 				// Start a new scan!
-				// if (executor == null || executor.isShutdown() ||
-				// executor.isTerminated()) {
 				if (executor == null || executor.getActiveCount() == 0) {
 
 					Display.getCurrent().asyncExec(new Runnable() {
@@ -347,7 +343,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 							params.setSudoPassword(getSudoPasswdIfExists());
 							params.setSudoUsername(getSudoUsernameIfExists());
 							params.setTimingTemplate(getSelectedTimingTemplate());
-							
+
 							RunnableNmap4j nmap4jThread = new RunnableNmap4j(tableHelper, params);
 							executor.execute(nmap4jThread);
 						}
@@ -355,42 +351,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 						// Initiate shutdown (waits for already-running threads
 						// to finish)
 						executor.shutdown();
-
-						// Çok hantal! tabloyu kitliyor!
-						// Display.getCurrent().asyncExec(new Runnable() {
-						// public void run() {
-						// try {
-						// while (!executor.awaitTermination(2000,
-						// TimeUnit.MILLISECONDS));
-						// btnScan.setText(Messages.getString("START_SCAN"));
-						// } catch (InterruptedException e1) {
-						// e1.printStackTrace();
-						// }
-						// }
-						// });
-						// Display.getCurrent().asyncExec(new Runnable() {
-						// public void run() {
-						// try {
-						// while (!executor.awaitTermination(2000,
-						// TimeUnit.MILLISECONDS)) {
-						// if (bar.isDisposed()) {
-						// return;
-						// }
-//						int selection = executor.getActiveCount() / NUM_THREADS * 100;
-						// bar.setSelection(selection);
-						// logger.log(Level.INFO,
-						// "EXECUTOR INFO: {0}", selection);
-						// }
-						// } catch (InterruptedException e1) {
-						// }
-						//
-						// btnScan.setText(Messages
-						// .getString("START_SCAN"));
-						// }
-						// });
-
 					}
-
 				}
 				// Executor already running! Force stop.
 				else {
@@ -406,15 +367,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 						@Override
 						public void run() {
 							executor.shutdownNow();
-							// TODO print status: stopping threads
-							// try {
-							// while (!executor.awaitTermination(10,
-							// TimeUnit.SECONDS)) {
-							// logger.log(Level.INFO, "Awaiting completion of
-							// threads.");
-							// }
-							// } catch (InterruptedException e1) {
-							// }
 						}
 					});
 
@@ -546,8 +498,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 	 */
 	private void createTableColumns(TableViewer tblVwrSetup) {
 
-		CellEditor editor = new CheckboxCellEditor(tblVwrSetup.getTable());
-
 		TableViewerColumn ipCol = createTableViewerColumn(tblVwrSetup, Messages.getString("IP_ADDRESS"), 100);
 		ipCol.setLabelProvider(new ColumnLabelProvider() {
 			@Override
@@ -568,15 +518,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 				}
 			}
 		});
-
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// TODO
-		// tblVwrSetup.setCellEditors(new CellEditor[]{ editor });
-		// ipCol.setEditingSupport(new EnableEditingSupport(tblVwrSetup));
 
 		TableViewerColumn hostnameCol = createTableViewerColumn(tblVwrSetup, Messages.getString("HOST_NAME"), 50);
 		hostnameCol.setLabelProvider(new ColumnLabelProvider() {
@@ -718,7 +659,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 		setPageComplete(ipSelected && sudoInfoEntered);
 	}
 
-	// TODO tablefilter
 	// Select or deselect all checkboxes
 	private void selectDeselectAll(String selectOrDeselect) {
 		TableItem[] items = tblVwrSetup.getTable().getItems();
@@ -737,7 +677,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 
 	private void selectOnlineIps() {
 		TableItem[] items = tblVwrSetup.getTable().getItems();
-
 		for (int i = 0; i < items.length; i++) {
 			if (NetworkUtils.isHostUp((Host) items[i].getData())) {
 				items[i].setChecked(true);
@@ -749,7 +688,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 	}
 
 	private void organizeSudoFields() {
-
 		if (btnOsGuess.getSelection()) {
 			txtSudoUsername.setEnabled(true);
 			txtSudoPassword.setEnabled(true);
@@ -757,7 +695,6 @@ public class AhenkNetworkScanPage extends WizardPage {
 			txtSudoUsername.setEnabled(false);
 			txtSudoPassword.setEnabled(false);
 		}
-
 	}
 
 	@Override

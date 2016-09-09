@@ -27,8 +27,8 @@ import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
@@ -104,7 +104,7 @@ public class LdapInstallMethodPage extends WizardPage implements ILdapPage {
 
 		// Copy mariadb.deb to /tmp and bring it as default deb in page
 		InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("slapd_default_2_4_40.deb");
-		File ldapDeb = SetupUtils.streamToFile(inputStream, "slapd_default_2_4_40.deb");
+		File ldapDeb = LiderAhenkUtils.streamToFile(inputStream, "slapd_default_2_4_40.deb");
 		txtFileName.setText(ldapDeb.getAbsolutePath());
 		
 		// Set file to config as array of bytes

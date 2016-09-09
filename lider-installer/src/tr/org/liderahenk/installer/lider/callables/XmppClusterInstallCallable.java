@@ -22,11 +22,12 @@ import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.liderahenk.installer.lider.wizard.model.XmppNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class XmppClusterInstallCallable implements Callable<Boolean> {
@@ -107,7 +108,7 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 
 				InputStream inputStream = this.getClass().getClassLoader()
 						.getResourceAsStream("ejabberd_16.06-0_amd64.deb");
-				File ejabberdDeb = SetupUtils.streamToFile(inputStream, "ejabberd_16.06-0_amd64.deb");
+				File ejabberdDeb = LiderAhenkUtils.streamToFile(inputStream, "ejabberd_16.06-0_amd64.deb");
 
 				printMessage(Messages.getString("SENDING_DEB_FILE_TO") + " " + nodeIp, display);
 				manager.copyFileToRemote(ejabberdDeb, "/tmp/", false);
@@ -150,8 +151,8 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				map.put("#LDAP_ROOT_PWD", config.getXmppLdapRootPwd());
 				map.put("#LDAP_BASE_DN", config.getXmppLdapBaseDn());
 
-				ejabberdYml = SetupUtils.replace(map, ejabberdYml);
-				File ejabberdYmlFile = SetupUtils.writeToFile(ejabberdYml, "ejabberd.yml");
+				ejabberdYml = LiderAhenkUtils.replace(map, ejabberdYml);
+				File ejabberdYmlFile = LiderAhenkUtils.writeToFile(ejabberdYml, "ejabberd.yml");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_YML_FILE"), display);
 
 				printMessage(Messages.getString("SENDING_EJABBERD_YML_TO") + " " + nodeIp, display);
@@ -204,7 +205,8 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				logger.log(Level.INFO, "Successfully modified /etc/hosts at: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
-				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_ETC_HOSTS_AT") + " " + nodeIp, display);
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_ETC_HOSTS_AT") + " " + nodeIp,
+						display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
 				logger.log(Level.SEVERE, e.getMessage());
 				e.printStackTrace();
@@ -212,20 +214,27 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 			}
 
 			// Create admin user with post install script of Ejabberd
-//			try {
-//				printMessage(Messages.getString("CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
-//				manager.execCommand("/opt/ejabberd-16.06/bin/postinstall.sh admin {0} {1}",
-//						new Object[] { config.getXmppHostname(), config.getXmppAdminPwd() });
-//				printMessage(Messages.getString("SUCCESSFULLY_CREATED_ADMIN_USER_AT") + " " + nodeIp, display);
-//				logger.log(Level.INFO, "Successfully created admin user at: {0}", new Object[] { nodeIp });
-//
-//			} catch (CommandExecutionException e) {
-//				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CREATING_ADMIN_USER_AT") + " " + nodeIp, display);
-//				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-//				logger.log(Level.SEVERE, e.getMessage());
-//				e.printStackTrace();
-//				throw new Exception();
-//			}
+			// try {
+			// printMessage(Messages.getString("CREATING_ADMIN_USER_AT") + " " +
+			// nodeIp, display);
+			// manager.execCommand("/opt/ejabberd-16.06/bin/postinstall.sh admin
+			// {0} {1}",
+			// new Object[] { config.getXmppHostname(), config.getXmppAdminPwd()
+			// });
+			// printMessage(Messages.getString("SUCCESSFULLY_CREATED_ADMIN_USER_AT")
+			// + " " + nodeIp, display);
+			// logger.log(Level.INFO, "Successfully created admin user at: {0}",
+			// new Object[] { nodeIp });
+			//
+			// } catch (CommandExecutionException e) {
+			// printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CREATING_ADMIN_USER_AT")
+			// + " " + nodeIp, display);
+			// printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " +
+			// e.getMessage() + " at " + nodeIp, display);
+			// logger.log(Level.SEVERE, e.getMessage());
+			// e.printStackTrace();
+			// throw new Exception();
+			// }
 
 			printMessage(Messages.getString("INSTALLATION_COMPLETED_SUCCESSFULLY_AT") + " " + nodeIp, display);
 			successfullSetup = true;

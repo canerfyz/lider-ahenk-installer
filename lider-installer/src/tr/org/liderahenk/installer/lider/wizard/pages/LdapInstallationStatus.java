@@ -21,6 +21,7 @@ import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
@@ -149,7 +150,7 @@ public class LdapInstallationStatus extends WizardPage implements ILdapPage, Ins
 
 						InputStream inputStream = this.getClass().getClassLoader()
 								.getResourceAsStream("liderahenk.ldif");
-						File liderAhenkLdifFile = SetupUtils.streamToFile(inputStream, "liderahenk.ldif");
+						File liderAhenkLdifFile = LiderAhenkUtils.streamToFile(inputStream, "liderahenk.ldif");
 						
 						// Delete previous databases
 						printMessage(Messages.getString("DELETING_PREVIOUS_DATABASES"));

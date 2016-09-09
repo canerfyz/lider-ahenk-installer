@@ -27,8 +27,8 @@ import tr.org.liderahenk.installer.ahenk.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.AccessMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author Volkan Şahin <bm.volkansahin@gmail.com>
@@ -129,11 +129,11 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 			}
 		});
 		receiveFile.setMessage(Messages.getString("EG_RECEIVE_FILE"));
-		
+
 		GUIHelper.createLabel(lineCont, Messages.getString("AHENK_USE_TLS"));
 		cmbUseSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbUseSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbUseSsl.setItems(new String[] {"false", "true"});
+		cmbUseSsl.setItems(new String[] { "false", "true" });
 		cmbUseSsl.select(0);
 
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
@@ -209,9 +209,9 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		map.put("#RECEIVE_FILE", receiveFile.getText());
 		map.put("#USE_TLS", cmbUseSsl.getText());
 
-		text = SetupUtils.replace(map, text);
+		text = LiderAhenkUtils.replace(map, text);
 		config.setAhenkConfContent(text);
-		config.setAhenkAbsPathConfFile(SetupUtils.writeToFileReturnPath(text, "ahenk.conf"));
+		config.setAhenkAbsPathConfFile(LiderAhenkUtils.writeToFileReturnPath(text, "ahenk.conf"));
 		return confPage;
 	}
 

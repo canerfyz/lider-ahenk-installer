@@ -1,15 +1,13 @@
 package tr.org.liderahenk.installer.ahenk.wizard.pages;
 
 import java.io.File;
-import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -26,52 +24,42 @@ import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
+import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
+ * 
+ * 
  * @author Caner Feyzullahoğlu <caner.feyzullahoglu@agem.com.tr>
  * @author Volkan Şahin <bm.volkansahin@gmail.com>
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
+ * 
  */
-
 public class AhenkInstallationStatusPage extends WizardPage implements ControlNextEvent, InstallationStatusPage {
 
 	private AhenkSetupConfig config = null;
 
 	// Widgets
 	private Composite mainContainer = null;
-
 	private ProgressBar progressBar;
-
 	private Text txtLogConsole;
-
 	private NextPageEventType nextPageEventType;
-
 	boolean isInstallationFinished = false;
-
 	boolean canGoBack = false;
-
 	private int progressBarPercent;
 
 	private final static String MAKE_DIR_UNDER_TMP = "mkdir /tmp/{0}";
 
-	// Status variable for the possible errors on this page
-	IStatus ipStatus;
-
 	public AhenkInstallationStatusPage(AhenkSetupConfig config) {
 		super(AhenkInstallationStatusPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
-
 		setDescription(Messages.getString("INSTALLATION_STATUS"));
-
 		this.config = config;
-
-		ipStatus = new Status(IStatus.OK, "not_used", 0, "", null);
 	}
 
 	@Override
 	public void createControl(Composite parent) {
-
-		// create main container
 		mainContainer = GUIHelper.createComposite(parent, 1);
 		setControl(mainContainer);
 
@@ -85,7 +73,6 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 		GridData progressGd = new GridData(GridData.FILL_HORIZONTAL);
 		progressGd.heightHint = 40;
 		progressBar.setLayoutData(progressGd);
-
 	}
 
 	@Override
@@ -104,107 +91,22 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 			printMessage(Messages.getString("INITIALIZING_INSTALLATION"), Display.getCurrent());
 
-			// Get display before new main runnable
+			// Get display before main runnable
 			final Display display = Display.getCurrent();
 
 			// Create a main runnable and execute installations as new runnables
-			// under this one. Because at the end of installation I have to wait
+			// under this one. Because at the end of installation we have to
+			// wait
 			// until all runnables completed and this situation locks GUI.
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
-					// Check installation method
-					if (config.getAhenkInstallMethod() == InstallMethod.APT_GET) {
-
-						// Calculate progress bar increment size
-						final Integer increment = (Integer) (90 / config.getIpList().size());
-
-						for (final String ip : config.getIpList()) {
-
-							// Execute each installation in a new runnable.
-							Runnable runnable = new Runnable() {
-								@Override
-								public void run() {
-									try {
-										printMessage(Messages.getString("TRYING_TO_CONNECT_TO", ip), display);
-
-										// Check authorization before starting
-										// installation
-										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
-												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
-												config.getPrivateKeyAbsPath(), config.getPassphrase());
-
-										// If we can connect to machine install
-										// Ahenk
-										if (canConnect) {
-											printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO", ip), display);
-
-											printMessage(Messages.getString("AHENK_IS_BEING_INSTALLED_TO", ip),
-													display);
-
-											// TODO gedit değiştirilecek
-											SetupUtils.installPackage(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), "gedit",
-													null);
-
-											setProgressBar(increment, display);
-
-											printMessage(Messages.getString("AHENK_SUCCESSFULLY_INSTALLED_TO", ip),
-													display);
-
-										} else {
-											printMessage(Messages.getString("COULD_NOT_CONNECT_TO_PASSING_OVER", ip),
-													display);
-
-											setProgressBar(increment, display);
-										}
-
-									} catch (SSHConnectionException e) {
-										// Also update progress bar when
-										// installation fails
-										setProgressBar(increment, display);
-
-										isInstallationFinished = false;
-
-										// If any error occured user should be
-										// able to go back and change selections
-										// etc.
-										canGoBack = true;
-
-										printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()), display);
-
-										e.printStackTrace();
-									} catch (CommandExecutionException e) {
-										// Also update progress bar when
-										// installation fails
-										setProgressBar(increment, display);
-
-										isInstallationFinished = false;
-
-										// If any error occured user should be
-										// able to go back and change selections
-										// etc.
-										canGoBack = true;
-
-										printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()), display);
-
-										e.printStackTrace();
-									}
-								}
-							};
-
-							executor.execute(runnable);
-
-						}
-
-					} else if (config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
+					if (config.getAhenkInstallMethod() == InstallMethod.PROVIDED_DEB) {
 
 						// Calculate progress bar increment size
 						final Integer increment = (Integer) (90 / config.getIpList().size());
 
 						final File fileConf = new File(config.getAhenkAbsPathConfFile());
-
 						final File logConf = new File(config.getAhenkLogConfAbsPath());
 
 						for (final String ip : config.getIpList()) {
@@ -221,131 +123,178 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 										final boolean canConnect = SetupUtils.canConnectViaSsh(ip,
 												config.getUsernameCm(), config.getPasswordCm(), config.getPort(),
 												config.getPrivateKeyAbsPath(), config.getPassphrase());
-
-										// If we can connect to machine install
-										// Ahenk
 										if (canConnect) {
 											printMessage(Messages.getString("SUCCESSFULLY_CONNECTED_TO", ip), display);
 
-											File debPackage = new File(config.getDebFileAbsPath());
-
-											InputStream stream = this.getClass()
-													.getResourceAsStream("/conf/liderahenk.list");
-											File file = SetupUtils.streamToFile(stream, "liderahenk.list");
-
-											printMessage(Messages.getString("ADDING_REQUIRED_REPO_AT", ip), display);
-											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
-													config.getPort(), config.getPrivateKeyAbsPath(),
-													config.getPassphrase(), file, "/etc/apt/sources.list.d/");
-
 											try {
+												// Add Lider Ahenk repository
+												printMessage(Messages.getString("ADDING_REQUIRED_REPO_AT", ip),
+														display);
+												SetupUtils
+														.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
+																config.getPort(), config.getPrivateKeyAbsPath(),
+																config.getPassphrase(),
+																LiderAhenkUtils.streamToFile(
+																		this.getClass().getResourceAsStream(
+																				"/conf/liderahenk.list"),
+																		"liderahenk.list"),
+																"/tmp/");
 												SetupUtils.executeCommand(ip, config.getUsernameCm(),
 														config.getPasswordCm(), config.getPort(),
 														config.getPrivateKeyAbsPath(), config.getPassphrase(),
-														"wget -qO - http://ftp.pardus.org.tr/Release.pub | apt-key add -");
+														"sudo mv -f /tmp/liderahenk.list /etc/apt/sources.list.d/",
+														new IOutputStreamProvider() {
+															@Override
+															public byte[] getStreamAsByteArray() {
+																return (config.getPasswordCm() + "\n")
+																		.getBytes(StandardCharsets.UTF_8);
+															}
+														});
+
+												// Update package list
 												SetupUtils.executeCommand(ip, config.getUsernameCm(),
 														config.getPasswordCm(), config.getPort(),
 														config.getPrivateKeyAbsPath(), config.getPassphrase(),
-														"apt-get update");
+														"sudo apt-get update", new IOutputStreamProvider() {
+															@Override
+															public byte[] getStreamAsByteArray() {
+																return (config.getPasswordCm() + "\n")
+																		.getBytes(StandardCharsets.UTF_8);
+															}
+														});
 												printMessage(
 														Messages.getString("SUCCESSFULLY_ADDED_REQUIRED_REPO_AT", ip),
 														display);
-
 											} catch (Exception e) {
 												printMessage(Messages.getString(
 														"EXCEPTION_OCCURED_WHILE_ADDING_NEW_REPO_AT", ip), display);
 											}
 
-											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"rm -rf /etc/ahenk/ahenk.db");
-											SetupUtils.executeCommand(ip, config.getUsernameCm(),
-													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"rm -rf /opt/ahenk");
+											try {
+												// Remove previous Ahenk
+												SetupUtils.executeCommand(ip, config.getUsernameCm(),
+														config.getPasswordCm(), config.getPort(),
+														config.getPrivateKeyAbsPath(), config.getPassphrase(),
+														"sudo apt-get purge --auto-remove -y --force-yes ahenk ahenk-*",
+														new IOutputStreamProvider() {
+															@Override
+															public byte[] getStreamAsByteArray() {
+																return (config.getPasswordCm() + "\n")
+																		.getBytes(StandardCharsets.UTF_8);
+															}
+														});
+											} catch (Exception e) {
+												// TODO ignore e100 only!
+											}
 
-											// Adding "--force-overwrite"
-											// option, because if files under
-											// /etc/ahenk has been removed
-											// manually before this
-											// installation, DPKG will not
-											// create them again.
+											// Copy Ahenk deb file
+											File debFile = new File(config.getDebFileAbsPath());
+											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
+													config.getPort(), config.getPrivateKeyAbsPath(),
+													config.getPassphrase(), debFile, "/tmp/");
+
+											// Install Ahenk
 											printMessage(Messages.getString("INSTALLING_AHENK_AT", ip), display);
-											SetupUtils.installPackageGdebiWithOpts(ip, config.getUsernameCm(),
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
-													config.getPrivateKeyAbsPath(), config.getPassphrase(), debPackage,
-													"Dpkg::Options::='--force-overwrite'");
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"sudo apt-get install -y --force-yes gdebi && sudo gdebi -n /tmp/"
+															+ debFile.getName(),
+													new IOutputStreamProvider() {
+														@Override
+														public byte[] getStreamAsByteArray() {
+															return (config.getPasswordCm() + "\n")
+																	.getBytes(StandardCharsets.UTF_8);
+														}
+													});
 											printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_AHENK_AT", ip),
 													display);
 
+											// Copy configuration files
 											printMessage(Messages.getString("COPYING_CONFIGURATION_FILES_TO", ip),
 													display);
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
-													config.getPassphrase(), fileConf, "/etc/ahenk/");
+													config.getPassphrase(), fileConf, "/tmp/");
+											SetupUtils
+													.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(),
+															config.getPort(), config.getPrivateKeyAbsPath(),
+															config.getPassphrase(), "sudo mv -f /tmp/{0} /etc/ahenk/"
+																	.replace("{0}", fileConf.getName()),
+															new IOutputStreamProvider() {
+																@Override
+																public byte[] getStreamAsByteArray() {
+																	return (config.getPasswordCm() + "\n")
+																			.getBytes(StandardCharsets.UTF_8);
+																}
+															});
 											SetupUtils.copyFile(ip, config.getUsernameCm(), config.getPasswordCm(),
 													config.getPort(), config.getPrivateKeyAbsPath(),
-													config.getPassphrase(), logConf, "/etc/ahenk/");
+													config.getPassphrase(), logConf, "/tmp/");
+											SetupUtils.executeCommand(ip, config.getUsernameCm(),
+													config.getPasswordCm(), config.getPort(),
+													config.getPrivateKeyAbsPath(), config.getPassphrase(),
+													"sudo mv -f /tmp/{0} /etc/ahenk/".replace("{0}", logConf.getName()),
+													new IOutputStreamProvider() {
+														@Override
+														public byte[] getStreamAsByteArray() {
+															return (config.getPasswordCm() + "\n")
+																	.getBytes(StandardCharsets.UTF_8);
+														}
+													});
 											printMessage(Messages.getString(
 													"SUCCESSFULLY_COPIED_CONFIGURATION_FILES_TO", ip), display);
 
+											// Restart Ahenk service
 											printMessage(Messages.getString("STARTING_AHENK_SERVICE_AT", ip), display);
 											SetupUtils.executeCommand(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(),
-													"service ahenk start");
+													"sudo service ahenk restart", new IOutputStreamProvider() {
+														@Override
+														public byte[] getStreamAsByteArray() {
+															return (config.getPasswordCm() + "\n")
+																	.getBytes(StandardCharsets.UTF_8);
+														}
+													});
 											printMessage(
 													Messages.getString("SUCCESSFULLY_STARTED_AHENK_SERVICE_AT", ip),
 													display);
 
 											setProgressBar(increment, display);
-
 										} else {
 											printMessage(Messages.getString("COULD_NOT_CONNECT_TO_PASSING_OVER", ip),
 													display);
-
 											setProgressBar(increment, display);
 										}
-
 									} catch (SSHConnectionException e) {
 										// Also update progress bar when
 										// installation fails
 										setProgressBar(increment, display);
-
 										isInstallationFinished = false;
-
 										// If any error occured user should be
 										// able to go back and change selections
 										// etc.
 										canGoBack = true;
-
 										printMessage("Error occurred: " + e.getMessage(), display);
-
 										e.printStackTrace();
 									} catch (CommandExecutionException e) {
 										// Also update progress bar when
 										// installation fails
 										setProgressBar(increment, display);
-
 										isInstallationFinished = false;
-
 										// If any error occured user should be
 										// able to go back and change selections
 										// etc.
 										canGoBack = true;
-
 										printMessage("Error occurred: " + e.getMessage(), display);
-
 										e.printStackTrace();
 									}
 								}
 							};
 
 							executor.execute(runnable);
-
 						}
-
 					} else if (config.getAhenkInstallMethod() == InstallMethod.WGET) {
 
 						// Calculate progress bar increment size
@@ -387,24 +336,20 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 
 											printMessage("Downloading Ahenk .deb package from: "
 													+ config.getAhenkDownloadUrl(), display);
-
 											SetupUtils.downloadPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
 													config.getAhenkDownloadUrl());
-
 											printMessage("Successfully downloaded file", display);
 
 											printMessage("Ahenk is being installed to: " + ip
 													+ " from downloaded .deb file.", display);
-
 											SetupUtils.installDownloadedPackage(ip, config.getUsernameCm(),
 													config.getPasswordCm(), config.getPort(),
 													config.getPrivateKeyAbsPath(), config.getPassphrase(), "ahenk.deb",
 													PackageInstaller.DPKG);
 
 											setProgressBar(increment, display);
-
 											printMessage("Ahenk has been successfully installed to: " + ip, display);
 
 										} else {

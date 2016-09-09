@@ -21,7 +21,6 @@ public class AhenkConfirmPage extends WizardPage {
 	private AhenkSetupConfig config;
 
 	private StyledText ipTextArea;
-	
 	private Label accessLabel;
 	private Label installLabel;
 
@@ -59,14 +58,13 @@ public class AhenkConfirmPage extends WizardPage {
 
 		installLabel = GUIHelper.createLabel(container);
 		installLabel.setLayoutData(gd);
-		
+
 		GUIHelper.createLabel(container, Messages.getString("AHENK_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-		
 		// Set the IP info in the opening of page
 		String allIps = "";
 		for (String ip : config.getIpList()) {

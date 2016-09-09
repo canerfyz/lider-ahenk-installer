@@ -37,14 +37,15 @@ import tr.org.liderahenk.installer.lider.wizard.model.LiderNodeInfoModel;
 import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
+import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class LiderClusterInstallationStatus extends WizardPage
@@ -113,7 +114,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			final Display display = Display.getCurrent();
 
 			setPageCompleteAsync(isInstallationFinished, display);
-			
+
 			clearLogConsole(display);
 
 			// Create a thread pool
@@ -130,7 +131,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			Runnable mainRunnable = new Runnable() {
 				@Override
 				public void run() {
-					
+
 					// To identify first node
 					int i = 1;
 					for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap().entrySet()
@@ -138,11 +139,11 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 						Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 						final LiderNodeInfoModel clusterNode = entry.getValue();
-						
+
 						Callable<Boolean> callable = new LiderClusterInstallCallable(clusterNode.getNodeIp(),
-								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(), clusterNode.getNodeXmppPresencePriority(), display, config,
-								txtLogConsole, i == 1);
-						
+								clusterNode.getNodeRootPwd(), clusterNode.getNodeXmppResource(),
+								clusterNode.getNodeXmppPresencePriority(), display, config, txtLogConsole, i == 1);
+
 						Future<Boolean> result = executor.submit(callable);
 						resultList.add(result);
 					}
@@ -187,7 +188,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 								installDependenciesToNode(clusterNode, display);
 
 								sendCellarConfig(clusterNode, display);
-								
+
 								startNode(clusterNode, display);
 
 							}
@@ -202,7 +203,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 							}
 
 							Thread.sleep(20000);
-							
+
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
 
@@ -271,16 +272,17 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
-						
+
 						if (!isInstallationFinished) {
 							try {
 								openDownloadUrl();
 							} catch (Exception e) {
 								e.printStackTrace();
-								txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
-										? txtLogConsole.getText() + "\n" : "")
-										+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
-										+ PropertyReader.property("troubleshooting.url"));
+								txtLogConsole
+										.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
+												? txtLogConsole.getText() + "\n" : "")
+												+ Messages.getString("CANNOT_OPEN_BROWSER_PLEASE_GO_TO") + "\n"
+												+ PropertyReader.property("troubleshooting.url"));
 							}
 						}
 					}
@@ -296,7 +298,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 		return PageFlowHelper.selectNextPage(config, this);
 
 	}
-	
+
 	private void openDownloadUrl() throws IOException {
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
@@ -312,10 +314,10 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
-			
+
 			printMessage(Messages.getString("CREATING_CELLAR_CFG_FILE"), display);
 			inputStream = this.getClass().getClassLoader().getResourceAsStream("org.apache.karaf.cellar.groups.cfg");
-			cellarCfg = SetupUtils.streamToFile(inputStream, "org.apache.karaf.cellar.groups.cfg");
+			cellarCfg = LiderAhenkUtils.streamToFile(inputStream, "org.apache.karaf.cellar.groups.cfg");
 			printMessage(Messages.getString("SUCCESSFULLY_CREATED_CELLAR_CFG_FILE"), display);
 
 			String copyPath = "/opt/" + PropertyReader.property("lider.package.name") + "/etc/";
@@ -323,14 +325,13 @@ public class LiderClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SENDING_CELLAR_CFG_FILE_TO_", clusterNode.getNodeIp()), display);
 			manager.copyFileToRemote(cellarCfg, copyPath, false);
 			printMessage(Messages.getString("SUCCESSFULLY_SENT_CELLAR_CFG_FILE_TO_", clusterNode.getNodeIp()), display);
-			
+
 			logger.log(Level.INFO, "Successfully sent org.apache.karaf.cellar.groups.cfg to: {0}",
 					new Object[] { clusterNode.getNodeIp() });
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CELLAR_CFG_AT_", clusterNode.getNodeIp()), display);
-			printMessage(
-					Messages.getString("EXCEPTION_MESSAG_AT", e.getMessage(), clusterNode.getNodeIp()),
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CELLAR_CFG_AT_", clusterNode.getNodeIp()),
 					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAG_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -391,28 +392,31 @@ public class LiderClusterInstallationStatus extends WizardPage
 	}
 
 	private void installDependenciesToNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
-		
+
 		SSHManager manager = null;
-		
+
 		try {
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
-			
+
 			printMessage(Messages.getString("INSTALLING_DEPENDENCIES_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DEPENDENCIES_AT_", clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Successfully installed dependencies at {0}", new Object[] { clusterNode.getNodeIp() });
-			
+			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DEPENDENCIES_AT_", clusterNode.getNodeIp()),
+					display);
+			logger.log(Level.INFO, "Successfully installed dependencies at {0}",
+					new Object[] { clusterNode.getNodeIp() });
+
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
-			
+
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_DEPENDENCIES_AT_", clusterNode.getNodeIp()),
+			printMessage(
+					Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_DEPENDENCIES_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
@@ -423,15 +427,15 @@ public class LiderClusterInstallationStatus extends WizardPage
 				manager.disconnect();
 			}
 		}
-		
+
 	}
-	
+
 	private void startNode(LiderNodeInfoModel clusterNode, Display display) throws Exception {
 
 		SSHManager manager = null;
 
 		try {
-			
+
 			SSHManager.USE_PTY = false;
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
@@ -500,10 +504,9 @@ public class LiderClusterInstallationStatus extends WizardPage
 			e.printStackTrace();
 			throw new Exception();
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_SERVICE_WRAPPER_AT_NODE", clusterNode.getNodeIp()), display);
-			printMessage(
-					Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()),
-					display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_SERVICE_WRAPPER_AT_NODE",
+					clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -518,13 +521,11 @@ public class LiderClusterInstallationStatus extends WizardPage
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
-			printMessage(Messages.getString("MODIFYING_KARAF_WRAPPER_CONF_AT_", clusterNode.getNodeIp()),
-					display);
+			printMessage(Messages.getString("MODIFYING_KARAF_WRAPPER_CONF_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand(
 					"sed -i '/set.default.JAVA_HOME/c\\set.default.JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre' /opt/{0}/etc/karaf-wrapper.conf",
 					new Object[] { PropertyReader.property("lider.package.name") });
-			printMessage(
-					Messages.getString("SUCCESSFULLY_MODIFIED_KARAF_WRAPPER_CONF_AT_", clusterNode.getNodeIp()),
+			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_KARAF_WRAPPER_CONF_AT_", clusterNode.getNodeIp()),
 					display);
 			logger.log(Level.INFO, "Successfully modified Karaf wrapper at {0}",
 					new Object[] { clusterNode.getNodeIp() });
@@ -538,10 +539,9 @@ public class LiderClusterInstallationStatus extends WizardPage
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
-			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_KARAF_WRAPPER_CONF_AT_", clusterNode.getNodeIp()), display);
-			printMessage(
-					Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()),
-					display);
+			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_KARAF_WRAPPER_CONF_AT_",
+					clusterNode.getNodeIp()), display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -577,8 +577,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 				}
 			});
 
-			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT_", clusterNode.getNodeIp()),
-					display);
+			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT_", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });
 			SSHManager.USE_PTY = true;
 
@@ -592,9 +591,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_KARAF_AS_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
-			printMessage(
-					Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()),
-					display);
+			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
 			throw new Exception();
@@ -649,8 +646,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 		map.put("#CLUSTER_CLIENTS_SSL", propertyMap.get("CLUSTER_CLIENTS_SSL"));
 		map.put("#CLUSTER_SERVERS", propertyMap.get("CLUSTER_SERVERS"));
 
-		haproxyCfg = SetupUtils.replace(map, haproxyCfg);
-		File haproxyCfgFile = SetupUtils.writeToFile(haproxyCfg, "haproxy.cfg");
+		haproxyCfg = LiderAhenkUtils.replace(map, haproxyCfg);
+		File haproxyCfgFile = LiderAhenkUtils.writeToFile(haproxyCfg, "haproxy.cfg");
 		printMessage(Messages.getString("SUCCESSFULLY_CREATED_HAPROXY_CONFIG_FILE"), display);
 		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
 
@@ -817,7 +814,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 		return readingText;
 	}
-
 
 	@Override
 	public IWizardPage getPreviousPage() {
