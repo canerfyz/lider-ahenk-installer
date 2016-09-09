@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
@@ -33,13 +34,26 @@ public class StringUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String convertStream(InputStream is) throws IOException {
+	public static String convertStream(InputStream is) {
 		String output;
 		StringBuffer outputBuffer = new StringBuffer();
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(is));
-		while ((output = streamReader.readLine()) != null) {
-			outputBuffer.append(output);
-			outputBuffer.append("\n");
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+			while ((output = br.readLine()) != null) {
+				outputBuffer.append(output);
+				outputBuffer.append("\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return outputBuffer.toString();
 	}

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +25,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
  * commands.
  * 
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class SSHManager {
@@ -82,10 +84,9 @@ public class SSHManager {
 	public void connect() throws SSHConnectionException {
 		try {
 			if (privateKey != null && !privateKey.isEmpty()) {
-				if (passphrase != null || !"".equals(passphrase)) {
-					SSHChannel.addIdentity(privateKey, passphrase.getBytes());
-				}
-				else {
+				if (passphrase != null && !passphrase.isEmpty()) {
+					SSHChannel.addIdentity(privateKey, passphrase.getBytes(StandardCharsets.UTF_8));
+				} else {
 					SSHChannel.addIdentity(privateKey);
 				}
 			}
@@ -101,8 +102,6 @@ public class SSHManager {
 			throw new SSHConnectionException(e.getMessage());
 		}
 	}
-	
-	public static boolean USE_PTY = true;
 
 	/**
 	 * Executes command string via SSH
@@ -112,7 +111,7 @@ public class SSHManager {
 	 * @param outputStreamProvider
 	 *            Provides an array of bytes which is used to pass arguments to
 	 *            the command executed.
-	 * @return 
+	 * @return
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 * 
@@ -121,18 +120,18 @@ public class SSHManager {
 			throws CommandExecutionException {
 
 		Channel channel = null;
-		
+
 		logger.log(Level.INFO, "Command: {0}", command);
 
 		String output = null;
-		
+
 		try {
 			channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand(command);
 
 			// Open channel and handle output stream
 			InputStream inputStream = channel.getInputStream();
-			((ChannelExec) channel).setPty(USE_PTY);
+			((ChannelExec) channel).setPty(true);
 
 			OutputStream outputStream = null;
 			byte[] byteArray = null;
@@ -156,7 +155,7 @@ public class SSHManager {
 					int i = inputStream.read(tmp, 0, 1024);
 					if (i < 0)
 						break;
-					output = new String(tmp, 0, i);
+					output = new String(tmp, 0, i, StandardCharsets.UTF_8);
 					logger.log(Level.INFO, output);
 				}
 				if (channel.isClosed()) {
@@ -164,7 +163,7 @@ public class SSHManager {
 					if (channel.getExitStatus() != 0) {
 						throw new CommandExecutionException("Exit status: " + channel.getExitStatus());
 					}
-					
+
 					break;
 				}
 				try {
@@ -174,9 +173,11 @@ public class SSHManager {
 				}
 			}
 
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.getMessage());
-			throw new CommandExecutionException(e.getMessage());
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e1) {
+			logger.log(Level.SEVERE, e1.getMessage());
+			throw new CommandExecutionException(e1.getMessage());
 		} finally {
 			if (channel != null) {
 				try {
@@ -185,7 +186,7 @@ public class SSHManager {
 				}
 			}
 		}
-		
+
 		return output;
 	}
 
@@ -235,12 +236,9 @@ public class SSHManager {
 	 */
 	public void copyFileToRemote(final File fileToTransfer, final String destDirectory, final boolean preserveTimestamp)
 			throws CommandExecutionException {
-
 		FileInputStream fis = null;
 		String error = null;
-
 		try {
-
 			String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t " + destDirectory
 					+ fileToTransfer.getName();
 
@@ -263,7 +261,7 @@ public class SSHManager {
 				// The access time should be sent here,
 				// but it is not accessible with JavaAPI ;-<
 				command += (" " + (fileToTransfer.lastModified() / 1000) + " 0\n");
-				out.write(command.getBytes());
+				out.write(command.getBytes(StandardCharsets.UTF_8));
 				out.flush();
 				if ((error = checkAck(in)) != null) {
 					throw new CommandExecutionException(error);
@@ -273,7 +271,7 @@ public class SSHManager {
 			// send scp command
 			long filesize = fileToTransfer.length();
 			command = "C0644 " + filesize + " " + fileToTransfer.getName() + "\n";
-			out.write(command.getBytes());
+			out.write(command.getBytes(StandardCharsets.UTF_8));
 			out.flush();
 			if ((error = checkAck(in)) != null) {
 				throw new CommandExecutionException(error);
@@ -288,8 +286,6 @@ public class SSHManager {
 					break;
 				out.write(buf, 0, len); // out.flush();
 			}
-			fis.close();
-			fis = null;
 			// send '\0'
 			buf[0] = 0;
 			out.write(buf, 0, 1);
@@ -301,9 +297,18 @@ public class SSHManager {
 
 			channel.disconnect();
 
-		} catch (Exception e) {
-			logger.log(Level.SEVERE, e.getMessage());
-			throw new CommandExecutionException(e.getMessage());
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e1) {
+			logger.log(Level.SEVERE, e1.getMessage());
+			throw new CommandExecutionException(e1.getMessage());
+		} finally {
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 
 	}
@@ -321,9 +326,7 @@ public class SSHManager {
 				c = in.read();
 				sb.append((char) c);
 			} while (c != '\n');
-			if (b == 1 || b == 2) { // error
-				return sb.toString();
-			}
+			return sb.toString();
 		}
 		return null;
 	}

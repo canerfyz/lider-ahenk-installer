@@ -348,7 +348,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 		SSHManager manager = null;
 
 		try {
-			SSHManager.USE_PTY = false;
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
@@ -383,7 +382,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 			e.printStackTrace();
 			throw new Exception();
 		} finally {
-			SSHManager.USE_PTY = false;
 			if (manager != null) {
 				manager.disconnect();
 			}
@@ -436,7 +434,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 		try {
 
-			SSHManager.USE_PTY = false;
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
@@ -465,7 +462,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 			e.printStackTrace();
 			throw new Exception();
 		} finally {
-			SSHManager.USE_PTY = true;
 			if (manager != null) {
 				manager.disconnect();
 			}
@@ -529,7 +525,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 					display);
 			logger.log(Level.INFO, "Successfully modified Karaf wrapper at {0}",
 					new Object[] { clusterNode.getNodeIp() });
-			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
@@ -552,8 +547,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 		}
 
 		try {
-			SSHManager.USE_PTY = false;
-
 			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
@@ -579,7 +572,6 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT_", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });
-			SSHManager.USE_PTY = true;
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);

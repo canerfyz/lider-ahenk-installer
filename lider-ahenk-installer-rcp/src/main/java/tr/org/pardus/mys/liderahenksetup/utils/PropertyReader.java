@@ -59,7 +59,7 @@ public class PropertyReader {
 
 	public static Integer propertyInt(String key) {
 		String val = property(key);
-		return val != null ? new Integer(val.trim()) : null;
+		return val != null ? Integer.valueOf(val.trim()) : null;
 	}
 
 }

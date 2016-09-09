@@ -26,30 +26,30 @@ import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 
 /**
- * Utility class which provides common network methods (such as
- * finding IP addresses, scanning network etc.) 
+ * Utility class which provides common network methods (such as finding IP
+ * addresses, scanning network etc.)
  * 
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class NetworkUtils {
-	
-	private static final Logger logger = Logger.getLogger(NetworkUtils.class
-			.getName());
-	
+
+	private static final Logger logger = Logger.getLogger(NetworkUtils.class.getName());
+
 	public static final String IPV4 = "ipv4";
 	public static final String HOST_UP = "up";
 	public static final String DISTANCE_UNIT = "hop";
 	public static final String MAC = "mac";
 	public static final String PORT_OPEN = "open";
-	
+
 	/**
 	 * IP address pattern
 	 */
 	private static final Pattern IP_PATTERN = Pattern
 			.compile("^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
-	
+
 	/**
 	 * Modify lider-config.properties
 	 */
@@ -61,108 +61,145 @@ public class NetworkUtils {
 		String limit = PropertyReader.property("os.limit");
 		OS_LIMIT = limit != null ? Integer.parseInt(limit) : OS_LIMIT;
 	}
-	
+
 	/**
 	 * 
 	 * @return all IP addresses of the network to which the machine belongs
-	 * @throws UnknownHostException 
-	 * @throws SocketException 
+	 * @throws UnknownHostException
+	 * @throws SocketException
 	 */
 	public static List<String> findIpAddresses() throws UnknownHostException, SocketException {
 
 		List<String> ipAddresses = new ArrayList<String>();
 		boolean add1921681 = true;
-		// Find all IP ranges of network interfaces belonging to the local machine. 
-		// (It may have multiple network interfaces, therefore might have multiple IP addresses)
-    	Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-    	while (netInterfaces.hasMoreElements()) {
-    		// http://bugs.java.com/view_bug.do?bug_id=6707289
-    		NetworkInterface iface = netInterfaces.nextElement();
-    		if (!iface.getName().contains("lo")) { // Consider only eth networks, skip localhost
-    			for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
-    				if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports only IPv4 at the moment, 
-    																		   // So max mask length cannot exceed 32!
-    					try {
-    						SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
-    						String[] adresses = subnet.getInfo().getAllAddresses();
-    						ipAddresses.addAll(Arrays.asList(adresses));
-    						if (adresses.length > 0) {
-    							if (adresses[0].startsWith("192.168.1.")) {
-    								add1921681 = false;
-    							}
-    						}
-    						logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
-						} catch (Exception e) {	
+		// Find all IP ranges of network interfaces belonging to the local
+		// machine.
+		// (It may have multiple network interfaces, therefore might have
+		// multiple IP addresses)
+		Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+		while (netInterfaces.hasMoreElements()) {
+			// http://bugs.java.com/view_bug.do?bug_id=6707289
+			NetworkInterface iface = netInterfaces.nextElement();
+			if (!iface.getName().contains("lo")) { // Consider only eth
+													// networks, skip localhost
+				for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
+					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports
+																				// only
+																				// IPv4
+																				// at
+																				// the
+																				// moment,
+																				// So
+																				// max
+																				// mask
+																				// length
+																				// cannot
+																				// exceed
+																				// 32!
+						try {
+							SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/"
+									+ ifaceAddress.getNetworkPrefixLength());
+							String[] adresses = subnet.getInfo().getAllAddresses();
+							ipAddresses.addAll(Arrays.asList(adresses));
+							if (adresses.length > 0) {
+								if (adresses[0].startsWith("192.168.1.")) {
+									add1921681 = false;
+								}
+							}
+							logger.log(Level.INFO, "iface " + iface.getName() + " has address "
+									+ ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
+						} catch (Exception e) {
 							e.printStackTrace();
-							logger.log(Level.SEVERE, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength(), e);
+							logger.log(
+									Level.SEVERE, "iface " + iface.getName() + " has address "
+											+ ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength(),
+									e);
 						}
-    					
-    				}
-    			}
-    		}
-    	}
-    	if (add1921681) {
-    		for(int i=1;i<256;i++) {
-    			ipAddresses.add(i-1, ("192.168.1."+i));
-    		}
-    	}
-    	
-    	logger.log(Level.INFO, "IP addresses have been found. Returning results.");
+
+					}
+				}
+			}
+		}
+		if (add1921681) {
+			for (int i = 1; i < 256; i++) {
+				ipAddresses.add(i - 1, ("192.168.1." + i));
+			}
+		}
+
+		logger.log(Level.INFO, "IP addresses have been found. Returning results.");
 
 		return ipAddresses;
 	}
-	
+
 	/**
 	 * Finds all IP ranges of the network interfaces which the local machine has
+	 * 
 	 * @return array list of ip ranges in CIDR notation
 	 * @throws UnknownHostException
 	 * @throws SocketException
 	 */
 	public static List<String> findIpRanges() throws UnknownHostException, SocketException {
-		
-		ArrayList<String> ipRanges = new ArrayList<String>();
-    	
-		// Find all IP ranges of network interfaces belonging to the local machine. 
-		// (It may have multiple network interfaces, therefore might have multiple IP addresses)
-    	Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
-    	while (netInterfaces.hasMoreElements()) {
-    		// http://bugs.java.com/view_bug.do?bug_id=6707289
-    		NetworkInterface iface = netInterfaces.nextElement();
-    		if (!iface.getName().contains("lo")) { // Consider only eth networks, skip localhost
-    			for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
-    				if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports only IPv4 at the moment, 
-    																		   // So max mask cannot exceed 32!
-    					SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
-    					String ipRange = subnet.getInfo().getLowAddress() + "/" + ifaceAddress.getNetworkPrefixLength();
-    					ipRanges.add(ipRange);
 
-    					logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
-    				}
-    			}
-    		}
-    	}
-    	
-    	logger.log(Level.INFO, "IP ranges have been found. Returning results.");
+		ArrayList<String> ipRanges = new ArrayList<String>();
+
+		// Find all IP ranges of network interfaces belonging to the local
+		// machine.
+		// (It may have multiple network interfaces, therefore might have
+		// multiple IP addresses)
+		Enumeration<NetworkInterface> netInterfaces = NetworkInterface.getNetworkInterfaces();
+		while (netInterfaces.hasMoreElements()) {
+			// http://bugs.java.com/view_bug.do?bug_id=6707289
+			NetworkInterface iface = netInterfaces.nextElement();
+			if (!iface.getName().contains("lo")) { // Consider only eth
+													// networks, skip localhost
+				for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
+					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports
+																				// only
+																				// IPv4
+																				// at
+																				// the
+																				// moment,
+																				// So
+																				// max
+																				// mask
+																				// cannot
+																				// exceed
+																				// 32!
+						SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/"
+								+ ifaceAddress.getNetworkPrefixLength());
+						String ipRange = subnet.getInfo().getLowAddress() + "/" + ifaceAddress.getNetworkPrefixLength();
+						ipRanges.add(ipRange);
+
+						logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress()
+								+ "/" + ifaceAddress.getNetworkPrefixLength());
+					}
+				}
+			}
+		}
+
+		logger.log(Level.INFO, "IP ranges have been found. Returning results.");
 
 		return ipRanges;
 	}
-	
-	public static ArrayList<Host> scanNetwork(NmapParameters params) throws CommandExecutionException, IOException, InterruptedException {
-		
+
+	public static ArrayList<Host> scanNetwork(NmapParameters params)
+			throws CommandExecutionException, IOException, InterruptedException {
+
 		logger.log(Level.INFO, "Scanning network with parameters: {0}", params);
 
 		try {
-			
+
 			LiderNmap4j nmap = new LiderNmap4j(PropertyReader.property("nmap.path"));
 			nmap.includeHosts(params.getIpRange());
-			
+
 			// Build flags
 			StringBuilder flags = new StringBuilder(" -v ");
 			if (params.getPorts() != null && !params.getPorts().isEmpty()) {
 				flags.append(" -p ").append(params.getPorts());
 			}
 			if (params.getSudoPassword() != null && !params.getSudoPassword().isEmpty()) {
-				nmap.useSudo(params.getSudoUsername() == null ? "root" : params.getSudoUsername(), params.getSudoPassword());
+				nmap.useSudo(params.getSudoUsername() == null ? "root" : params.getSudoUsername(),
+						params.getSudoPassword());
 				flags.append(" -O --osscan-guess ");
 			}
 			if (params.getTimingTemplate() != null && !params.getTimingTemplate().isEmpty()) {
@@ -171,22 +208,22 @@ public class NetworkUtils {
 			nmap.addFlags(flags.toString());
 
 			nmap.execute();
-			
+
 			if (!nmap.hasError()) {
 				NMapRun nmapRun = nmap.getResult();
 				logger.log(Level.INFO, "Finished scanning network. Returning results");
-				return nmapRun != null ? nmapRun.getHosts(): null;
+				return nmapRun != null ? nmapRun.getHosts() : null;
 			} else {
 				logger.log(Level.SEVERE, nmap.getExecutionResults().getErrors());
 				throw new CommandExecutionException(nmap.getExecutionResults().getErrors());
 			}
-			
+
 		} catch (NMapInitializationException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		} catch (NMapExecutionException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		}
-		
+
 		return null;
 	}
 
@@ -196,7 +233,8 @@ public class NetworkUtils {
 		}
 		String[] nums = ipRange.split("-");
 		String firstIp = nums[0];
-		String lastIp = firstIp.substring(0, firstIp.lastIndexOf(".") + 1) + nums[1];
+		// 46: dot character
+		String lastIp = firstIp.substring(0, firstIp.lastIndexOf(46) + 1) + nums[1];
 		List<String> ipList = new ArrayList<String>();
 		String currentIp = firstIp;
 		while (true) {
@@ -208,22 +246,24 @@ public class NetworkUtils {
 		}
 		return ipList;
 	}
-	
+
 	public static String getNextIPV4Address(String ip) {
-	    String[] nums = ip.split("\\.");
-	    int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8
-	          |  Integer.parseInt(nums[1]) << 16 | Integer.parseInt(nums[3])) + 1;
+		String[] nums = ip.split("\\.");
+		int i = (Integer.parseInt(nums[0]) << 24 | Integer.parseInt(nums[2]) << 8 | Integer.parseInt(nums[1]) << 16
+				| Integer.parseInt(nums[3])) + 1;
 
-	    // If you wish to skip over .255 addresses.
-	    if ((byte) i == -1) i++;
+		// If you wish to skip over .255 addresses.
+		if ((byte) i == -1)
+			i++;
 
-	    return String.format("%d.%d.%d.%d", i >>> 24 & 0xFF, i >> 16 & 0xFF,
-	                                        i >>   8 & 0xFF, i >>  0 & 0xFF);
+		return String.format("%d.%d.%d.%d", i >>> 24 & 0xFF, i >> 16 & 0xFF, i >> 8 & 0xFF, i >> 0 & 0xFF);
 	}
 
 	/**
-	 * Converts a collection of ordered IP addresses to IP range string
-	 * ( e.g. ipList = {"192.168.1.50", "192.168.1.51", "192.168.1.52"} returns ipRange = "192.168.1.50-52" )
+	 * Converts a collection of ordered IP addresses to IP range string ( e.g.
+	 * ipList = {"192.168.1.50", "192.168.1.51", "192.168.1.52"} returns ipRange
+	 * = "192.168.1.50-52" )
+	 * 
 	 * @param ipList
 	 * @return
 	 */
@@ -234,19 +274,19 @@ public class NetworkUtils {
 		if (ipList.size() == 1) {
 			return ipList.get(0);
 		}
-		String ipRange = ipList.get(0) + "-" + ipList.get(ipList.size()-1).split("\\.")[3];
+		String ipRange = ipList.get(0) + "-" + ipList.get(ipList.size() - 1).split("\\.")[3];
 		return isIpRangeValid(ipRange) ? ipRange : null;
 	}
-	
+
 	// TODO
 	public static boolean isIpRangeValid(String ipRange) {
 		return true;
 	}
-	
+
 	public static boolean isLocal(String ip) {
 		return "127.0.0.1".equals(ip) || "localhost".equals(ip);
 	}
-	
+
 	/**
 	 * 
 	 * @param ip
@@ -267,10 +307,7 @@ public class NetworkUtils {
 	 */
 	public static boolean isIpReachable(String ip) {
 		try {
-			return InetAddress.getByName(ip)
-					.isReachable(
-							Integer.parseInt(PropertyReader
-									.property("network.timeout")));
+			return InetAddress.getByName(ip).isReachable(Integer.parseInt(PropertyReader.property("network.timeout")));
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, e.getMessage());
 		}
@@ -279,8 +316,8 @@ public class NetworkUtils {
 
 	//
 	// Helper methods for Host class
-	// 
-	
+	//
+
 	public static String getIpV4(Host host) {
 		if (host != null && host.getAddresses() != null) {
 			for (Address address : host.getAddresses()) {
@@ -325,7 +362,7 @@ public class NetworkUtils {
 			for (Address address : host.getAddresses()) {
 				if (MAC.equalsIgnoreCase(address.getAddrtype())) {
 					return address.getAddr();
-				}				
+				}
 			}
 		}
 		return null;
@@ -337,7 +374,7 @@ public class NetworkUtils {
 				if (MAC.equalsIgnoreCase(address.getAddrtype())) {
 					return address.getVendor();
 				}
-			}			
+			}
 		}
 		return null;
 	}
@@ -347,12 +384,10 @@ public class NetworkUtils {
 			StringBuilder portsStr = new StringBuilder();
 			for (Port port : host.getPorts().getPorts()) {
 				if (PORT_OPEN.equalsIgnoreCase(port.getState().getState())) {
-					portsStr.append(port.getPortId()).append("/")
-							.append(port.getProtocol()).append(" ")
-							.append(port.getService().getName())
-							.append("\n");
+					portsStr.append(port.getPortId()).append("/").append(port.getProtocol()).append(" ")
+							.append(port.getService().getName()).append("\n");
 				}
-			}	
+			}
 			return portsStr.toString();
 		}
 		return null;
@@ -361,14 +396,10 @@ public class NetworkUtils {
 	public static String getOsGuess(Host host) {
 		if (host != null && host.getOs() != null && host.getOs().getOsMatches() != null) {
 			StringBuilder osStr = new StringBuilder();
-			for (int i = 0, osCount = 0; i < host.getOs().getOsMatches().size()
-					&& osCount < OS_LIMIT; i++) {
+			for (int i = 0, osCount = 0; i < host.getOs().getOsMatches().size() && osCount < OS_LIMIT; i++) {
 				OsMatch os = host.getOs().getOsMatches().get(i);
-				if (os.getAccuracy() != null
-						&& Integer.parseInt(os.getAccuracy()) > OS_ACCURACY_THRESHOLD) {
-					osStr.append("(%").append(os.getAccuracy())
-					.append(") ").append(os.getName())
-					.append("\n");
+				if (os.getAccuracy() != null && Integer.parseInt(os.getAccuracy()) > OS_ACCURACY_THRESHOLD) {
+					osStr.append("(%").append(os.getAccuracy()).append(") ").append(os.getName()).append("\n");
 					osCount++;
 				}
 			}
@@ -376,7 +407,7 @@ public class NetworkUtils {
 		}
 		return null;
 	}
-	
+
 	//
 	// Helper methods end
 	//

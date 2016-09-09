@@ -225,10 +225,7 @@ public class GUIHelper {
 			MouseListener mouseListener) {
 
 		final Label imageButton = new Label(parent, SWT.NONE);
-
-		if (imageButton != null) {
-			imageButton.setImage(image);
-		}
+		imageButton.setImage(image);
 
 		if (mouseOverImage != null) {
 			imageButton.addListener(SWT.MouseEnter, new Listener() {

@@ -20,7 +20,7 @@ public class FontProvider {
 	public static final String HEADER_FONT = "header-font";
 	public static final String INPUT_FONT = "input-font";
 
-	public static FontProvider getInstance() {
+	public synchronized static FontProvider getInstance() {
 		if (instance == null) {
 			instance = new FontProvider();
 			instance.registerSystemWideFonts();

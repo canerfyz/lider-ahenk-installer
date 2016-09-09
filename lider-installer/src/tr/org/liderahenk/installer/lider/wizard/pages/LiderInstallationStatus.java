@@ -208,7 +208,6 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 								+ "/bin/karaf > /dev/null 2>&1 &";
 
 						printMessage(Messages.getString("STARTING_LIDER"));
-						SSHManager.USE_PTY = false;
 						// Start Karaf
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
@@ -218,7 +217,6 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 										return "\n".getBytes(StandardCharsets.UTF_8);
 									}
 								});
-						SSHManager.USE_PTY = true;
 						try {
 							Thread.sleep(30000);
 						} catch (Exception e) {

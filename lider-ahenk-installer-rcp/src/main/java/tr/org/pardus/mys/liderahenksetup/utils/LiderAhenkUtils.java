@@ -4,10 +4,11 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -47,45 +48,53 @@ public class LiderAhenkUtils {
 	 * @param fileName
 	 * @return absolute path of created temp file
 	 */
-	public static String writeToFileReturnPath(String content, String fileName) {
-
+	public static synchronized String writeToFileReturnPath(String content, String fileName) {
 		String absPath = null;
-
+		BufferedWriter bw = null;
 		try {
 			File temp = new File(System.getProperty("java.io.tmpdir") + "/" + fileName);
-
-			FileWriter fileWriter = new FileWriter(temp.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), StandardCharsets.UTF_8));
+			bw.write(content);
+			bw.flush();
 			absPath = temp.getAbsolutePath();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+				}
+			}
 		}
-
 		return absPath;
 	}
 
 	public static File streamToFile(InputStream stream, String filename) {
+		OutputStream os = null;
 		try {
 			File file = new File(System.getProperty("java.io.tmpdir") + File.separator + filename);
-			OutputStream outputStream = new FileOutputStream(file);
+			os = new FileOutputStream(file);
 			int read = 0;
 			byte[] bytes = new byte[1024];
-
 			while ((read = stream.read(bytes)) != -1) {
-				outputStream.write(bytes, 0, read);
+				os.write(bytes, 0, read);
 			}
-
-			outputStream.close();
 			return file;
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		return null;
 	}
@@ -99,24 +108,27 @@ public class LiderAhenkUtils {
 	 * @return created file
 	 */
 	public static synchronized File writeToFile(String content, String fileName) {
-
-		File tempFile = null;
-
+		File temp = null;
+		BufferedWriter bw = null;
 		try {
-			tempFile = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
-
-			FileWriter fileWriter = new FileWriter(tempFile.getAbsoluteFile());
-
-			BufferedWriter buffWriter = new BufferedWriter(fileWriter);
-
-			buffWriter.write(content);
-			buffWriter.close();
-
-		} catch (Exception e) {
-			e.printStackTrace();
+			temp = new File(System.getProperty("java.io.tmpdir") + File.separator + fileName);
+			bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(temp), StandardCharsets.UTF_8));
+			bw.write(content);
+			bw.flush();
+		} catch (RuntimeException e) {
+			throw e;
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			if (bw != null) {
+				try {
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-
-		return tempFile;
+		return temp;
 	}
 
 }

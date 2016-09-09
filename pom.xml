@@ -19,7 +19,7 @@
 		<tycho.version>0.23.0</tycho.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.plugin.version>2.5.1</maven.compiler.plugin.version>
-		<findbugs.maven.plugin.version>3.0.0</findbugs.maven.plugin.version>
+		<findbugs.maven.plugin.version>3.0.4</findbugs.maven.plugin.version>
 		<checkstyle.maven.plugin.version>2.12</checkstyle.maven.plugin.version>
 		<mars.repo.url>http://download.eclipse.org/releases/mars</mars.repo.url>
 		<orbit.repo.url>http://download.eclipse.org/tools/orbit/downloads/drops/R20151118145958/repository</orbit.repo.url>
@@ -131,6 +131,11 @@
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>${findbugs.maven.plugin.version}</version>
 				<configuration>
+					<!-- Enables analysis which takes more memory but finds more bugs. If 
+						you run out of memory, changes the value of the effort element to 'low'. -->
+					<effort>Max</effort>
+					<!-- Reports all bugs (other values are medium and max) -->
+					<threshold>Low</threshold>
 					<xmlOutput>true</xmlOutput>
 					<findbugsXmlOutput>true</findbugsXmlOutput>
 				</configuration>
@@ -156,7 +161,7 @@
 							</execution>
 						</executions>
 						<configuration>
-							<failOnError>true</failOnError>
+							<failOnError>false</failOnError>
 							<excludeFilterFile>${main.basedir}/findbugs/findbugs-exclude.xml</excludeFilterFile>
 						</configuration>
 					</plugin>

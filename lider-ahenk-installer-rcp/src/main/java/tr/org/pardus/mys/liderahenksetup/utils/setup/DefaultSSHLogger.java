@@ -10,15 +10,14 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
  */
 public class DefaultSSHLogger implements com.jcraft.jsch.Logger {
 
-	public static Hashtable<Integer, String> name = null;
-
+	private static Hashtable<Integer, String> name = null;
 	static {
 		name = new Hashtable<Integer, String>();
-		name.put(new Integer(DEBUG), "DEBUG: ");
-		name.put(new Integer(INFO), "INFO: ");
-		name.put(new Integer(WARN), "WARN: ");
-		name.put(new Integer(ERROR), "ERROR: ");
-		name.put(new Integer(FATAL), "FATAL: ");
+		name.put(Integer.valueOf(DEBUG), "DEBUG: ");
+		name.put(Integer.valueOf(INFO), "INFO: ");
+		name.put(Integer.valueOf(WARN), "WARN: ");
+		name.put(Integer.valueOf(ERROR), "ERROR: ");
+		name.put(Integer.valueOf(FATAL), "FATAL: ");
 	}
 
 	@Override
@@ -30,7 +29,7 @@ public class DefaultSSHLogger implements com.jcraft.jsch.Logger {
 	@Override
 	public void log(int level, String message) {
 		// TODO
-		System.err.print(name.get(new Integer(level)));
+		System.err.print(name.get(Integer.valueOf(level)));
 		System.err.println(message);
 	}
 
