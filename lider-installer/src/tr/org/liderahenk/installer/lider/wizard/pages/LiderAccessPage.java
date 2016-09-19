@@ -40,9 +40,9 @@ public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNe
 	private FileDialog dialog;
 	private String selectedFile;
 	private Text passphraseTxt;
-	
+
 	private NextPageEventType nextPageEventType;
-	
+
 	// Set to true as default otherwise
 	// wizard button activations does not work properly.
 	private boolean goNextPage = true;
@@ -78,7 +78,6 @@ public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNe
 
 		usernameTxt = GUIHelper.createText(childContainer, gdForTextField);
 		usernameTxt.setText("root");
-		usernameTxt.setEditable(false);
 
 		GUIHelper.createLabel(childContainer, Messages.getString("PASSWORD"));
 
@@ -256,7 +255,7 @@ public class LiderAccessPage extends WizardPage implements ILiderPage, ControlNe
 			return this;
 		}
 	}
-	
+
 	private void openConnectionCheckDialog(Shell shell) {
 		// Create a dialog
 		ConnectionCheckDialog ccDialog = new ConnectionCheckDialog(getShell(), config.getLiderIp(),

@@ -14,10 +14,8 @@ import tr.org.liderahenk.installer.lider.wizard.pages.IXmppPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.InstallationStatusPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.LiderClusterConfPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.LiderConfPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppAccessPage;
 import tr.org.liderahenk.installer.lider.wizard.pages.XmppClusterConfPage;
-import tr.org.liderahenk.installer.lider.wizard.pages.XmppConfPage;
 
 /**
  * This contains some helpful methods to control the page flow of wizard.

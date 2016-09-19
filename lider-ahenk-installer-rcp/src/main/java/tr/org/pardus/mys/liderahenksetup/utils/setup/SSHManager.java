@@ -116,7 +116,7 @@ public class SSHManager {
 	 * @throws CommandExecutionException
 	 * 
 	 */
-	public String execCommand(final String command, final IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final IOutputStreamProvider outputStreamProvider, boolean usePty)
 			throws CommandExecutionException {
 
 		Channel channel = null;
@@ -131,7 +131,7 @@ public class SSHManager {
 
 			// Open channel and handle output stream
 			InputStream inputStream = channel.getInputStream();
-			((ChannelExec) channel).setPty(true);
+			((ChannelExec) channel).setPty(usePty);
 
 			OutputStream outputStream = null;
 			byte[] byteArray = null;
@@ -200,7 +200,7 @@ public class SSHManager {
 	 * @throws CommandExecutionException
 	 */
 	public String execCommand(final String command, final Object[] params) throws CommandExecutionException {
-		return execCommand(command, params, null);
+		return execCommand(command, params, null, true);
 	}
 
 	/**
@@ -214,7 +214,7 @@ public class SSHManager {
 	 * @return output of the executed command
 	 * @throws CommandExecutionException
 	 */
-	public String execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider)
+	public String execCommand(final String command, final Object[] params, IOutputStreamProvider outputStreamProvider, boolean usePty)
 			throws CommandExecutionException {
 		String tmpCommand = command;
 		if (params != null) {
@@ -223,7 +223,7 @@ public class SSHManager {
 				tmpCommand = tmpCommand.replaceAll("\\{" + i + "\\}", param);
 			}
 		}
-		return execCommand(tmpCommand, outputStreamProvider);
+		return execCommand(tmpCommand, outputStreamProvider, usePty);
 	}
 
 	/**

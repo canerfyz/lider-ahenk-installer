@@ -485,7 +485,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 				public byte[] getStreamAsByteArray() {
 					return "\n".getBytes(StandardCharsets.UTF_8);
 				}
-			});
+			}, true);
 			Thread.sleep(3000);
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_WRAPPER_AT_NODE_", clusterNode.getNodeIp()),
 					display);
@@ -561,14 +561,14 @@ public class LiderClusterInstallationStatus extends WizardPage
 						public byte[] getStreamAsByteArray() {
 							return "\n".getBytes(StandardCharsets.UTF_8);
 						}
-					});
+					}, true);
 
 			manager.execCommand("update-rc.d karaf-service defaults", new IOutputStreamProvider() {
 				@Override
 				public byte[] getStreamAsByteArray() {
 					return "\n".getBytes(StandardCharsets.UTF_8);
 				}
-			});
+			}, true);
 
 			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_SERVICE_AT_", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });

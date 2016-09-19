@@ -23,12 +23,12 @@ import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.IOutputStreamProvider;
-import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
 
 /**
  * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
  *         Feyzullahoglu</a>
+ * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
  * 
  */
 public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage {
@@ -37,10 +37,19 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 
 	private ProgressBar progressBar;
 	private Text txtLogConsole;
-
 	boolean isInstallationFinished = false;
-
 	boolean canGoBack = false;
+
+	private static final String CREATE_TEMP_DIR = "sudo rm -rf /tmp/lider-temp && mkdir -p /tmp/lider-temp";
+	private static final String INSTALL_DEPENDENCIES = "sudo apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap";
+	private static final String EXTRACT_FILE = "sudo tar -xzvf {0} --directory /opt/";
+	private static final String DOWNLOAD_PACKAGE = "sudo wget --output-document=/tmp/{0} {1}";
+	private static final String START_KARAF = "sudo sh -c 'nohup /opt/{0}/bin/karaf > /dev/null 2>&1 &'";
+	private static final String INSTALL_WRAPPER = "wrapper:install";
+	private static final String UPDATE_KARAF_CONF = "sudo sed -i '/set.default.JAVA_HOME/c\\set.default.JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre' /opt/{0}/etc/karaf-wrapper.conf";
+	private static final String LINK_KARAF_SERVICE = "sudo ln -fs /opt/{0}/bin/karaf-service /etc/init.d/ && sudo update-rc.d karaf-service defaults";
+	private static final String UPDATE_SERVICES = "sudo update-rc.d karaf-service defaults";
+	private static final String MOVE_FILE = "sudo mv -f /tmp/{0} {1}";
 
 	public LiderInstallationStatus(LiderSetupConfig config) {
 		super(LiderInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -74,13 +83,13 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 		if (super.isCurrentPage() && !isInstallationFinished) {
 
 			final Display display = Display.getCurrent();
-			
+
 			Runnable runnable = new Runnable() {
 				@Override
 				public void run() {
 
 					setPageCompleteAsync(isInstallationFinished);
-					
+
 					printMessage(Messages.getString("INITIALIZING_INSTALLATION"));
 					setProgressBar(10);
 
@@ -90,16 +99,27 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						try {
 							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"rm -rf /tmp/lider-temp && mkdir -p /tmp/lider-temp");
-
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), CREATE_TEMP_DIR,
+									new IOutputStreamProvider() {
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							setProgressBar(30);
 
 							printMessage(Messages.getString("INSTALLING_DEPENDENCIES"));
 							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap");
+									INSTALL_DEPENDENCIES, new IOutputStreamProvider() {
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DEPENDENCIES"));
 							setProgressBar(40);
 
@@ -112,10 +132,17 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 							setProgressBar(60);
 
 							printMessage(Messages.getString("EXTRACTING_TAR_GZ_FILE", tar.getName()));
-							SetupUtils.extractTarFile(config.getLiderIp(), config.getLiderAccessUsername(),
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"/tmp/lider-temp/" + tar.getName(), "/opt/");
+									EXTRACT_FILE.replace("{0}", "/tmp/lider-temp/" + tar.getName()),
+									new IOutputStreamProvider() {
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							setProgressBar(90);
 							printMessage(Messages.getString("SUCCESSFULLY_EXTRACTED_TAR_GZ_FILE", tar.getName()));
 
@@ -135,21 +162,33 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						try {
 							printMessage(
 									Messages.getString("DOWNLOADING_TAR_GZ_FILE_FROM", config.getLiderDownloadUrl()));
-
-							SetupUtils.downloadPackage(config.getLiderIp(), config.getLiderAccessUsername(),
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
-									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(), "lider.tar.gz",
-									config.getLiderDownloadUrl());
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
+									DOWNLOAD_PACKAGE.replace("{0}", "lider.tar.gz").replace("{1}",
+											config.getLiderDownloadUrl()),
+									new IOutputStreamProvider() {
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							printMessage(Messages.getString("SUCCESSFULLY_DOWNLOADED_TAR_GZ_FILE_FROM",
 									config.getLiderDownloadUrl()));
-
 							setProgressBar(30);
 
 							printMessage(Messages.getString("EXTRACTING_DOWNLOADED_TAR_GZ_FILE"));
-							SetupUtils.extractTarFile(config.getLiderIp(), config.getLiderAccessUsername(),
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
-									"/tmp/lider.tar.gz", "/opt/");
+									EXTRACT_FILE.replace("{0}", "/tmp/lider.tar.gz"), new IOutputStreamProvider() {
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							setProgressBar(90);
 							printMessage(Messages.getString("SUCCESSFULLY_EXTRACTED_TAR_GZ_FILE"));
 
@@ -164,7 +203,6 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 							printMessage(Messages.getString("ERROR_OCCURED", e.getMessage()));
 							e.printStackTrace();
 						}
-
 					} else {
 						isInstallationFinished = false;
 						printMessage(Messages.getString("INVALID_INSTALLATION_METHOD"));
@@ -184,50 +222,79 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						printMessage(Messages.getString("SENDING_LIDER_CFG"));
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-								config.getLiderAccessPassphrase(), liderConfigFile,
-								"/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
+								config.getLiderAccessPassphrase(), liderConfigFile, "/tmp/");
+						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+								config.getLiderAccessPassphrase(),
+								MOVE_FILE.replace("{0}", liderConfigFile.getName()).replace("{1}",
+										"/opt/" + PropertyReader.property("lider.package.name") + "/etc/"),
+								new IOutputStreamProvider() {
+									@Override
+									public byte[] getStreamAsByteArray() {
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
+									}
+								});
 						printMessage(Messages.getString("SUCCESSFULLY_SENT_LIDER_CFG"));
 
 						// Copy tr.org.liderahenk.datasource.cfg
 						printMessage(Messages.getString("SENDING_LIDER_DATASOURCE_CFG"));
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-								config.getLiderAccessPassphrase(), datasourceConfigFile,
-								"/opt/" + PropertyReader.property("lider.package.name") + "/etc/");
+								config.getLiderAccessPassphrase(), datasourceConfigFile, "/tmp/");
+						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+								config.getLiderAccessPassphrase(),
+								MOVE_FILE.replace("{0}", datasourceConfigFile.getName()).replace("{1}",
+										"/opt/" + PropertyReader.property("lider.package.name") + "/etc/"),
+								new IOutputStreamProvider() {
+									@Override
+									public byte[] getStreamAsByteArray() {
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
+									}
+								});
 						printMessage(Messages.getString("SUCCESSFULLY_SENT_LIDER_DATASOURCE_CFG"));
 
 						// Copy setenv file
 						printMessage(Messages.getString("SENDING_KARAF_SETENV"));
 						SetupUtils.copyFile(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-								config.getLiderAccessPassphrase(), setEnvFile,
-								"/opt/" + PropertyReader.property("lider.package.name") + "/bin/");
-						printMessage(Messages.getString("SUCCESSFULLY_SENT_KARAF_SETENV"));
-
-						String command = "nohup /opt/" + PropertyReader.property("lider.package.name")
-								+ "/bin/karaf > /dev/null 2>&1 &";
-
-						printMessage(Messages.getString("STARTING_LIDER"));
-						// Start Karaf
+								config.getLiderAccessPassphrase(), setEnvFile, "/tmp/");
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-								config.getLiderAccessPassphrase(), command, new IOutputStreamProvider() {
+								config.getLiderAccessPassphrase(),
+								MOVE_FILE.replace("{0}", setEnvFile.getName()).replace("{1}",
+										"/opt/" + PropertyReader.property("lider.package.name") + "/bin/"),
+								new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
-										return "\n".getBytes(StandardCharsets.UTF_8);
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
 								});
+						printMessage(Messages.getString("SUCCESSFULLY_SENT_KARAF_SETENV"));
+
+						// Start Karaf
+						printMessage(Messages.getString("STARTING_LIDER"));
+						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+								config.getLiderAccessPassphrase(),
+								START_KARAF.replace("{0}", PropertyReader.property("lider.package.name")),
+								new IOutputStreamProvider() {
+									@Override
+									public byte[] getStreamAsByteArray() {
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
+									}
+								}, true);
 						try {
 							Thread.sleep(30000);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 						printMessage(Messages.getString("SUCCESSFULLY_STARTED_LIDER"));
-
 						printMessage(Messages.getString("DEFINING_KARAF_AS_A_SERVICE"));
+
 						printMessage(Messages.getString("INSTALLING_WRAPPER"));
 						SetupUtils.executeCommand(config.getLiderIp(), "karaf", "karaf", 8101, null, null,
-								"wrapper:install", new IOutputStreamProvider() {
+								INSTALL_WRAPPER, new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
 										return "\n".getBytes(StandardCharsets.UTF_8);
@@ -239,12 +306,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
 								config.getLiderAccessPassphrase(),
-								"sed -i '/set.default.JAVA_HOME/c\\set.default.JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre' /opt/"
-										+ PropertyReader.property("lider.package.name") + "/etc/karaf-wrapper.conf",
+								UPDATE_KARAF_CONF.replace("{0}", PropertyReader.property("lider.package.name")),
 								new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
-										return "\n".getBytes(StandardCharsets.UTF_8);
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
 								});
 						printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_KARAF_WRAPPER_CONF"));
@@ -253,12 +319,11 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
 								config.getLiderAccessPassphrase(),
-								"ln -fs /opt/" + PropertyReader.property("lider.package.name")
-										+ "/bin/karaf-service /etc/init.d/ && update-rc.d karaf-service defaults",
+								LINK_KARAF_SERVICE.replace("{0}", PropertyReader.property("lider.package.name")),
 								new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
-										return "\n".getBytes(StandardCharsets.UTF_8);
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
 								});
 						printMessage(Messages.getString("SUCCESSFULLY_LINKED_SERVICE_SCRIPTS_TO_INIT"));
@@ -266,11 +331,10 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 						printMessage(Messages.getString("UPDATING_DEFAULT_SERVICES"));
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-								config.getLiderAccessPassphrase(), "update-rc.d karaf-service defaults",
-								new IOutputStreamProvider() {
+								config.getLiderAccessPassphrase(), UPDATE_SERVICES, new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
-										return "\n".getBytes(StandardCharsets.UTF_8);
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
 								});
 						printMessage(Messages.getString("SUCCESSFULLY_UPDATED_DEFAULT_SERVICES"));

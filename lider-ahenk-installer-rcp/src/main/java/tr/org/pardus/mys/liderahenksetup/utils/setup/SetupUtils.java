@@ -76,8 +76,6 @@ public class SetupUtils {
 
 	private static final String INSTALL_PACKAGE_GDEBI = "gdebi -n {0}";
 
-	private static final String EXTRACT_FILE = "tar -xzvf {0} --directory {1}";
-
 	private static final String INSTALL_GDEBI = "apt-get install -y gdebi";
 
 	/**
@@ -435,13 +433,20 @@ public class SetupUtils {
 	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String command,
 			IOutputStreamProvider outputStreamProvider) throws SSHConnectionException, CommandExecutionException {
+		executeCommand(ip, username, password, port, privateKey, passphrase, command, outputStreamProvider, true);
+	}
+
+	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
+			final String privateKey, final String passphrase, final String command,
+			IOutputStreamProvider outputStreamProvider, boolean usePty)
+			throws SSHConnectionException, CommandExecutionException {
 		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
 
-		manager.execCommand(command, new Object[] {}, outputStreamProvider);
+		manager.execCommand(command, null, outputStreamProvider, usePty);
 		logger.log(Level.INFO, "Executed command successfully: {0}", new Object[] { command });
 
 		manager.disconnect();
@@ -578,25 +583,6 @@ public class SetupUtils {
 		// Finally, install the downloaded package
 		SetupUtils.installDownloadedPackage(ip, username, password, port, privateKey, passphrase, filename,
 				packageInstaller);
-	}
-
-	public static void extractTarFile(final String ip, final String username, final String password, final Integer port,
-			final String privateKey, final String passphrase, final String pathOfFile,
-			final String extracingDestination) throws SSHConnectionException, CommandExecutionException {
-
-		String command = EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination);
-
-		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
-
-		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
-				passphrase);
-		manager.connect();
-
-		manager.execCommand(command, new Object[] {});
-		logger.log(Level.INFO, "Command: '{0}' executed successfully.",
-				new Object[] { EXTRACT_FILE.replace("{0}", pathOfFile).replace("{1}", extracingDestination) });
-
-		manager.disconnect();
 	}
 
 }
