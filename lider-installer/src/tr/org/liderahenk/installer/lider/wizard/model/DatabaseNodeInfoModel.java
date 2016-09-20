@@ -9,10 +9,11 @@ public class DatabaseNodeInfoModel {
 	private int nodeNumber;
 	private String nodeIp;
 	private String nodeName;
+	private String nodeUsername;
 	private String nodeRootPwd;
 	private boolean nodeNewSetup;
 	
-	public DatabaseNodeInfoModel(int nodeNumber, String nodeIp, String nodeName, String nodeRootPwd,
+	public DatabaseNodeInfoModel(int nodeNumber, String nodeIp, String nodeName, String nodeUsername, String nodeRootPwd,
 			boolean nodeNewSetup) {
 		super();
 		this.nodeNumber = nodeNumber;
@@ -20,6 +21,7 @@ public class DatabaseNodeInfoModel {
 		this.nodeName = nodeName;
 		this.nodeRootPwd = nodeRootPwd;
 		this.nodeNewSetup = nodeNewSetup;
+		this.nodeUsername = nodeUsername;
 	}
 	
 	public int getNodeNumber() {
@@ -51,6 +53,12 @@ public class DatabaseNodeInfoModel {
 	}
 	public void setNodeNewSetup(boolean nodeNewSetup) {
 		this.nodeNewSetup = nodeNewSetup;
+	}
+	public String getNodeUsername() {
+		return nodeUsername;
+	}
+	public void setNodeUsername(String nodeUsername) {
+		this.nodeUsername = nodeUsername;
 	}
 	
 }
