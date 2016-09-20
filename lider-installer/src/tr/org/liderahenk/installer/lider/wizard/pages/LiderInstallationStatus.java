@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Text;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
 import tr.org.pardus.mys.liderahenksetup.constants.InstallMethod;
+import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
 import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
@@ -31,7 +32,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
  * 
  */
-public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage {
+public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -39,12 +40,15 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 	private Text txtLogConsole;
 	boolean isInstallationFinished = false;
 	boolean canGoBack = false;
+	
+	private NextPageEventType nextPageEventType;
 
 	private static final String CREATE_TEMP_DIR = "sudo rm -rf /tmp/lider-temp && mkdir -p /tmp/lider-temp";
+	private static final String UPDATE_PACKAGE_LIST = "sudo apt-get -y --force-yes update";
 	private static final String INSTALL_DEPENDENCIES = "sudo apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap";
 	private static final String EXTRACT_FILE = "sudo tar -xzvf {0} --directory /opt/";
 	private static final String DOWNLOAD_PACKAGE = "sudo wget --output-document=/tmp/{0} {1}";
-	private static final String START_KARAF = "sudo sh -c 'nohup /opt/{0}/bin/karaf > /dev/null 2>&1 &'";
+	private static final String START_KARAF = "sudo /opt/{0}/bin/start";
 	private static final String INSTALL_WRAPPER = "wrapper:install";
 	private static final String UPDATE_KARAF_CONF = "sudo sed -i '/set.default.JAVA_HOME/c\\set.default.JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre' /opt/{0}/etc/karaf-wrapper.conf";
 	private static final String LINK_KARAF_SERVICE = "sudo ln -fs /opt/{0}/bin/karaf-service /etc/init.d/ && sudo update-rc.d karaf-service defaults";
@@ -108,6 +112,19 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 										}
 									});
 							setProgressBar(30);
+
+							printMessage(Messages.getString("UPDATING_PACKAGE_LIST"));
+							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+									config.getLiderAccessPasswd(), config.getLiderPort(),
+									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
+									UPDATE_PACKAGE_LIST, new IOutputStreamProvider() {
+								@Override
+								public byte[] getStreamAsByteArray() {
+									return (config.getLiderAccessPasswd() + "\n")
+											.getBytes(StandardCharsets.UTF_8);
+								}
+							});
+							printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
 							printMessage(Messages.getString("INSTALLING_DEPENDENCIES"));
 							SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
@@ -283,9 +300,9 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 									public byte[] getStreamAsByteArray() {
 										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
-								}, true);
+								}, false);
 						try {
-							Thread.sleep(30000);
+							Thread.sleep(45000);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -444,6 +461,16 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public NextPageEventType getNextPageEventType() {
+		return nextPageEventType;
+	}
+
+	@Override
+	public void setNextPageEventType(NextPageEventType nextPageEventType) {
+		this.nextPageEventType = nextPageEventType;
 	}
 
 }
