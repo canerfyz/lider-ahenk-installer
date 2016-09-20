@@ -33,7 +33,8 @@ import tr.org.pardus.mys.liderahenksetup.constants.NextPageEventType;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class XmppClusterConfPage extends WizardPage implements IXmppPage {
@@ -259,27 +260,13 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		Label lblNodeInfo = GUIHelper.createLabel(innerContainer, Messages.getString("XMPP_CLUSTER_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
-		// Labels for headers
-		Composite cmpLabels = GUIHelper.createComposite(innerContainer, 4);
-		cmpLabels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		GridData gdLabels = new GridData();
-		gdLabels.widthHint = 205;
-		Label lblNodeIp = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_IP"));
-		lblNodeIp.setLayoutData(gdLabels);
-		Label lblNodeName = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_NAME"));
-		lblNodeName.setLayoutData(gdLabels);
-		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
-		lblNodeRootPwd.setLayoutData(gdLabels);
-		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_EXISTS"));
-		lblNodeNewSetup.setLayoutData(gdLabels);
-
 		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// Add at least 2 nodes
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, true);
 		GUIHelper.createLabel(cmpNodeList);
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, false);
 
 		btnAddRemoveNode = GUIHelper.createButton(cmpNodeList, SWT.PUSH);
 		btnAddRemoveNode
@@ -382,13 +369,22 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		}
 	}
 
-	private void createNewNode(Composite cmpNodeList) {
+	private void createNewNode(Composite cmpNodeList, boolean addLabels) {
 		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 6);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		GridData gd = new GridData();
 		gd.widthHint = 190;
 
+		if (addLabels) {
+			GUIHelper.createLabel(grpClusterNode, "");
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_IP"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_NAME"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_USERNAME"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_PWD"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_EXISTS"));
+		}
+		
 		XmppNodeSwtModel clusterNode = new XmppNodeSwtModel();
 
 		Integer nodeNumber = nodeMap.size() + 1;
@@ -418,6 +414,19 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 		});
 		clusterNode.setTxtNodeName(txtNodeName);
 
+		Text txtNodeUsername = GUIHelper.createText(grpClusterNode);
+		txtNodeUsername.setLayoutData(gd);
+		txtNodeUsername.setMessage(Messages.getString("ENTER_USERNAME_OF_THIS_NODE"));
+		txtNodeUsername.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		clusterNode.setTxtNodeUsername(txtNodeUsername);
+		txtNodeUsername.setText("root");
+		txtNodeUsername.setEditable(false);
+
 		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
 		txtNodeRootPwd.setMessage(Messages.getString("ENTER_ROOT_PWD_OF_THIS_NODE"));
@@ -440,7 +449,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 	private void handleAddButtonClick(SelectionEvent event) {
 		Composite parent = (Composite) ((Button) event.getSource()).getParent();
-		createNewNode(parent);
+		createNewNode(parent, false);
 
 		Button btnRemoveNode = GUIHelper.createButton(parent, SWT.PUSH);
 		btnRemoveNode
@@ -538,6 +547,7 @@ public class XmppClusterConfPage extends WizardPage implements IXmppPage {
 
 			XmppNodeInfoModel nodeInfo = new XmppNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
+					nodeSwt.getTxtNodeUsername().getText(),
 					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
 					!nodeSwt.getBtnNodeNewSetup().getSelection());
 
