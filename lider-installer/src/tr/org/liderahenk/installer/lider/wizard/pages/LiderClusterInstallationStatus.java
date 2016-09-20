@@ -398,6 +398,11 @@ public class LiderClusterInstallationStatus extends WizardPage
 					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
+			printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", clusterNode.getNodeIp()), display);
+			manager.execCommand("apt-get install -y --force-yes update", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", clusterNode.getNodeIp()),
+					display);
+
 			printMessage(Messages.getString("INSTALLING_DEPENDENCIES_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_DEPENDENCIES_AT_", clusterNode.getNodeIp()),
@@ -442,7 +447,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager.execCommand("/opt/" + PropertyReader.property("lider.package.name") + "/bin/start",
 					new Object[] {});
 
-			Thread.sleep(30000);
+			Thread.sleep(45000);
 
 			printMessage(Messages.getString("SUCCESSFULLY_STARTED_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully started Cellar node at {0}", new Object[] { clusterNode.getNodeIp() });
