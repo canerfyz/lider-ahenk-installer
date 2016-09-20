@@ -12,6 +12,7 @@ public class DatabaseNodeSwtModel {
 	private int nodeNumber;
 	private Text txtNodeIp;
 	private Text txtNodeName;
+	private Text txtNodeUsername;
 	private Text txtNodeRootPwd;
 	private Button btnNodeNewSetup;
 	
@@ -44,6 +45,12 @@ public class DatabaseNodeSwtModel {
 	}
 	public void setNodeNumber(int nodeNumber) {
 		this.nodeNumber = nodeNumber;
+	}
+	public Text getTxtNodeUsername() {
+		return txtNodeUsername;
+	}
+	public void setTxtNodeUsername(Text txtNodeUsername) {
+		this.txtNodeUsername = txtNodeUsername;
 	}
 	
 	
