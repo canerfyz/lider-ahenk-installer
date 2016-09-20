@@ -119,11 +119,11 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 		cmpMain = new ScrolledComposite(cmpMain, SWT.V_SCROLL);
 		cmpMain.setLayout(new GridLayout(1, false));
-		cmpMain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		cmpMain.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
 		innerContainer = new Composite(cmpMain, SWT.NONE);
 		innerContainer.setLayout(new GridLayout(1, false));
-		innerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		innerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
 		Label lblGeneralInfo = GUIHelper.createLabel(innerContainer, Messages.getString("XMPP_CLUSTER_GENERAL_INFO"));
 		lblGeneralInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
@@ -553,27 +553,13 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		Label lblNodeInfo = GUIHelper.createLabel(innerContainer, Messages.getString("KARAF_CELLAR_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
-		// Labels for headers
-		Composite cmpLabels = GUIHelper.createComposite(innerContainer, 4);
-		cmpLabels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		GridData gdLabels = new GridData();
-		gdLabels.widthHint = 205;
-		Label lblNodeIp = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_IP"));
-		lblNodeIp.setLayoutData(gdLabels);
-		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
-		lblNodeRootPwd.setLayoutData(gdLabels);
-		Label lblNodeResource = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_XMPP_RESOURCE"));
-		lblNodeResource.setLayoutData(gdLabels);
-		Label lblNodePriority = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_XMPP_PRIORITY"));
-		lblNodePriority.setLayoutData(gdLabels);
-
 		Composite cmpNodeList = GUIHelper.createComposite(innerContainer, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// Add at least 2 nodes
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, true);
 		GUIHelper.createLabel(cmpNodeList);
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, false);
 
 		btnAddRemoveNode = GUIHelper.createButton(cmpNodeList, SWT.PUSH);
 		btnAddRemoveNode
@@ -690,13 +676,22 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		}
 	}
 
-	private void createNewNode(Composite cmpNodeList) {
-		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 5);
+	private void createNewNode(Composite cmpNodeList, boolean addLabels) {
+		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 6);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		GridData gd = new GridData();
 		gd.widthHint = 190;
 
+		if (addLabels) {
+			GUIHelper.createLabel(grpClusterNode, "");
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_IP"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_USERNAME"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_PWD"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_XMPP_RESOURCE"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_XMPP_PRIORITY"));
+		}
+		
 		LiderNodeSwtModel clusterNode = new LiderNodeSwtModel();
 
 		Integer nodeNumber = nodeMap.size() + 1;
@@ -715,9 +710,21 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		});
 		clusterNode.setTxtNodeIp(txtNodeIp);
 
+		Text txtNodeUsername = GUIHelper.createText(grpClusterNode);
+		txtNodeUsername.setLayoutData(gd);
+		txtNodeUsername.setMessage(Messages.getString("ENTER_USERNAME_OF_THIS_NODE"));
+		txtNodeUsername.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		clusterNode.setTxtNodeUsername(txtNodeUsername);
+		txtNodeUsername.setText("root");
+		
 		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
-		txtNodeRootPwd.setMessage(Messages.getString("ENTER_ROOT_PWD_OF_THIS_NODE"));
+		txtNodeRootPwd.setMessage(Messages.getString("ENTER_PWD_OF_THIS_NODE"));
 		txtNodeRootPwd.addModifyListener(new ModifyListener() {
 			@Override
 			public void modifyText(ModifyEvent event) {
@@ -753,7 +760,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 
 	private void handleAddButtonClick(SelectionEvent event) {
 		Composite parent = (Composite) ((Button) event.getSource()).getParent();
-		createNewNode(parent);
+		createNewNode(parent, false);
 
 		Button btnRemoveNode = GUIHelper.createButton(parent, SWT.PUSH);
 		btnRemoveNode
@@ -884,7 +891,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 			LiderNodeSwtModel nodeSwt = entry.getValue();
 
 			LiderNodeInfoModel nodeInfo = new LiderNodeInfoModel(nodeSwt.getNodeNumber(),
-					nodeSwt.getTxtNodeIp().getText(),
+					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeUsername().getText(),
 					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
 					nodeSwt.getTxtNodeXmppResource().getText(), nodeSwt.getTxtNodeXmppPresencePriority().getText());
 
