@@ -26,7 +26,7 @@ public class LiderInstallationHandler {
 
 		if (versionDialog.isContinueInstallation()) {
 			WizardDialog wizardDialog = GUIHelper.createDialog(Display.getCurrent().getActiveShell(),
-					new LiderSetupWizard(), new Point(1000, 600));
+					new LiderSetupWizard(), new Point(1175, 600));
 			wizardDialog.open();
 		}
 	}
