@@ -30,7 +30,8 @@ import tr.org.liderahenk.installer.lider.wizard.model.DatabaseNodeSwtModel;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage {
@@ -176,29 +177,15 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		Label lblNodeInfo = GUIHelper.createLabel(cmpMain, Messages.getString("MARIADB_CLUSTER_NODE_INFO"));
 		lblNodeInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
-		// Labels for headers
-		Composite cmpLabels = GUIHelper.createComposite(cmpMain, 4);
-		cmpLabels.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-		GridData gdLabels = new GridData();
-		gdLabels.widthHint = 205;
-		Label lblNodeIp = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_IP"));
-		lblNodeIp.setLayoutData(gdLabels);
-		Label lblNodeName = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_NAME"));
-		lblNodeName.setLayoutData(gdLabels);
-		Label lblNodeRootPwd = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_ROOT_PWD"));
-		lblNodeRootPwd.setLayoutData(gdLabels);
-		Label lblNodeNewSetup = GUIHelper.createLabel(cmpLabels, Messages.getString("NODE_EXISTS"));
-		lblNodeNewSetup.setLayoutData(gdLabels);
-
 		Composite cmpNodeList = GUIHelper.createComposite(cmpMain, 2);
 		cmpNodeList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		// Add at least 3 nodes
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, true);
 		GUIHelper.createLabel(cmpNodeList);
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, false);
 		GUIHelper.createLabel(cmpNodeList);
-		createNewNode(cmpNodeList);
+		createNewNode(cmpNodeList, false);
 
 		btnAddRemoveNode = GUIHelper.createButton(cmpNodeList, SWT.PUSH);
 		btnAddRemoveNode
@@ -253,7 +240,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 	private void handleAddButtonClick(SelectionEvent event) {
 		Composite parent = (Composite) ((Button) event.getSource()).getParent();
-		createNewNode(parent);
+		createNewNode(parent, false);
 
 		Button btnRemoveNode = GUIHelper.createButton(parent, SWT.PUSH);
 		btnRemoveNode
@@ -297,15 +284,24 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		updatePageCompleteStatus();
 	}
 
-	private void createNewNode(Composite cmpNodeList) {
+	private void createNewNode(Composite cmpNodeList, boolean addLabels) {
 		Group grpClusterNode = GUIHelper.createGroup(cmpNodeList, 6);
 		grpClusterNode.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
 		GridData gd = new GridData();
 		gd.widthHint = 190;
 
-		DatabaseNodeSwtModel clusterNode = new DatabaseNodeSwtModel();
+		if (addLabels) {
+			GUIHelper.createLabel(grpClusterNode, "");
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_IP"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_NAME"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_USERNAME"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_PWD"));
+			GUIHelper.createLabel(grpClusterNode, Messages.getString("NODE_EXISTS"));
+		}
 
+		DatabaseNodeSwtModel clusterNode = new DatabaseNodeSwtModel();
+		
 		Integer nodeNumber = nodeMap.size() + 1;
 		clusterNode.setNodeNumber(nodeNumber);
 
@@ -332,6 +328,19 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 			}
 		});
 		clusterNode.setTxtNodeName(txtNodeName);
+
+		Text txtNodeUsername = GUIHelper.createText(grpClusterNode);
+		txtNodeUsername.setLayoutData(gd);
+		txtNodeUsername.setMessage(Messages.getString("ENTER_USERNAME_OF_THIS_NODE"));
+		txtNodeUsername.addModifyListener(new ModifyListener() {
+			@Override
+			public void modifyText(ModifyEvent event) {
+				updatePageCompleteStatus();
+			}
+		});
+		clusterNode.setTxtNodeUsername(txtNodeUsername);
+		txtNodeUsername.setText("root");
+		txtNodeUsername.setEditable(false);
 
 		Text txtNodeRootPwd = GUIHelper.createText(grpClusterNode);
 		txtNodeRootPwd.setLayoutData(gd);
@@ -374,9 +383,8 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 		config.setDatabaseRootPassword(txtDbRootPwd.getText());
 		config.setDatabaseSstUsername(txtSstUsername.getText());
 		config.setDatabaseSstPwd(txtSstPwd.getText());
-//		config.setDatabaseNodeMap(nodeMap);
+		// config.setDatabaseNodeMap(nodeMap);
 		config.setDatabasePort(txtDbSshPort.getText() != null ? new Integer(txtDbSshPort.getText()) : null);
-		
 
 		Map<Integer, DatabaseNodeInfoModel> nodeInfoMap = createInfoModelMap();
 
@@ -412,22 +420,22 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 	}
 
 	private String createWsrepClusterAddressForLider() {
-		
+
 		String wsrepClusterAddress = "";
-		
+
 		for (Iterator<Entry<Integer, DatabaseNodeSwtModel>> iterator = nodeMap.entrySet().iterator(); iterator
 				.hasNext();) {
 			Entry<Integer, DatabaseNodeSwtModel> entry = iterator.next();
 			DatabaseNodeSwtModel clusterNode = entry.getValue();
 			wsrepClusterAddress += clusterNode.getTxtNodeIp().getText() + ":3306,";
-			
+
 		}
-		
+
 		// Delete last comma
 		wsrepClusterAddress = wsrepClusterAddress.substring(0, wsrepClusterAddress.length() - 1);
-		
+
 		return wsrepClusterAddress;
-		
+
 	}
 
 	private Map<Integer, DatabaseNodeInfoModel> createInfoModelMap() {
@@ -440,6 +448,7 @@ public class DatabaseClusterConfPage extends WizardPage implements IDatabasePage
 
 			DatabaseNodeInfoModel nodeInfo = new DatabaseNodeInfoModel(nodeSwt.getNodeNumber(),
 					nodeSwt.getTxtNodeIp().getText(), nodeSwt.getTxtNodeName().getText(),
+					nodeSwt.getTxtNodeUsername().getText(),
 					btnUsePrivateKey.getSelection() ? null : nodeSwt.getTxtNodeRootPwd().getText(),
 					!nodeSwt.getBtnNodeNewSetup().getSelection());
 
