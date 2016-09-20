@@ -10,6 +10,7 @@ public class LiderNodeSwtModel {
 
 	private int nodeNumber;
 	private Text txtNodeIp;
+	private Text txtNodeUsername;
 	private Text txtNodeRootPwd;
 	private Text txtNodeXmppResource;
 	private Text txtNodeXmppPresencePriority;
@@ -43,6 +44,12 @@ public class LiderNodeSwtModel {
 	}
 	public void setTxtNodeXmppPresencePriority(Text txtNodeXmppPresencePriority) {
 		this.txtNodeXmppPresencePriority = txtNodeXmppPresencePriority;
+	}
+	public Text getTxtNodeUsername() {
+		return txtNodeUsername;
+	}
+	public void setTxtNodeUsername(Text txtNodeUsername) {
+		this.txtNodeUsername = txtNodeUsername;
 	}
 	
 }
