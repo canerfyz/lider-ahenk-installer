@@ -60,7 +60,7 @@ public class LdapConfirmPage extends WizardPage implements ILdapPage {
 				NextPageEventType.CLICK_FROM_PREV_PAGE);
 		
 		// Set page complete to true, otherwise it does not go into getNextPage
-		// method of DatabaseInstallationStatus page.
+		// method of LdapInstallationStatus page.
 		((WizardPage) super.getNextPage()).setPageComplete(true);
 		
 		return super.getNextPage();
