@@ -32,7 +32,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SetupUtils;
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
  * 
  */
-public class LiderInstallationStatus extends WizardPage implements ILiderPage, InstallationStatusPage, ControlNextEvent {
+public class LiderInstallationStatus extends WizardPage
+		implements ILiderPage, InstallationStatusPage, ControlNextEvent {
 
 	private LiderSetupConfig config;
 
@@ -40,7 +41,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 	private Text txtLogConsole;
 	boolean isInstallationFinished = false;
 	boolean canGoBack = false;
-	
+
 	private NextPageEventType nextPageEventType;
 
 	private static final String CREATE_TEMP_DIR = "sudo rm -rf /tmp/lider-temp && mkdir -p /tmp/lider-temp";
@@ -49,7 +50,7 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 	private static final String EXTRACT_FILE = "sudo tar -xzvf {0} --directory /opt/";
 	private static final String DOWNLOAD_PACKAGE = "sudo wget --output-document=/tmp/{0} {1}";
 	private static final String START_KARAF = "sudo /opt/{0}/bin/start";
-	private static final String INSTALL_WRAPPER = "wrapper:install";
+	private static final String INSTALL_WRAPPER = "/opt/{0}/bin/client -r 50 'wrapper:install'";
 	private static final String UPDATE_KARAF_CONF = "sudo sed -i '/set.default.JAVA_HOME/c\\set.default.JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/jre' /opt/{0}/etc/karaf-wrapper.conf";
 	private static final String LINK_KARAF_SERVICE = "sudo ln -fs /opt/{0}/bin/karaf-service /etc/init.d/ && sudo update-rc.d karaf-service defaults";
 	private static final String UPDATE_SERVICES = "sudo update-rc.d karaf-service defaults";
@@ -118,12 +119,12 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 									config.getLiderAccessPasswd(), config.getLiderPort(),
 									config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase(),
 									UPDATE_PACKAGE_LIST, new IOutputStreamProvider() {
-								@Override
-								public byte[] getStreamAsByteArray() {
-									return (config.getLiderAccessPasswd() + "\n")
-											.getBytes(StandardCharsets.UTF_8);
-								}
-							});
+										@Override
+										public byte[] getStreamAsByteArray() {
+											return (config.getLiderAccessPasswd() + "\n")
+													.getBytes(StandardCharsets.UTF_8);
+										}
+									});
 							printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST"));
 
 							printMessage(Messages.getString("INSTALLING_DEPENDENCIES"));
@@ -301,24 +302,23 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
 								}, false);
-						try {
-							Thread.sleep(45000);
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
+
 						printMessage(Messages.getString("SUCCESSFULLY_STARTED_LIDER"));
 						printMessage(Messages.getString("DEFINING_KARAF_AS_A_SERVICE"));
 
 						printMessage(Messages.getString("INSTALLING_WRAPPER"));
-						SetupUtils.executeCommand(config.getLiderIp(), "karaf", "karaf", 8101, null, null,
-								INSTALL_WRAPPER, new IOutputStreamProvider() {
+						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
+								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+								config.getLiderAccessPassphrase(),
+								INSTALL_WRAPPER.replace("{0}", PropertyReader.property("lider.package.name")),
+								new IOutputStreamProvider() {
 									@Override
 									public byte[] getStreamAsByteArray() {
-										return "\n".getBytes(StandardCharsets.UTF_8);
+										return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
 									}
-								});
+								}, false);
 						printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_WRAPPER"));
-
+						
 						printMessage(Messages.getString("MODIFYING_KARAF_WRAPPER_CONF"));
 						SetupUtils.executeCommand(config.getLiderIp(), config.getLiderAccessUsername(),
 								config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
@@ -448,6 +448,38 @@ public class LiderInstallationStatus extends WizardPage implements ILiderPage, I
 		return super.getNextPage();
 	}
 
+//	private void defineKarafAsService() throws SSHConnectionException, CommandExecutionException {
+//
+//		SSHManager manager = new SSHManager(config.getLiderIp(), config.getLiderAccessUsername(),
+//				config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
+//				config.getLiderAccessPassphrase());
+//		
+//		manager.connect();
+//
+//		manager.execCommand(CONNECT_TO_KARAF_SHELL,
+//				new Object[] { PropertyReader.property("lider.package.name") },
+//				new IOutputStreamProvider() {
+//					@Override
+//					public byte[] getStreamAsByteArray() {
+//						return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
+//					}
+//				}, false);
+//
+//		manager.execCommand(INSTALL_WRAPPER, new Object[] {}, new IOutputStreamProvider() {
+//			@Override
+//			public byte[] getStreamAsByteArray() {
+//				return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
+//			}
+//		}, false);
+//
+//		try {
+//			Thread.sleep(5000);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		
+//	}
+	
 	private void openDownloadUrl() throws IOException {
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
