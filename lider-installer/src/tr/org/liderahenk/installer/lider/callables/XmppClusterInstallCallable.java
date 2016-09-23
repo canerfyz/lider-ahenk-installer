@@ -88,9 +88,9 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 
 			// Update package list
 			try {
-				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully updated package list of {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {

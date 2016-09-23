@@ -115,7 +115,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("ADDING_KEYSERVER_TO_", nodeIp), display);
 				manager.execCommand("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db",
 						new Object[] {});
-				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO", nodeIp), display);
+				printMessage(Messages.getString("SUCCESSFULLY_ADDED_KEYSERVER_TO_", nodeIp), display);
 
 				printMessage(Messages.getString("ADDING_REPOSITORY_",
 						"'ftp://ftp.ulak.net.tr/pub/MariaDB/repo/10.1/debian jessie main'", nodeIp), display);
@@ -234,7 +234,7 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 			// Stop mysql service
 			// Send galera.cnf
 			try {
-				printMessage(Messages.getString("STOPPING_MYSQL_SERVICE_AT") + nodeIp, display);
+				printMessage(Messages.getString("STOPPING_MYSQL_SERVICE_AT_", nodeIp), display);
 				manager.execCommand("service mysql stop", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_STOPPED_MYSQL_SERVICE_AT") + nodeIp, display);
 
@@ -253,9 +253,9 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				File galeraCnfFile = LiderAhenkUtils.writeToFile(galeraCnf, "galera.cnf");
 				printMessage(Messages.getString("SUCCESSFULLY_CREATED_CNF_FILE"), display);
 
-				printMessage(Messages.getString("SENDING_CNF_FILE_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("SENDING_CNF_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(galeraCnfFile, "/etc/mysql/conf.d/", false);
-				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO") + " " + nodeIp, display);
+				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO_", nodeIp), display);
 				logger.log(Level.INFO, "Successfully sent galera.cnf to: {0}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
