@@ -239,7 +239,7 @@ public class SSHManager {
 		FileInputStream fis = null;
 		String error = null;
 		try {
-			String command = "scp " + (preserveTimestamp ? "-p" : "") + " -t " + destDirectory
+			String command = "scp -l 8192 " + (preserveTimestamp ? "-p" : "") + " -t " + destDirectory
 					+ fileToTransfer.getName();
 
 			logger.log(Level.INFO, "Command: {0}", command);

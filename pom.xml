@@ -210,5 +210,38 @@
 		<module>ahenk-installer</module>
 		<module>lider-installer</module>
 	</modules>
+	
+	<developers>
+		<developer>
+			<id>canerfyz</id>
+			<name>caner feyzullahoglu</name>
+			<email>caner.feyzullahoglu@agem.com.tr</email>
+		</developer>
+		<developer>
+			<id>emrekgn</id>
+			<name>emre kagan akkaya</name>
+			<email>emre.akkaya@agem.com.tr</email>
+		</developer>
+		<developer>
+			<id>vsahin</id>
+			<name>volkan sahin</name>
+			<email>volkan.sahin@agem.com.tr</email>
+		</developer>
+		<developer>
+			<id>ibasaran</id>
+			<name>ismail basaran</name>
+			<email>basaran.ismaill@gmail.com</email>
+		</developer>
+		<developer>
+			<id>mdogan</id>
+			<name>mine dogan</name>
+			<email>mine.dogan@agem.com.tr</email>
+		</developer>
+		<developer>
+			<id>cemrealpsoy</id>
+			<name>cemre alpsoy</name>
+			<email>cemre.alpsoy@agem.com.tr</email>
+		</developer>
+	</developers>
 
 </project>

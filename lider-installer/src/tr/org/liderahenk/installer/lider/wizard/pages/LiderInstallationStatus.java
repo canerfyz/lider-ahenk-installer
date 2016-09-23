@@ -448,38 +448,6 @@ public class LiderInstallationStatus extends WizardPage
 		return super.getNextPage();
 	}
 
-//	private void defineKarafAsService() throws SSHConnectionException, CommandExecutionException {
-//
-//		SSHManager manager = new SSHManager(config.getLiderIp(), config.getLiderAccessUsername(),
-//				config.getLiderAccessPasswd(), config.getLiderPort(), config.getLiderAccessKeyPath(),
-//				config.getLiderAccessPassphrase());
-//		
-//		manager.connect();
-//
-//		manager.execCommand(CONNECT_TO_KARAF_SHELL,
-//				new Object[] { PropertyReader.property("lider.package.name") },
-//				new IOutputStreamProvider() {
-//					@Override
-//					public byte[] getStreamAsByteArray() {
-//						return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
-//					}
-//				}, false);
-//
-//		manager.execCommand(INSTALL_WRAPPER, new Object[] {}, new IOutputStreamProvider() {
-//			@Override
-//			public byte[] getStreamAsByteArray() {
-//				return (config.getLiderAccessPasswd() + "\n").getBytes(StandardCharsets.UTF_8);
-//			}
-//		}, false);
-//
-//		try {
-//			Thread.sleep(5000);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//		
-//	}
-	
 	private void openDownloadUrl() throws IOException {
 		Runtime.getRuntime().exec("xdg-open " + PropertyReader.property("troubleshooting.url"));
 	}
