@@ -65,6 +65,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 	private final static String CLUSTER_CLIENTS_SSL = "server  server1 #NODE_IP:8443 check fall 3 id #CLIENT_SSL_ID inter 5000 rise 3 slowstart 240000 weight 50";
 	private final static String CLUSTER_SERVERS = "server  server1 #NODE_IP:5701 check fall 3 id #SERVER_ID inter 5000 rise 3 slowstart 60000 weight 50";
 
+	private static final String INSTALL_WRAPPER = "/opt/{0}/bin/client -r 50 'wrapper:install'";
+
 	private Integer clientId = 1005;
 	private Integer clientSslId = 1008;
 	private Integer serverId = 10011;
@@ -193,16 +195,17 @@ public class LiderClusterInstallationStatus extends WizardPage
 
 							}
 
-							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
-									.entrySet().iterator(); iterator.hasNext();) {
-
-								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
-								final LiderNodeInfoModel clusterNode = entry.getValue();
-
-								restartNode(clusterNode, display);
-							}
-
-							Thread.sleep(20000);
+							// for (Iterator<Entry<Integer, LiderNodeInfoModel>>
+							// iterator = config.getLiderNodeInfoMap()
+							// .entrySet().iterator(); iterator.hasNext();) {
+							//
+							// Entry<Integer, LiderNodeInfoModel> entry =
+							// iterator.next();
+							// final LiderNodeInfoModel clusterNode =
+							// entry.getValue();
+							//
+							// restartNode(clusterNode, display);
+							// }
 
 							for (Iterator<Entry<Integer, LiderNodeInfoModel>> iterator = config.getLiderNodeInfoMap()
 									.entrySet().iterator(); iterator.hasNext();) {
@@ -399,9 +402,8 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager.connect();
 
 			printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", clusterNode.getNodeIp()), display);
-			manager.execCommand("apt-get install -y --force-yes update", new Object[] {});
-			printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", clusterNode.getNodeIp()),
-					display);
+			manager.execCommand("apt-get -y --force-yes update", new Object[] {});
+			printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", clusterNode.getNodeIp()), display);
 
 			printMessage(Messages.getString("INSTALLING_DEPENDENCIES_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("apt-get install -y --force-yes openjdk-7-jdk sshpass rsync nmap", new Object[] {});
@@ -444,10 +446,15 @@ public class LiderClusterInstallationStatus extends WizardPage
 			manager.connect();
 
 			printMessage(Messages.getString("STARTING_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
-			manager.execCommand("/opt/" + PropertyReader.property("lider.package.name") + "/bin/start",
-					new Object[] {});
+			manager.execCommand("/opt/" + PropertyReader.property("lider.package.name") + "/bin/start", new Object[] {},
+					new IOutputStreamProvider() {
+						@Override
+						public byte[] getStreamAsByteArray() {
+							return ("\n").getBytes(StandardCharsets.UTF_8);
+						}
+					}, false);
 
-			Thread.sleep(45000);
+			Thread.sleep(20000);
 
 			printMessage(Messages.getString("SUCCESSFULLY_STARTED_CELLAR_NODE_AT", clusterNode.getNodeIp()), display);
 			logger.log(Level.INFO, "Successfully started Cellar node at {0}", new Object[] { clusterNode.getNodeIp() });
@@ -481,16 +488,18 @@ public class LiderClusterInstallationStatus extends WizardPage
 		// Install service wrapper
 		try {
 
-			manager = new SSHManager(clusterNode.getNodeIp(), "karaf", "karaf", 8101, null, null);
+			manager = new SSHManager(clusterNode.getNodeIp(), "root", clusterNode.getNodeRootPwd(),
+					config.getLiderPort(), config.getLiderAccessKeyPath(), config.getLiderAccessPassphrase());
 			manager.connect();
 
 			printMessage(Messages.getString("INSTALLING_WRAPPER_AT_NODE_", clusterNode.getNodeIp()), display);
-			manager.execCommand("wrapper:install", new IOutputStreamProvider() {
-				@Override
-				public byte[] getStreamAsByteArray() {
-					return "\n".getBytes(StandardCharsets.UTF_8);
-				}
-			}, true);
+			manager.execCommand(INSTALL_WRAPPER, new Object[] { PropertyReader.property("lider.package.name") },
+					new IOutputStreamProvider() {
+						@Override
+						public byte[] getStreamAsByteArray() {
+							return "\n".getBytes(StandardCharsets.UTF_8);
+						}
+					}, true);
 			Thread.sleep(3000);
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_WRAPPER_AT_NODE_", clusterNode.getNodeIp()),
 					display);
