@@ -125,7 +125,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		innerContainer.setLayout(new GridLayout(1, false));
 		innerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
-		Label lblGeneralInfo = GUIHelper.createLabel(innerContainer, Messages.getString("XMPP_CLUSTER_GENERAL_INFO"));
+		Label lblGeneralInfo = GUIHelper.createLabel(innerContainer, Messages.getString("LIDER_CLUSTER_GENERAL_INFO"));
 		lblGeneralInfo.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_RED));
 
 		Composite cmpGeneralInfo = GUIHelper.createComposite(innerContainer, 2);
