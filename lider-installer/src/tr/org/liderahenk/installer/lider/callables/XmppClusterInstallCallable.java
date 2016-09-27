@@ -123,6 +123,11 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				throw new Exception();
 			}
 
+			// TODO install GDEBI!!!!
+			// TODO install GDEBI!!!!
+			// TODO install GDEBI!!!!
+			
+			
 			// Install Ejabberd package
 			try {
 				printMessage(Messages.getString("INSTALLING_EJABBERD_TO") + " " + nodeIp, display);
