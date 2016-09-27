@@ -448,7 +448,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 			manager.connect();
 
 			printMessage(Messages.getString("DEFINING_EJABBERD_AS_SERVICE_AT_", clusterNode.getNodeIp()), display);
-			manager.execCommand("ln -s " + PropertyReader.property("xmpp.bin.path")
+			manager.execCommand("ln -fs " + PropertyReader.property("xmpp.bin.path")
 					+ "ejabberd.init /etc/init.d/ejabberd && update-rc.d ejabberd defaults", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_EJABBERD_AS_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
