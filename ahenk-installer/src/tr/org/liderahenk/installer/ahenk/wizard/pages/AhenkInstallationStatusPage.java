@@ -54,6 +54,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	private final static String MOVE_AHENK_CONF = "sudo mv -f /tmp/{0} /etc/ahenk/";
 	private final static String RESTART_AHENK_SERVICE = "sudo service ahenk restart";
 	private static final String DOWNLOAD_PACKAGE = "wget --output-document=/tmp/{0} {1}";
+	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< 'libpam-runtime	libpam-runtime/override	boolean	true'";
 
 	public AhenkInstallationStatusPage(AhenkSetupConfig config) {
 		super(AhenkInstallationStatusPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
@@ -224,6 +225,20 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 											filename = "ahenk.deb";
 											printMessage("Successfully downloaded file", display);
 										}
+
+										printMessage(Messages.getString("SETTING_DEBCONF_SELECTIONS_", ip), display);
+										SetupUtils.executeCommand(ip, config.getUsernameCm(), config.getPasswordCm(),
+												config.getPort(), config.getPrivateKeyAbsPath(), config.getPassphrase(),
+												DEBCONF_SET_SELECTIONS,
+												new IOutputStreamProvider() {
+													@Override
+													public byte[] getStreamAsByteArray() {
+														return (config.getPasswordCm() + "\n")
+																.getBytes(StandardCharsets.UTF_8);
+													}
+												});
+										printMessage(Messages.getString("SUCCESSFULLY_SET_DEBCONF_SELECTIONS_", ip),
+												display);
 
 										// Install Ahenk
 										printMessage(Messages.getString("INSTALLING_AHENK_AT", ip), display);
