@@ -89,8 +89,7 @@ public class LiderOrganizationPage extends WizardPage {
 			public void keyPressed(KeyEvent e) {
 				// Validate inputs for letter and dot only
 				char c = e.character;
-				if (!Character.isLetter(c) && !(c == SWT.DEL || e.keyCode == SWT.ARROW_LEFT
-						|| e.keyCode == SWT.ARROW_RIGHT || c == SWT.BS || c == ".".hashCode())) {
+				if (Character.isSpaceChar(c)) {
 					e.doit = false;
 					return;
 				} else {
