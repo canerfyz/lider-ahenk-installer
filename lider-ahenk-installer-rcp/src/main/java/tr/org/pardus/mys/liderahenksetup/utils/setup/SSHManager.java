@@ -220,7 +220,7 @@ public class SSHManager {
 		if (params != null) {
 			for (int i = 0; i < params.length; i++) {
 				String param = params[i].toString();
-				tmpCommand = tmpCommand.replaceAll("\\{" + i + "\\}", param);
+				tmpCommand = tmpCommand.replace("{" + i + "}", param);
 			}
 		}
 		return execCommand(tmpCommand, outputStreamProvider, usePty);
