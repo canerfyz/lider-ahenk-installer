@@ -586,15 +586,27 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 		try {
 			printMessage(Messages.getString("REGISTERING_ADMIN_USER_AT_", firstNode.getNodeIp()), display);
-			manager.execCommand(EJABBERD_REGISTER, new Object[] { PropertyReader.property("xmpp.cluster.bin.path"),
-					"admin", config.getXmppHostname(), config.getXmppAdminPwd() });
+
+			// Using this prepareCommand method instead of using execCommand
+			// method with command parameters because special parameters in
+			// password fields like "$" causes an IllegalArgumentException due
+			// to their special meanings in regular expressions (execCommand
+			// uses replaceAll, prepareCommand uses just replace).
+			String registerCmd = prepareCommand(EJABBERD_REGISTER,
+					new Object[] { PropertyReader.property("xmpp.cluster.bin.path"), "admin", config.getXmppHostname(),
+							config.getXmppAdminPwd() });
+
+			manager.execCommand(registerCmd, new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_ADMIN_USER_AT_", firstNode.getNodeIp()), display);
 
 			printMessage(
 					Messages.getString("REGISTERING_USER_AT_", config.getXmppLiderUsername(), firstNode.getNodeIp()),
 					display);
-			manager.execCommand(EJABBERD_REGISTER, new Object[] { PropertyReader.property("xmpp.cluster.bin.path"),
-					config.getXmppLiderUsername(), config.getXmppHostname(), config.getXmppLiderPassword() });
+			registerCmd = prepareCommand(EJABBERD_REGISTER,
+					new Object[] { PropertyReader.property("xmpp.cluster.bin.path"), config.getXmppLiderUsername(),
+							config.getXmppHostname(), config.getXmppLiderPassword() });
+
+			manager.execCommand(registerCmd, new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_USER_AT_", config.getXmppLiderUsername(),
 					firstNode.getNodeIp()), display);
 
@@ -1030,6 +1042,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 		}
 
 		return readingText;
+	}
+
+	private String prepareCommand(String command, Object[] params) {
+		String tmpCmd = command;
+
+		if (params != null) {
+			for (int i = 0; i < params.length; i++) {
+				if (params[i] != null) {
+					tmpCmd = tmpCmd.replace("{" + i + "}", params[i].toString());
+				}
+			}
+		}
+		return tmpCmd;
 	}
 
 	@Override
