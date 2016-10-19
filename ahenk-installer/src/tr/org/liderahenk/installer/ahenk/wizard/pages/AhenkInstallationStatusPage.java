@@ -54,7 +54,7 @@ public class AhenkInstallationStatusPage extends WizardPage implements ControlNe
 	private final static String MOVE_AHENK_CONF = "sudo mv -f /tmp/{0} /etc/ahenk/";
 	private final static String RESTART_AHENK_SERVICE = "sudo service ahenk restart";
 	private static final String DOWNLOAD_PACKAGE = "wget --output-document=/tmp/{0} {1}";
-	private static final String DEBCONF_SET_SELECTIONS = "debconf-set-selections <<< 'libpam-runtime	libpam-runtime/override	boolean	true'";
+	private static final String DEBCONF_SET_SELECTIONS = "sudo debconf-set-selections <<< 'libpam-runtime libpam-runtime/override boolean true'";
 
 	public AhenkInstallationStatusPage(AhenkSetupConfig config) {
 		super(AhenkInstallationStatusPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
