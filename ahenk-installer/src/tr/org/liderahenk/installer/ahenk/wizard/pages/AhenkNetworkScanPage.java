@@ -12,8 +12,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -43,6 +41,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.nmap4j.data.host.Address;
 import org.nmap4j.data.nmaprun.Host;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.ahenk.config.AhenkSetupConfig;
 import tr.org.liderahenk.installer.ahenk.i18n.Messages;
@@ -62,7 +62,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.network.TableThreadHelper;
  */
 public class AhenkNetworkScanPage extends WizardPage {
 
-	private static final Logger logger = Logger.getLogger(AhenkNetworkScanPage.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(AhenkNetworkScanPage.class);
 
 	private AhenkSetupConfig config = null;
 
@@ -301,7 +301,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 									}
 								});
 								running.remove(r);
-								logger.log(Level.INFO, "Running threads: {0}", running);
+								logger.info("Running threads: {0}", running);
 							}
 						};
 
@@ -317,7 +317,7 @@ public class AhenkNetworkScanPage extends WizardPage {
 							hostsPerThread = numberOfHosts / NUM_THREADS;
 						}
 
-						logger.log(Level.INFO, "Hosts: {0}, Threads:{1}, Host per Thread: {2}",
+						logger.info("Hosts: {}, Threads:{}, Host per Thread: {}",
 								new Object[] { numberOfHosts, NUM_THREADS, hostsPerThread });
 
 						for (int i = 0; i < numberOfHosts; i += hostsPerThread) {

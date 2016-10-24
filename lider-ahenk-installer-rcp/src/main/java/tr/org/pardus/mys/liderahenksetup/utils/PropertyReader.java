@@ -5,8 +5,9 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author <a href="mailto:emre.akkaya@agem.com.tr">Emre Akkaya</a>
@@ -14,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class PropertyReader {
 
-	private static final Logger logger = Logger.getLogger(PropertyReader.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(PropertyReader.class);
 
 	private static HashMap<String, String> propertyMap = null;
 	private static final String propertiesFile = "lider-config.properties";
@@ -30,7 +31,7 @@ public class PropertyReader {
 					.getResourceAsStream(propertiesFile);
 
 			if (inputStream == null) {
-				logger.log(Level.WARNING, "Could not find properties file: {0}", propertiesFile);
+				logger.error("Could not find properties file: {}", propertiesFile);
 				return;
 			}
 
@@ -40,14 +41,12 @@ public class PropertyReader {
 			while (keySet.hasMoreElements()) {
 				Object keyObject = keySet.nextElement();
 				propertyMap.put(keyObject.toString(), properties.getProperty(keyObject.toString()));
-				logger.log(Level.INFO, keyObject.toString() + "=" + properties.getProperty(keyObject.toString()));
+				logger.info(keyObject.toString() + "=" + properties.getProperty(keyObject.toString()));
 			}
 
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.toString(), e);
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 		}
-
 	}
 
 	public static String property(String key) {

@@ -10,8 +10,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -21,6 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.callables.DatabaseOnlyConfigureNodeCallable;
 import tr.org.liderahenk.installer.lider.callables.DatabaseSetupClusterNodeCallable;
@@ -53,7 +53,7 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 	boolean canGoBack = false;
 
-	private static final Logger logger = Logger.getLogger(DatabaseClusterInstallationStatus.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseClusterInstallationStatus.class);
 
 	public DatabaseClusterInstallationStatus(LiderSetupConfig config) {
 		super(DatabaseClusterInstallationStatus.class.getName(), Messages.getString("LIDER_INSTALLATION"), null);
@@ -314,16 +314,14 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(
 					Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_FIRST_NODE_AT_", firstNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} finally {
 			if (manager != null) {
@@ -357,14 +355,12 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		} catch (SSHConnectionException e) {
 			printMessage(firstNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_AND_STARTING_NODE_AT_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} finally {
 			if (manager != null) {
@@ -393,16 +389,14 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 		} catch (SSHConnectionException e) {
 			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(
 					Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_NODE_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("ERROR_MESSAGE_",e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} finally {
 			if (manager != null) {
@@ -429,14 +423,12 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 		} catch (SSHConnectionException e) {
 			printMessage(clusterNode.getNodeIp() + " " + Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_NODE_AT_", clusterNode.getNodeIp()),
 					display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		} finally {
 			if (manager != null) {

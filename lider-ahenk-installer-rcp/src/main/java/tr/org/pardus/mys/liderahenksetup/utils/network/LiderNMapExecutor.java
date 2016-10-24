@@ -5,14 +5,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.nmap4j.core.flags.ArgumentProperties;
 import org.nmap4j.core.nmap.ExecutionResults;
 import org.nmap4j.core.nmap.NMapExecutionException;
 import org.nmap4j.core.nmap.NMapExecutor;
 import org.nmap4j.core.nmap.NMapInitializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.pardus.mys.liderahenksetup.utils.StringUtils;
 
@@ -22,7 +22,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.StringUtils;
  */
 public class LiderNMapExecutor extends NMapExecutor {
 
-	private static final Logger logger = Logger.getLogger(LiderNMapExecutor.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(LiderNMapExecutor.class);
 
 	private ArgumentProperties nmapArguments;
 	private LiderNMapProperties nmapProperties;
@@ -74,7 +74,7 @@ public class LiderNMapExecutor extends NMapExecutor {
 		ExecutionResults results = new ExecutionResults();
 		BufferedWriter writer = null;
 		try {
-			logger.log(Level.INFO, "Command: {0}", command.toString());
+			logger.info("Command: {}", command.toString());
 
 			results.setExecutedCommand(command.toString());
 			Process process = Runtime.getRuntime().exec(command.toString());

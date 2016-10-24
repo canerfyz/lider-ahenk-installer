@@ -1,8 +1,9 @@
 package tr.org.pardus.mys.liderahenksetup.utils.setup;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.pardus.mys.liderahenksetup.constants.PackageInstaller;
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
@@ -20,7 +21,7 @@ import tr.org.pardus.mys.liderahenksetup.exception.SSHConnectionException;
  */
 public class SetupUtils {
 
-	private static final Logger logger = Logger.getLogger(SetupUtils.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SetupUtils.class);
 
 	/**
 	 * Install package via apt-get
@@ -126,11 +127,11 @@ public class SetupUtils {
 		try {
 			manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey, passphrase);
 			manager.connect();
-			logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
+			logger.info("Connection established to: {} with username: {}",
 					new Object[] { ip, username == null ? "root" : username });
 			return true;
 		} catch (SSHConnectionException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 		} finally {
 			if (manager != null) {
 				manager.disconnect();
@@ -158,7 +159,7 @@ public class SetupUtils {
 	public static void installPackage(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String packageName, final String version)
 			throws SSHConnectionException, CommandExecutionException {
-		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Installing package remotely on: {} with username: {}", new Object[] { ip, username });
 
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
@@ -170,10 +171,10 @@ public class SetupUtils {
 		// If version is not given
 		if (version == null || "".equals(version)) {
 			manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD_WITHOUT_VERSION, new Object[] { packageName });
-			logger.log(Level.INFO, "Package {0} installed successfully", new Object[] { packageName });
+			logger.info("Package {} installed successfully", new Object[] { packageName });
 		} else {
 			manager.execCommand(INSTALL_PACKAGE_FROM_REPO_CMD, new Object[] { packageName, version });
-			logger.log(Level.INFO, "Package {0}:{1} installed successfully", new Object[] { packageName, version });
+			logger.info("Package {}:{} installed successfully", new Object[] { packageName, version });
 		}
 		manager.disconnect();
 	}
@@ -246,7 +247,7 @@ public class SetupUtils {
 			final String privateKey, final String passphrase, final File debPackage,
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 
-		logger.log(Level.INFO, "Installing package remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Installing package remotely on: {} with username: {}", new Object[] { ip, username });
 
 		// Update package list first!
 		SetupUtils.executeCommand(ip, username, password, port, privateKey, passphrase, UPDATE_PACKAGE_LIST);
@@ -270,7 +271,7 @@ public class SetupUtils {
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
-		logger.log(Level.INFO, "Package {0} installed successfully", debPackage.getName());
+		logger.info("Package {} installed successfully", debPackage.getName());
 	}
 
 	/**
@@ -331,8 +332,7 @@ public class SetupUtils {
 	public static void uninstallPackage(final String ip, final String username, final String password,
 			final Integer port, final String privateKey, final String passphrase, final String packageName)
 			throws CommandExecutionException, SSHConnectionException {
-		logger.log(Level.INFO, "Uninstalling package remotely on: {0} with username: {1}",
-				new Object[] { ip, username });
+		logger.info("Uninstalling package remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -340,7 +340,7 @@ public class SetupUtils {
 		manager.execCommand(UNINSTALL_PACKAGE_CMD, new Object[] { packageName });
 		manager.disconnect();
 
-		logger.log(Level.INFO, "Package {0} uninstalled successfully", packageName);
+		logger.info("Package {} uninstalled successfully", packageName);
 	}
 
 	/**
@@ -358,7 +358,7 @@ public class SetupUtils {
 	public static void addRepository(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String repository)
 			throws CommandExecutionException, SSHConnectionException {
-		logger.log(Level.INFO, "Adding repository remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Adding repository remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -366,7 +366,7 @@ public class SetupUtils {
 		manager.execCommand(ADD_APP_REPO_CMD, new Object[] { repository });
 		manager.disconnect();
 
-		logger.log(Level.INFO, "Repository {0} added successfully", repository);
+		logger.info("Repository {} added successfully", repository);
 	}
 
 	/**
@@ -390,7 +390,7 @@ public class SetupUtils {
 			destinationDir += "/";
 		}
 
-		logger.log(Level.INFO, "Copying file to: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Copying file to: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -398,7 +398,7 @@ public class SetupUtils {
 		manager.copyFileToRemote(fileToTranster, destinationDir, false);
 		manager.disconnect();
 
-		logger.log(Level.INFO, "File {0} copied successfully", fileToTranster.getName());
+		logger.info("File {} copied successfully", fileToTranster.getName());
 	}
 
 	/**
@@ -418,14 +418,14 @@ public class SetupUtils {
 	public static void executeCommand(final String ip, final String username, final String password, final Integer port,
 			final String privateKey, final String passphrase, final String command)
 			throws SSHConnectionException, CommandExecutionException {
-		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Executing command remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
 
 		manager.execCommand(command, new Object[] {});
-		logger.log(Level.INFO, "Executed command successfully: {0}", new Object[] { command });
+		logger.info("Executed command successfully: {}", new Object[] { command });
 
 		manager.disconnect();
 	}
@@ -440,14 +440,14 @@ public class SetupUtils {
 			final String privateKey, final String passphrase, final String command,
 			IOutputStreamProvider outputStreamProvider, boolean usePty)
 			throws SSHConnectionException, CommandExecutionException {
-		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Executing command remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
 
 		manager.execCommand(command, null, outputStreamProvider, usePty);
-		logger.log(Level.INFO, "Executed command successfully: {0}", new Object[] { command });
+		logger.info("Executed command successfully: {}", new Object[] { command });
 
 		manager.disconnect();
 	}
@@ -472,7 +472,7 @@ public class SetupUtils {
 			final Integer port, final String privateKey, final String passphrase, final String filename,
 			final PackageInstaller packageInstaller) throws SSHConnectionException, CommandExecutionException {
 
-		logger.log(Level.INFO, "Installing package remotely on: {} with username: {}", new Object[] { ip, username });
+		logger.info("Installing package remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
@@ -500,7 +500,7 @@ public class SetupUtils {
 		manager.execCommand(command, new Object[] {});
 		manager.disconnect();
 
-		logger.log(Level.INFO, "Package {} installed successfully", filename);
+		logger.info("Package {} installed successfully", filename);
 	}
 
 	/**
@@ -530,14 +530,14 @@ public class SetupUtils {
 			command = DOWNLOAD_PACKAGE_WITH_FILENAME.replace("{0}", filename).replace("{1}", downloadUrl);
 		}
 
-		logger.log(Level.INFO, "Executing command remotely on: {0} with username: {1}", new Object[] { ip, username });
+		logger.info("Executing command remotely on: {} with username: {}", new Object[] { ip, username });
 
 		SSHManager manager = new SSHManager(ip, username == null ? "root" : username, password, port, privateKey,
 				passphrase);
 		manager.connect();
 
 		manager.execCommand(command, new Object[] {});
-		logger.log(Level.INFO, "Command: '{0}' executed successfully.", new Object[] { command });
+		logger.info("Command: '{}' executed successfully.", new Object[] { command });
 
 		manager.disconnect();
 	}

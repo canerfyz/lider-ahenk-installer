@@ -11,11 +11,11 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -32,7 +32,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
  */
 public class XmppClusterInstallCallable implements Callable<Boolean> {
 
-	private static final Logger logger = Logger.getLogger(XmppClusterInstallCallable.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(XmppClusterInstallCallable.class);
 
 	private String nodeIp;
 	private String nodeRootPwd;
@@ -74,15 +74,14 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
+				logger.info("Connection established to: {} with username: {}",
 						new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
 				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE") + " " + nodeIp, display);
 				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF" + " " + nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				e.printStackTrace();
-				logger.log(Level.SEVERE, e.getMessage());
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -91,15 +90,14 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully updated package list of {0}", new Object[] { nodeIp });
+				logger.info("Successfully updated package list of {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("COULD_NOT_UPDATE_PACKAGE_LIST_OF") + " " + nodeIp, display);
 				printMessage(Messages.getString("CHECK_INTERNET_CONNECTION_OF") + " " + nodeIp, display);
 				printMessage(Messages.getString("CHECK_REPOSITORY_LISTS_OF") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -113,13 +111,12 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SENDING_DEB_FILE_TO") + " " + nodeIp, display);
 				manager.copyFileToRemote(ejabberdDeb, "/tmp/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_DEB_FILE_TO") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully sent Ejabberd deb to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent Ejabberd deb to: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_DEB_FILE_TO") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -128,13 +125,12 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("INSTALLING_GDEBI_TO_", nodeIp), display);
 				manager.execCommand("apt-get install -y --force-yes gdebi", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_GDEBI_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully installed gdebi to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully installed gdebi to: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_GDEBI_TO_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 			
@@ -143,14 +139,13 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("INSTALLING_EJABBERD_TO") + " " + nodeIp, display);
 				manager.execCommand("gdebi -n /tmp/ejabberd_16.06-0_amd64.deb", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_EJABBERD_TO") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully installed Ejabberd at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully installed Ejabberd at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_EJABBERD_TO") + " " + nodeIp,
 						display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -173,13 +168,12 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SENDING_EJABBERD_YML_TO") + " " + nodeIp, display);
 				manager.copyFileToRemote(ejabberdYmlFile, "/opt/ejabberd-16.06/conf/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_EJABBERD_YML_TO") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully sent ejabberd.yml to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent ejabberd.yml to: {}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_EJABBERD_YML_TO") + " " + nodeIp,
 						display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -190,14 +184,13 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 						"sed -i '/#ERLANG_NODE/c\\ERLANG_NODE=ejabberd@{0}.{1}' /opt/ejabberd-16.06/conf/ejabberdctl.cfg",
 						new Object[] { nodeName, config.getXmppHostname() });
 				printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_EJABBERD_CTL_CFG_AT_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully modified ejabberdctl.cfg at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully modified ejabberdctl.cfg at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_EJABBERDCTL_AT") + " " + nodeIp,
 						display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -217,14 +210,13 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				}
 
 				printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ETC_HOSTS_AT") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully modified /etc/hosts at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully modified /etc/hosts at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_ETC_HOSTS_AT") + " " + nodeIp,
 						display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 

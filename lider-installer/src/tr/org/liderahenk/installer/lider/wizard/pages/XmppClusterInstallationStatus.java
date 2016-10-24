@@ -17,8 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -28,6 +26,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.callables.XmppClusterInstallCallable;
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
@@ -74,7 +74,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 
 	private String erlangCookie = null;
 
-	private static final Logger logger = Logger.getLogger(XmppClusterInstallationStatus.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(XmppClusterInstallationStatus.class);
 
 	private List<XmppNodeInfoModel> installedNodeList;
 	private List<XmppNodeInfoModel> newNodeList;
@@ -174,8 +174,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 							printMessage(
 									Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()),
 									display);
-							logger.log(Level.SEVERE, e.getMessage());
-							e.printStackTrace();
+							logger.error(e.getMessage(), e);
 						}
 
 					}
@@ -384,15 +383,14 @@ public class XmppClusterInstallationStatus extends WizardPage
 			manager.connect();
 
 			printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
+			logger.info("Connection established to: {} with username: {}",
 					new Object[] { clusterNode.getNodeIp(), "root" });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			e.printStackTrace();
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -408,15 +406,13 @@ public class XmppClusterInstallationStatus extends WizardPage
 			}
 
 			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ETC_HOSTS_AT_", clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Successfully modified /etc/hosts at: {0}",
-					new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully modified /etc/hosts at: {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_ALREADY_INSTALLED_NODE_AT",
 					clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 	}
@@ -453,21 +449,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_DEFINED_EJABBERD_AS_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
 
-			logger.log(Level.INFO, "Successfully defined service at {0}", new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully defined service at {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_DEFINING_SERVICE_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -487,14 +481,12 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("SUCCESSFULLY_MODIFIED_ERLANG_COOKIE_AT_", clusterNode.getNodeIp()),
 					display);
 
-			logger.log(Level.INFO, "Successfully modified .erlang.cookie at {0}",
-					new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully modified .erlang.cookie at {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
@@ -502,8 +494,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					Messages.getString("EXCEPTION_RAISED_WHILE_MODIFYING_ERLANG_COOKIE_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -524,21 +515,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			erlangCookie = erlangCookie.replaceAll("\n", "");
 			printMessage(Messages.getString("SUCCESSFULLY_READ_ERLANG_COOKIE_FROM_", firstNode.getNodeIp()), display);
 
-			logger.log(Level.INFO, "Successfully read .erlang.cookie from {0}", new Object[] { firstNode.getNodeIp() });
+			logger.info("Successfully read .erlang.cookie from {}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", firstNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_READING_ERLANG_COOKIE_AT_") + firstNode.getNodeIp(),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 	}
@@ -566,48 +555,42 @@ public class XmppClusterInstallationStatus extends WizardPage
 					config.getXmppHostname(), config.getXmppHostname() });
 			printMessage(Messages.getString("SUCCESSFULLY_ADDED_DEFAULT_SRG_BEHAVIOUR_AT_", firstNode.getNodeIp()),
 					display);
-			logger.log(Level.INFO, "Successfully created shared roster group at {0}",
-					new Object[] { firstNode.getNodeIp() });
+			logger.info("Successfully created shared roster group at {}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", firstNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CREATING_SRG_AT_", firstNode.getNodeIp()), display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
 		try {
 			printMessage(Messages.getString("REGISTERING_ADMIN_USER_AT_", firstNode.getNodeIp()), display);
-			manager.execCommand(EJABBERD_REGISTER,
-					new Object[] { PropertyReader.property("xmpp.cluster.bin.path"), "admin", config.getXmppHostname(),
-							config.getXmppAdminPwd() });
+			manager.execCommand(EJABBERD_REGISTER, new Object[] { PropertyReader.property("xmpp.cluster.bin.path"),
+					"admin", config.getXmppHostname(), config.getXmppAdminPwd() });
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_ADMIN_USER_AT_", firstNode.getNodeIp()), display);
 
 			printMessage(
 					Messages.getString("REGISTERING_USER_AT_", config.getXmppLiderUsername(), firstNode.getNodeIp()),
 					display);
-			manager.execCommand(EJABBERD_REGISTER,
-					new Object[] { PropertyReader.property("xmpp.cluster.bin.path"), config.getXmppLiderUsername(),
-							config.getXmppHostname(), config.getXmppLiderPassword() });
+			manager.execCommand(EJABBERD_REGISTER, new Object[] { PropertyReader.property("xmpp.cluster.bin.path"),
+					config.getXmppLiderUsername(), config.getXmppHostname(), config.getXmppLiderPassword() });
 			printMessage(Messages.getString("SUCCESSFULLY_REGISTERED_USER_AT_", config.getXmppLiderUsername(),
 					firstNode.getNodeIp()), display);
 
-			logger.log(Level.INFO, "Successfully registered users at {0}", new Object[] { firstNode.getNodeIp() });
+			logger.info("Successfully registered users at {}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_REGISTERING_USERS_AT_", firstNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -626,21 +609,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("INSTALLING_HAPROXY_PACKAGE_TO", xmppProxyAddress), display);
 			manager.execCommand("apt-get -y --force-yes install haproxy", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_HAPROXY_PACKAGE_TO", xmppProxyAddress), display);
-			logger.log(Level.INFO, "Successfully installed HaProxy to {0}", new Object[] { xmppProxyAddress });
+			logger.info("Successfully installed HaProxy to {}", new Object[] { xmppProxyAddress });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", xmppProxyAddress), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_HAPROXY_PACKAGE_AT", xmppProxyAddress),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), xmppProxyAddress), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -660,20 +641,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 		haproxyCfg = LiderAhenkUtils.replace(map, haproxyCfg);
 		File haproxyCfgFile = LiderAhenkUtils.writeToFile(haproxyCfg, "haproxy.cfg");
 		printMessage(Messages.getString("SUCCESSFULLY_CREATED_HAPROXY_CONFIG_FILE"), display);
-		logger.log(Level.INFO, "Successfully created haproxy.cfg", new Object[] {});
+		logger.info("Successfully created haproxy.cfg");
 
 		try {
 			printMessage(Messages.getString("SENDING_HAPROXY_CONFIG_FILE_TO") + " " + xmppProxyAddress, display);
 			manager.copyFileToRemote(haproxyCfgFile, "/etc/haproxy/", false);
 			printMessage(Messages.getString("SUCCESSFULLY_SENT_HAPROXY_CONFIG_FILE_TO", xmppProxyAddress), display);
-			logger.log(Level.INFO, "Successfully sent haproxy.cfg to {0}", new Object[] {});
+			logger.info("Successfully sent haproxy.cfg to {}", new Object[] { xmppProxyAddress });
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_HAPROXY_CFG_TO", xmppProxyAddress),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), xmppProxyAddress), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -681,21 +661,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("RESTARTING_HAPROXY_SERVICE_AT", xmppProxyAddress), display);
 			manager.execCommand("service haproxy restart", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_RESTARTED_HAPROXY_SERVICE_AT", xmppProxyAddress), display);
-			logger.log(Level.INFO, "Successfully restarted haproxy service at {0}", new Object[] {});
+			logger.info("Successfully restarted haproxy service at {}", new Object[] { xmppProxyAddress });
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_HAPROXY_SERVICE_AT", xmppProxyAddress),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), xmppProxyAddress), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
 		printMessage(Messages.getString("SUCCESSFULLY_COMPLETED_INSTALLATION_OF_HAPROXY_AT", xmppProxyAddress),
 				display);
-		logger.log(Level.INFO, "Successfully completed installation of HaProxy at: {0}",
-				new Object[] { xmppProxyAddress });
+		logger.info("Successfully completed installation of HaProxy at: {}", new Object[] { xmppProxyAddress });
 	}
 
 	private Map<String, String> prepareBackendProperties() {
@@ -744,21 +722,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl join_cluster 'ejabberd@{0}.{1}'",
 					new Object[] { firstNodeName, config.getXmppHostname() });
 			printMessage(Messages.getString("SUCCESSFULLY_JOINED_TO_CLUSTER_AT_", clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Successfully joined to cluster at {0}", new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully joined to cluster at {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_JOINING_TO_CLUSTER_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 
 			boolean joinSuccessfull = false;
 			for (int i = 0; i < 3; i++) {
@@ -795,8 +771,7 @@ public class XmppClusterInstallationStatus extends WizardPage
 					printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()),
 							display);
 					printMessage(Messages.getString("WILL_RETRY_TO_JOIN_AT_", clusterNode.getNodeIp()), display);
-					logger.log(Level.SEVERE, e.getMessage());
-					e.printStackTrace();
+					logger.error(e.getMessage(), e);
 				}
 
 				if (joinSuccessfull) {
@@ -828,21 +803,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("WAITING_FOR_RESTARTING_EJABBERD_AT_", clusterNode.getNodeIp()), display);
 			Thread.sleep(15000);
 
-			logger.log(Level.INFO, "Successfully restarted Ejabberd at {0}", new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully restarted Ejabberd at {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_RESTARTING_EJABBERD_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -858,21 +831,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("STARTING_EJABBERD_AT_", clusterNode.getNodeIp()), display);
 			manager.execCommand("/opt/ejabberd-16.06/bin/ejabberdctl start", new Object[] {});
 			printMessage(Messages.getString("SUCCESSFULLY_STARTED_EJABBERD_AT_", clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Successfully started Ejabberd at {0}", new Object[] { clusterNode.getNodeIp() });
+			logger.info("Successfully started Ejabberd at {}", new Object[] { clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_STARTING_EJABBERD_AT_", clusterNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 
@@ -890,21 +861,19 @@ public class XmppClusterInstallationStatus extends WizardPage
 					new Object[] { firstNode.getNodeRootPwd(), firstNode.getNodeIp() });
 			printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_SSHPASS_PACKAGE_TO") + " " + firstNode.getNodeIp(),
 					display);
-			logger.log(Level.INFO, "Successfully installed sshpass to {0}", new Object[] { firstNode.getNodeIp() });
+			logger.info("Successfully installed sshpass to {}", new Object[] { firstNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO", firstNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_SSHPASS_AT_", firstNode.getNodeIp()),
 					display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 	}
@@ -924,22 +893,20 @@ public class XmppClusterInstallationStatus extends WizardPage
 					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
 			printMessage(Messages.getString("SUCCESSFULLY_SENT_ERLANG_COOKIE_FROM_TO_", firstNode.getNodeIp(),
 					clusterNode.getNodeIp()), display);
-			logger.log(Level.INFO, "Successfully sent Erlang cookie from {0} to {1}",
+			logger.info("Successfully sent Erlang cookie from {} to {}",
 					new Object[] { firstNode.getNodeIp(), clusterNode.getNodeIp() });
 
 		} catch (SSHConnectionException e) {
 			printMessage(Messages.getString("COULD_NOT_CONNECT_TO_", clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("ERROR_MESSAGE_", e.getMessage()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 
 		} catch (CommandExecutionException e) {
 			printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_ERLANG_COOKIE_FROM_TO_",
 					firstNode.getNodeIp(), clusterNode.getNodeIp()), display);
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), firstNode.getNodeIp()), display);
-			logger.log(Level.SEVERE, e.getMessage());
-			e.printStackTrace();
+			logger.error(e.getMessage(), e);
 			throw new Exception();
 		}
 	}

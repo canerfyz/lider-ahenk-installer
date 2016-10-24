@@ -9,11 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -30,7 +30,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
  */
 public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 
-	private static final Logger logger = Logger.getLogger(DatabaseSetupClusterNodeCallable.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseSetupClusterNodeCallable.class);
 
 	private String nodeIp;
 	private String nodeRootPwd;
@@ -72,15 +72,13 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
-						new Object[] { nodeIp, "root" });
+				logger.info("Connection established to: {} with username: {}", new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
 				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", nodeIp), display);
 				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				e.printStackTrace();
-				logger.log(Level.SEVERE, e.getMessage());
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -90,15 +88,14 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				manager.execCommand("apt-get update", new Object[] {});
 
 				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully updated package list of {0}", new Object[] { nodeIp });
+				logger.info("Successfully updated package list of {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("COULD_NOT_UPDATE_PACKAGE_LIST_OF_", nodeIp), display);
 				printMessage(Messages.getString("CHECK_INTERNET_CONNECTION_OF_", nodeIp), display);
 				printMessage(Messages.getString("CHECK_REPOSITORY_LISTS_OF_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -128,13 +125,12 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("UPDATING_PACKAGE_LIST_OF_", nodeIp), display);
 				manager.execCommand("apt-get update", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_UPDATED_PACKAGE_LIST_OF_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully done prerequiste part at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully done prerequiste part at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_PREREQUISITES_AT_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -152,13 +148,12 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 					manager.execCommand("debconf-set-selections <<< '{0}'", new Object[] { value });
 				}
 				printMessage(Messages.getString("SUCCESSFULLY_SET_DEB_CONF_SELECTIONS_AT") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully done debconf selections part at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully done debconf selections part at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_DURING_DEBCONF_AT") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -167,13 +162,11 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("CLEANING_BEFORE_INSTALLATION_AT") + " " + nodeIp, display);
 				manager.execCommand("apt-get -y --force-yes purge -y mysql-* mariadb-*", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_CLEANED_BEFORE_INSTALLATION_AT") + " " + nodeIp, display);
-				logger.log(Level.INFO, "Successfully successfully cleaned before installation at: {0}",
-						new Object[] { nodeIp });
+				logger.info("Successfully successfully cleaned before installation at: {}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("COULD_NOT_CLEAN_AT") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -184,13 +177,11 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				manager.execCommand("apt-get -y --force-yes install mariadb-server-10.1", new Object[] {});
 				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_PACKAGE") + " 'software-properties-common' to: "
 						+ nodeIp, display);
-				logger.log(Level.INFO, "Successfully installed package mariadb-server-10.1 at: {0}",
-						new Object[] { nodeIp });
+				logger.info("Successfully installed package mariadb-server-10.1 at: {}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("COULD_NOT_INSTALL_MARIADB_TO") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -221,13 +212,12 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 						"mysql -uroot -p{0} -e \"CREATE DATABASE liderdb DEFAULT CHARACTER SET utf8 DEFAULT COLLATE utf8_general_ci\"",
 						new Object[] { config.getDatabaseRootPassword() });
 				printMessage(Messages.getString("SUCCESSFULLY_EXECUTED_MYSQL_COMMANDS_AT") + nodeIp, display);
-				logger.log(Level.INFO, "Successfully mysql commands at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully mysql commands at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_ON_MYSQL_SERVICE_AT") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -256,13 +246,12 @@ public class DatabaseSetupClusterNodeCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SENDING_CNF_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(galeraCnfFile, "/etc/mysql/conf.d/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully sent galera.cnf to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent galera.cnf to: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_MYSQL_AT") + " " + nodeIp, display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 

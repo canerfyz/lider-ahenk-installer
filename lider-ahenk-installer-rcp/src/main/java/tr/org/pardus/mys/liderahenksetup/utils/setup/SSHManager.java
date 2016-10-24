@@ -7,8 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
@@ -31,7 +32,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
  */
 public class SSHManager {
 
-	private static final Logger logger = Logger.getLogger(SSHManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(SSHManager.class);
 
 	private JSch SSHChannel;
 	private Session session;
@@ -98,7 +99,7 @@ public class SSHManager {
 			int timeout = PropertyReader.propertyInt("session.timeout").intValue();
 			session.connect(timeout);
 		} catch (JSchException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 			throw new SSHConnectionException(e.getMessage());
 		}
 	}
@@ -121,7 +122,7 @@ public class SSHManager {
 
 		Channel channel = null;
 
-		logger.log(Level.INFO, "Command: {0}", command);
+		logger.info("Command: {}", command);
 
 		String output = null;
 
@@ -156,10 +157,10 @@ public class SSHManager {
 					if (i < 0)
 						break;
 					output = new String(tmp, 0, i, StandardCharsets.UTF_8);
-					logger.log(Level.INFO, output);
+					logger.info(output);
 				}
 				if (channel.isClosed()) {
-					logger.log(Level.INFO, "exit status: " + channel.getExitStatus());
+					logger.info("exit status: " + channel.getExitStatus());
 					if (channel.getExitStatus() != 0) {
 						throw new CommandExecutionException("Exit status: " + channel.getExitStatus());
 					}
@@ -174,9 +175,10 @@ public class SSHManager {
 			}
 
 		} catch (RuntimeException e) {
+			logger.error(e.getMessage(), e);
 			throw e;
 		} catch (Exception e1) {
-			logger.log(Level.SEVERE, e1.getMessage());
+			logger.error(e1.getMessage(), e1);
 			throw new CommandExecutionException(e1.getMessage());
 		} finally {
 			if (channel != null) {
@@ -242,7 +244,7 @@ public class SSHManager {
 			String command = "scp -l 8192 " + (preserveTimestamp ? "-p" : "") + " -t " + destDirectory
 					+ fileToTransfer.getName();
 
-			logger.log(Level.INFO, "Command: {0}", command);
+			logger.info("Command: {}", command);
 
 			Channel channel = session.openChannel("exec");
 			((ChannelExec) channel).setCommand(command);
@@ -298,9 +300,10 @@ public class SSHManager {
 			channel.disconnect();
 
 		} catch (RuntimeException e) {
+			logger.error(e.getMessage(), e);
 			throw e;
 		} catch (Exception e1) {
-			logger.log(Level.SEVERE, e1.getMessage());
+			logger.error(e1.getMessage(), e1);
 			throw new CommandExecutionException(e1.getMessage());
 		} finally {
 			if (fis != null) {

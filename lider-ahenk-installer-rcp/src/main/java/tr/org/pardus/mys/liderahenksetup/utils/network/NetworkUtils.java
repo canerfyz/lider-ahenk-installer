@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.nmap4j.core.nmap.NMapExecutionException;
@@ -21,6 +19,8 @@ import org.nmap4j.data.host.Address;
 import org.nmap4j.data.host.os.OsMatch;
 import org.nmap4j.data.host.ports.Port;
 import org.nmap4j.data.nmaprun.Host;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.pardus.mys.liderahenksetup.exception.CommandExecutionException;
 import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
@@ -36,7 +36,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.PropertyReader;
  */
 public class NetworkUtils {
 
-	private static final Logger logger = Logger.getLogger(NetworkUtils.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(NetworkUtils.class);
 
 	public static final String IPV4 = "ipv4";
 	public static final String HOST_UP = "up";
@@ -83,19 +83,7 @@ public class NetworkUtils {
 			if (!iface.getName().contains("lo")) { // Consider only eth
 													// networks, skip localhost
 				for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
-					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports
-																				// only
-																				// IPv4
-																				// at
-																				// the
-																				// moment,
-																				// So
-																				// max
-																				// mask
-																				// length
-																				// cannot
-																				// exceed
-																				// 32!
+					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) {
 						try {
 							SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/"
 									+ ifaceAddress.getNetworkPrefixLength());
@@ -106,16 +94,11 @@ public class NetworkUtils {
 									add1921681 = false;
 								}
 							}
-							logger.log(Level.INFO, "iface " + iface.getName() + " has address "
-									+ ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength());
+							logger.info("iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/"
+									+ ifaceAddress.getNetworkPrefixLength());
 						} catch (Exception e) {
-							e.printStackTrace();
-							logger.log(
-									Level.SEVERE, "iface " + iface.getName() + " has address "
-											+ ifaceAddress.getAddress() + "/" + ifaceAddress.getNetworkPrefixLength(),
-									e);
+							logger.error(e.getMessage(), e);
 						}
-
 					}
 				}
 			}
@@ -126,7 +109,7 @@ public class NetworkUtils {
 			}
 		}
 
-		logger.log(Level.INFO, "IP addresses have been found. Returning results.");
+		logger.info("IP addresses have been found. Returning results.");
 
 		return ipAddresses;
 	}
@@ -153,31 +136,20 @@ public class NetworkUtils {
 			if (!iface.getName().contains("lo")) { // Consider only eth
 													// networks, skip localhost
 				for (InterfaceAddress ifaceAddress : iface.getInterfaceAddresses()) {
-					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) { // Supports
-																				// only
-																				// IPv4
-																				// at
-																				// the
-																				// moment,
-																				// So
-																				// max
-																				// mask
-																				// cannot
-																				// exceed
-																				// 32!
+					if (ifaceAddress.getNetworkPrefixLength() <= (short) 32) {
 						SubnetUtils subnet = new SubnetUtils(ifaceAddress.getAddress().getHostAddress() + "/"
 								+ ifaceAddress.getNetworkPrefixLength());
 						String ipRange = subnet.getInfo().getLowAddress() + "/" + ifaceAddress.getNetworkPrefixLength();
 						ipRanges.add(ipRange);
 
-						logger.log(Level.INFO, "iface " + iface.getName() + " has address " + ifaceAddress.getAddress()
-								+ "/" + ifaceAddress.getNetworkPrefixLength());
+						logger.info("iface " + iface.getName() + " has address " + ifaceAddress.getAddress() + "/"
+								+ ifaceAddress.getNetworkPrefixLength());
 					}
 				}
 			}
 		}
 
-		logger.log(Level.INFO, "IP ranges have been found. Returning results.");
+		logger.info("IP ranges have been found. Returning results.");
 
 		return ipRanges;
 	}
@@ -185,7 +157,7 @@ public class NetworkUtils {
 	public static ArrayList<Host> scanNetwork(NmapParameters params)
 			throws CommandExecutionException, IOException, InterruptedException {
 
-		logger.log(Level.INFO, "Scanning network with parameters: {0}", params);
+		logger.info("Scanning network with parameters: {}", params);
 
 		try {
 
@@ -211,17 +183,17 @@ public class NetworkUtils {
 
 			if (!nmap.hasError()) {
 				NMapRun nmapRun = nmap.getResult();
-				logger.log(Level.INFO, "Finished scanning network. Returning results");
+				logger.info("Finished scanning network. Returning results");
 				return nmapRun != null ? nmapRun.getHosts() : null;
 			} else {
-				logger.log(Level.SEVERE, nmap.getExecutionResults().getErrors());
+				logger.error(nmap.getExecutionResults().getErrors());
 				throw new CommandExecutionException(nmap.getExecutionResults().getErrors());
 			}
 
 		} catch (NMapInitializationException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 		} catch (NMapExecutionException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 		}
 
 		return null;
@@ -309,7 +281,7 @@ public class NetworkUtils {
 		try {
 			return InetAddress.getByName(ip).isReachable(Integer.parseInt(PropertyReader.property("network.timeout")));
 		} catch (IOException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			logger.error(e.getMessage(), e);
 		}
 		return false;
 	}

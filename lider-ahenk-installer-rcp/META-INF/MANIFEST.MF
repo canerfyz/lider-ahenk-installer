@@ -27,7 +27,9 @@ Require-Bundle: javax.inject,
  org.eclipse.e4.ui.css.swt,
  org.eclipse.e4.ui.workbench.swt,
  org.nmap4j,
- org.eclipse.e4.core.commands
+ org.eclipse.e4.core.commands,
+ org.slf4j.api,
+ org.apache.log4j
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: tr.org.pardus.mys.liderahenksetup.constants,
@@ -36,4 +38,5 @@ Export-Package: tr.org.pardus.mys.liderahenksetup.constants,
  tr.org.pardus.mys.liderahenksetup.utils.gui,
  tr.org.pardus.mys.liderahenksetup.utils.network,
  tr.org.pardus.mys.liderahenksetup.utils.setup
-Bundle-ClassPath: .
+Bundle-ClassPath: conf/,
+ .

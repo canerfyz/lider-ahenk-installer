@@ -9,11 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -23,12 +23,13 @@ import tr.org.pardus.mys.liderahenksetup.utils.LiderAhenkUtils;
 import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
 
 /**
- * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner Feyzullahoglu</a>
+ * @author <a href="mailto:caner.feyzullahoglu@agem.com.tr">Caner
+ *         Feyzullahoglu</a>
  * 
  */
 public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 
-	private static final Logger logger = Logger.getLogger(DatabaseOnlyConfigureNodeCallable.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseOnlyConfigureNodeCallable.class);
 
 	private String nodeIp;
 	private String nodeRootPwd;
@@ -37,7 +38,7 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 	private Display display;
 	private LiderSetupConfig config;
 	private Text txtLogConsole;
-	
+
 	public DatabaseOnlyConfigureNodeCallable(String nodeIp, String nodeRootPwd, String nodeName, Display display,
 			LiderSetupConfig config, Text txtLogConsole) {
 		super();
@@ -48,7 +49,7 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 		this.config = config;
 		this.txtLogConsole = txtLogConsole;
 	}
-	
+
 	@Override
 	public Boolean call() throws Exception {
 
@@ -56,7 +57,7 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 	}
 
 	private boolean configureClusterNode() {
-		
+
 		SSHManager manager = null;
 
 		boolean successfullSetup = false;
@@ -65,19 +66,18 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 			try {
 				printMessage(Messages.getString("CHECKING_CONNECTION_TO_", nodeIp), display);
 
-				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(), config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
+				manager = new SSHManager(nodeIp, "root", nodeRootPwd, config.getDatabasePort(),
+						config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase());
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
-						new Object[] { nodeIp, "root" });
+				logger.info("Connection established to: {} with username: {}", new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
 				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", nodeIp), display);
 				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				e.printStackTrace();
-				logger.log(Level.SEVERE, e.getMessage());
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -105,13 +105,12 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SENDING_CNF_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(galeraCnfFile, "/etc/mysql/conf.d/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_CNF_FILE_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully sent galera.cnf to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent galera.cnf to: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_CONFIGURING_MYSQL_AT_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -146,10 +145,11 @@ public class DatabaseOnlyConfigureNodeCallable implements Callable<Boolean> {
 				}
 				txtLogConsole.setText((txtLogConsole.getText() != null && !txtLogConsole.getText().isEmpty()
 						? txtLogConsole.getText() + "\n" : "") + message);
-				txtLogConsole.setSelection(txtLogConsole.getCharCount() - 1);			}
+				txtLogConsole.setSelection(txtLogConsole.getCharCount() - 1);
+			}
 		});
 	}
-	
+
 	/**
 	 * Reads file from classpath location of current project
 	 * 

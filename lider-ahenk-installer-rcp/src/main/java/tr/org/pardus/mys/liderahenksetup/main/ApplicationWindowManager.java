@@ -1,8 +1,6 @@
 package tr.org.pardus.mys.liderahenksetup.main;
 
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
@@ -28,6 +26,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.pardus.mys.liderahenksetup.constants.InstallerConstants;
 import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
@@ -50,7 +50,7 @@ public class ApplicationWindowManager {
 	@Inject
 	EHandlerService handlerService;
 
-	private static final Logger logger = Logger.getLogger(ApplicationWindowManager.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(ApplicationWindowManager.class);
 
 	private Composite comp;
 
@@ -122,7 +122,7 @@ public class ApplicationWindowManager {
 			}
 		}
 
-		logger.log(Level.FINE, "Created installer table");
+		logger.info("Created installer table");
 
 		return comp;
 	}

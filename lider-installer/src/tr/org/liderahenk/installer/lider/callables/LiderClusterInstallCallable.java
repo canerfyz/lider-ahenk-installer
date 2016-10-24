@@ -9,11 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import tr.org.liderahenk.installer.lider.config.LiderSetupConfig;
 import tr.org.liderahenk.installer.lider.i18n.Messages;
@@ -30,7 +30,7 @@ import tr.org.pardus.mys.liderahenksetup.utils.setup.SSHManager;
  */
 public class LiderClusterInstallCallable implements Callable<Boolean> {
 
-	private static final Logger logger = Logger.getLogger(LiderClusterInstallCallable.class.getName());
+	private static final Logger logger = LoggerFactory.getLogger(LiderClusterInstallCallable.class);
 
 	private String nodeIp;
 	private String nodeRootPwd;
@@ -77,15 +77,13 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				manager.connect();
 
 				printMessage(Messages.getString("CONNECTION_ESTABLISHED_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Connection established to: {0} with username: {1}",
-						new Object[] { nodeIp, "root" });
+				logger.info("Connection established to: {} with username: {}", new Object[] { nodeIp, "root" });
 
 			} catch (SSHConnectionException e) {
 				printMessage(Messages.getString("COULD_NOT_CONNECT_TO_NODE_", nodeIp), display);
 				printMessage(Messages.getString("CHECK_SSH_ROOT_PERMISSONS_OF_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				e.printStackTrace();
-				logger.log(Level.SEVERE, e.getMessage());
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -98,13 +96,12 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("SENDING_TAR_FILE_TO_", nodeIp), display);
 				manager.copyFileToRemote(karafTar, "/tmp/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_TAR_FILE_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully sent Karaf tar to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent Karaf tar to: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_TAR_FILE_TO_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -113,13 +110,12 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				printMessage(Messages.getString("EXTRACTING_TAR_FILE_AT_", nodeIp), display);
 				manager.execCommand("tar -xzvf {0} --directory {1}", new Object[] { "/tmp/lider.tar.gz", "/opt/" });
 				printMessage(Messages.getString("SUCCESSFULLY_EXTRACTED_TAR_FILE_AT_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully tar file at: {0}", new Object[] { nodeIp });
+				logger.info("Successfully tar file at: {}", new Object[] { nodeIp });
 
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_EXTRACTING_TAR_FILE_AT_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -184,12 +180,11 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				manager.copyFileToRemote(liderCfgFile,
 						"/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_CFG_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.cfg to: {0}", new Object[] { nodeIp });
+				logger.info("Successfully sent tr.org.liderahenk.cfg to: {}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_CFG_TO_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
@@ -213,13 +208,11 @@ public class LiderClusterInstallCallable implements Callable<Boolean> {
 				manager.copyFileToRemote(liderDatasourceCfgFile,
 						"/opt/" + PropertyReader.property("lider.package.name") + "/etc/", false);
 				printMessage(Messages.getString("SUCCESSFULLY_SENT_DATASOURCE_CFG_TO_", nodeIp), display);
-				logger.log(Level.INFO, "Successfully sent tr.org.liderahenk.datasource.cfg to: {0}",
-						new Object[] { nodeIp });
+				logger.info("Successfully sent tr.org.liderahenk.datasource.cfg to: {}", new Object[] { nodeIp });
 			} catch (CommandExecutionException e) {
 				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_SENDING_DATASOURCE_CFG_TO_", nodeIp), display);
 				printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), nodeIp), display);
-				logger.log(Level.SEVERE, e.getMessage());
-				e.printStackTrace();
+				logger.error(e.getMessage(), e);
 				throw new Exception();
 			}
 
