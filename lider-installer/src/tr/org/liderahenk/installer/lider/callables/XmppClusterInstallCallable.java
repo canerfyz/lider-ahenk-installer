@@ -123,10 +123,20 @@ public class XmppClusterInstallCallable implements Callable<Boolean> {
 				throw new Exception();
 			}
 
-			// TODO install GDEBI!!!!
-			// TODO install GDEBI!!!!
-			// TODO install GDEBI!!!!
-			
+			// Install Gdebi
+			try {
+				printMessage(Messages.getString("INSTALLING_GDEBI_TO_", nodeIp), display);
+				manager.execCommand("apt-get install -y --force-yes gdebi", new Object[] {});
+				printMessage(Messages.getString("SUCCESSFULLY_INSTALLED_GDEBI_TO_", nodeIp), display);
+				logger.log(Level.INFO, "Successfully installed gdebi to: {0}", new Object[] { nodeIp });
+
+			} catch (CommandExecutionException e) {
+				printMessage(Messages.getString("EXCEPTION_RAISED_WHILE_INSTALLING_GDEBI_TO_", nodeIp), display);
+				printMessage(Messages.getString("EXCEPTION_MESSAGE") + " " + e.getMessage() + " at " + nodeIp, display);
+				logger.log(Level.SEVERE, e.getMessage());
+				e.printStackTrace();
+				throw new Exception();
+			}
 			
 			// Install Ejabberd package
 			try {
