@@ -213,7 +213,16 @@ public class LiderClusterInstallationStatus extends WizardPage
 								Entry<Integer, LiderNodeInfoModel> entry = iterator.next();
 								final LiderNodeInfoModel clusterNode = entry.getValue();
 
-								defineServiceForNode(clusterNode, display);
+								try {
+									defineServiceForNode(clusterNode, display);
+								} catch (Exception e) {
+									if (e instanceof IOException) {
+										Thread.sleep(5000);
+										defineServiceForNode(clusterNode, display);
+									} else {
+										throw e;
+									}
+								}
 							}
 
 							// After Karaf nodes started, install HaProxy.
@@ -519,7 +528,7 @@ public class LiderClusterInstallationStatus extends WizardPage
 			printMessage(Messages.getString("EXCEPTION_MESSAGE_AT", e.getMessage(), clusterNode.getNodeIp()), display);
 			logger.log(Level.SEVERE, e.getMessage());
 			e.printStackTrace();
-			throw new Exception();
+			throw e;
 		} finally {
 			if (manager != null) {
 				manager.disconnect();
