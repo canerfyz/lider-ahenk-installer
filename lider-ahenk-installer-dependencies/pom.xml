@@ -41,6 +41,8 @@
 								<!-- groupId:artifactId:version -->
 								<artifact>
 									<id>org.nmap4j:nmap4j:1.1.0</id>
+								</artifact>
+								<artifact>
 									<id>org.apache.directory.api:api-all:1.0.0-M33</id>
 								</artifact>
 							</artifacts>
