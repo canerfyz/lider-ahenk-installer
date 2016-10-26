@@ -9,6 +9,7 @@
       <children xsi:type="menu:Menu" xmi:id="_vvR98HsSEeWYT4_CknNf9A" elementId="lider-ahenk-installer.menu.help" label="Help">
         <children xsi:type="menu:HandledMenuItem" xmi:id="_0pJ28HsSEeWYT4_CknNf9A" elementId="lider-ahenk-installer.handledmenuitem.about" label="About" command="_Y5UhhmabEeWqicFihqUSNQ"/>
       </children>
+      <children xsi:type="menu:Menu" xmi:id="_dvzVQJtXEeaKC74mLO4cPw" elementId="tr.org.liderahenk.installer.rcp.menu.tools" label="Araçlar"/>
     </mainMenu>
   </children>
   <handlers xmi:id="_Y5UhfWabEeWqicFihqUSNQ" elementId="lider-ahenk-installer.handler.quitCommand" contributionURI="bundleclass://tr.org.liderahenk.installer.rcp/tr.org.pardus.mys.liderahenksetup.handlers.QuitHandler" command="_Y5UhfGabEeWqicFihqUSNQ"/>

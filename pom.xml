@@ -209,6 +209,7 @@
 		<module>lider-ahenk-installer-product</module>
 		<module>ahenk-installer</module>
 		<module>lider-installer</module>
+		<module>ad-migration</module>
 	</modules>
 	
 	<developers>

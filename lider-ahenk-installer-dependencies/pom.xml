@@ -15,7 +15,6 @@
 	<properties>
 		<p2.maven.plugin.version>1.2.0-SNAPSHOT</p2.maven.plugin.version>
 		<jetty.maven.plugin.version>8.1.5.v20120716</jetty.maven.plugin.version>
-		<!-- needed for checkstyle/findbugs -->
 	</properties>
 
 	<repositories>
@@ -42,6 +41,7 @@
 								<!-- groupId:artifactId:version -->
 								<artifact>
 									<id>org.nmap4j:nmap4j:1.1.0</id>
+									<id>org.apache.directory.api:api-all:1.0.0-M33</id>
 								</artifact>
 							</artifacts>
 						</configuration>
