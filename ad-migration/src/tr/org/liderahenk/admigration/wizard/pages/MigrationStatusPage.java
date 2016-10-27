@@ -55,8 +55,8 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 	private final static RandomStringGenerator random = new RandomStringGenerator(10);
 
 	public MigrationStatusPage(MigrationConfig config) {
-		super(MigrationStatusPage.class.getName(), Messages.getString("INSTALLATION_OF_AHENK"), null);
-		setDescription(Messages.getString("INSTALLATION_STATUS"));
+		super(MigrationStatusPage.class.getName(), Messages.getString("AD_MIGRATION"), null);
+		setDescription(Messages.getString("MIGRATION_STATUS"));
 		this.config = config;
 	}
 
@@ -101,15 +101,18 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 				public void run() {
 					try {
 						logger.info("Creating Active Directory connection pool.");
+						printMessage(Messages.getString("CREATING_AD_CONN_POLL"), display);
 						LdapUtils activeDirectory = new LdapUtils(config.getAdHost(), config.getAdPort(),
 								config.getAdUsername(), config.getAdPassword(), false);
 
 						logger.info("Creating OpenLDAP connection pool.");
+						printMessage(Messages.getString("CREATING_LDAP_CONN_POLL"), display);
 						LdapUtils openLdap = new LdapUtils(config.getLdapHost(), config.getLdapPort(),
 								config.getLdapUsername(), config.getLdapPassword(), false);
 
 						// Search parameters for Active Directory
 						logger.info("Calculating Active Directory search parameters.");
+						printMessage(Messages.getString("CALCULATING_AD_SEARCH_PARAMS"), display);
 						final ArrayList<LdapSearchFilterAttribute> aUserFilterAttributes = new ArrayList<LdapSearchFilterAttribute>();
 						if (config.getAdUserObjectClasses() != null && config.getAdUserObjectClasses().length > 0) {
 							for (String objectClass : config.getAdUserObjectClasses()) {
@@ -127,6 +130,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 
 						// Search parameters for OpenLDAP
 						logger.info("Calculating OpenLDAP search parameters.");
+						printMessage(Messages.getString("CALCULATING_LDAP_SEARCH_PARAMS"), display);
 						final ArrayList<LdapSearchFilterAttribute> oUserFilterAttributes = new ArrayList<LdapSearchFilterAttribute>();
 						if (config.getLdapUserObjectClasses() != null && config.getLdapUserObjectClasses().length > 0) {
 							for (String objectClass : config.getLdapUserObjectClasses()) {
@@ -151,12 +155,14 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 						// attributes to
 						// them.
 						logger.info("Collecting user attributes in OpenLDAP...");
+						printMessage(Messages.getString("COLLECTING_USER_ATTR_LDAP"), display);
 						ArrayList<String> validUserAttrNames = null;
 						boolean[] userAttrUsed = null;
 						ArrayList<String> validUserObjClsValues = null;
 						List<Entry> oUserEntries = openLdap.search(config.getLdapUserSearchBaseDn(),
 								oUserFilterAttributes, null);
 						if (oUserEntries != null && !oUserEntries.isEmpty()) {
+							System.out.println("------------------------- 165");
 							// Select first entry
 							Entry entry = oUserEntries.get(0);
 
@@ -166,18 +172,22 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 							// Iterate over its each attribute
 							Collection<Attribute> attributes = entry.getAttributes();
 							if (attributes != null) {
+								System.out.println("------------------------- 175");
 								for (Attribute attribute : attributes) {
 									// If it is an object class, store only its
 									// valid object
 									// class values...
 									if (attribute.getId().equalsIgnoreCase("objectClass")) {
+										System.out.println("------------------------- 181");
 										for (Value<?> value : attribute) {
 											if (value == null || value.getValue() == null) {
 												continue;
 											}
+											System.out.println("------------------------- 186");
 											validUserObjClsValues.add(value.getValue().toString());
 										}
 									} else {
+										System.out.println("------------------------- 190");
 										// Flag current attribute as valid
 										validUserAttrNames.add(attribute.getId().toLowerCase(Locale.ENGLISH));
 									}
@@ -195,16 +205,19 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 						for (Entry entry : aEntries) {
 							try {
 								logger.info("Copying entry {} to OpenLDAP...", entry.getDn().getName());
+								printMessage(Messages.getString("COPYING_ENTRY_TO_LDAP_", entry.getDn().getName()), display);
 
 								String newDn = null;
 								Map<String, String[]> newAttributes = null;
 
 								logger.info("Reading attributes of the entry.");
+								printMessage(Messages.getString("READING_ATTR_OF_ENTRY_", entry.getDn().getName()), display);
 								Collection<Attribute> attributes = entry.getAttributes();
 								if (attributes != null) {
 									newAttributes = new HashMap<String, String[]>();
 									newAttributes.put("objectClass",
 											validUserObjClsValues.toArray(new String[validUserObjClsValues.size()]));
+									System.out.println("---------------------validUserObjClsValues: " + validUserObjClsValues != null ? validUserObjClsValues.size() : "null");
 									for (Attribute attribute : attributes) {
 										if (attribute.getId().equalsIgnoreCase("objectClass")) {
 											// Ignore object class, use valid
@@ -219,6 +232,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 											newDn += "=" + attribute.get() + ",";
 											newDn += config.getLdapNewUserEntrySuffix();
 											logger.info("Creating new DN {} for the entry...", newDn);
+											printMessage(Messages.getString("CREATING_NEW_DN_FOR_ENTRY_", newDn), display);
 										}
 										String log = "";
 										// Copy this AD attribute only if it has
@@ -241,6 +255,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 											userAttrUsed[index] = true;
 											logger.info("Copying new attribute {} = {} for the entry...",
 													new Object[] { attribute.getUpId(), log });
+											printMessage(Messages.getString("COPYING_NEW_ATTRIBUTE_", attribute.getId()), display);
 										}
 									}
 								}
@@ -257,10 +272,12 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 
 								// Create entry
 								logger.info("Trying to add new user entry to OpenLDAP: {}", newDn);
+								printMessage(Messages.getString("ADD_NEW_USER_TO_LDAP_", newDn), display);
 								openLdap.addEntry(newDn, newAttributes);
 
 							} catch (Exception e) {
 								logger.error(e.getMessage(), e);
+								printMessage(Messages.getString("ERROR_OCCURED_", e.getMessage()), display);
 							}
 						}
 
@@ -272,6 +289,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 						// attributes to
 						// them.
 						logger.info("Collecting group attributes in OpenLDAP...");
+						printMessage(Messages.getString("COLLECTING_GROUP_ENTRIES_LDAP"), display);
 						ArrayList<String> validGroupAttrNames = null;
 						boolean[] attrUsed = null;
 						ArrayList<String> validObjClsValues = null;
@@ -322,15 +340,18 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 						for (Entry entry : entries) {
 							try {
 								logger.info("Copying group entry {} to OpenLDAP...", entry.getDn().getName());
-
+								printMessage(Messages.getString("COPYING_GROUP_ENTRY_TO_LDAP_", entry.getDn().getName()), display);
+								
 								String newDn = null;
 								Map<String, String[]> newAttributes = null;
 								ArrayList<String> groupMembers = new ArrayList<String>();
 
 								logger.info("Reading group attributes of the entry.");
+								printMessage(Messages.getString("READING_GROUP_ATTR_OF_ENTRY_", entry.getDn().getName()), display);
 								Collection<Attribute> attributes = entry.getAttributes();
 								if (attributes != null) {
 									newAttributes = new HashMap<String, String[]>();
+									System.out.println("---------------------validUserObjClsValues: " + validUserObjClsValues != null ? validUserObjClsValues.size() : "null");
 									newAttributes.put("objectClass",
 											validObjClsValues.toArray(new String[validObjClsValues.size()]));
 									for (Attribute attribute : attributes) {
@@ -347,6 +368,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 											newDn += "=" + attribute.get() + ",";
 											newDn += config.getLdapNewGroupEntrySuffix();
 											logger.info("Creating new DN {} for the group entry...", newDn);
+											printMessage(Messages.getString("CREATING_NEW_DN_FOR_GROUP_ENTRY_", newDn), display);
 										}
 										if (attribute.size() > 0) {
 											// Copy this AD attribute only if it
@@ -369,6 +391,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 												attrUsed[index] = true;
 												logger.info("Copying new attribute {} = {} for the group entry...",
 														new Object[] { attribute.getUpId(), log });
+												printMessage(Messages.getString("COPYING_NEW_ATTR_FOR_GROUP_ENTRY_", attribute.getUpId()), display);
 											}
 											// If this is a 'member' attribute,
 											// save its values
@@ -399,6 +422,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 								// Add its members
 								if (!groupMembers.isEmpty()) {
 									logger.info("Trying to find members of the group entry: {}", newDn);
+									printMessage(Messages.getString("FIND_MEMBERS_OF_GROUP_ENTRY_", newDn), display);
 									ArrayList<String> newGroupMembers = new ArrayList<String>();
 									for (String aDn : groupMembers) {
 										try {
@@ -410,6 +434,7 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 											}
 										} catch (Exception e) {
 											logger.error(e.getMessage(), e);
+											printMessage(Messages.getString("ERROR_OCCURED_", e.getMessage()), display);
 										}
 									}
 									if (!newGroupMembers.isEmpty()) {
@@ -420,10 +445,12 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 
 								// Create entry
 								logger.info("Trying to add new group entry to OpenLDAP: {}", newDn);
+								printMessage(Messages.getString("ADD_NEW_GROUP_ENTRY_TO_LDAP", newDn), display);
 								openLdap.addEntry(newDn, newAttributes);
 
 							} catch (Exception e) {
 								logger.error(e.getMessage(), e);
+								printMessage(Messages.getString("ERROR_OCCURED_", e.getMessage()), display);
 							}
 						}
 
@@ -434,13 +461,13 @@ public class MigrationStatusPage extends WizardPage implements ControlNextEvent,
 						isInstallationFinished = true;
 						// Set progress bar to complete
 						setProgressBar(100, display);
-						printMessage(Messages.getString("INSTALLATION_COMPLETED"), display);
+						printMessage(Messages.getString("MIGRATION_COMPLETED"), display);
 						config.setInstallationFinished(isInstallationFinished);
 						// To enable finish button
 						setPageCompleteAsync(isInstallationFinished, display);
 					} catch (Exception e) {
 						logger.error(e.getMessage(), e);
-						// TODO
+						printMessage(Messages.getString("ERROR_OCCURED_", e.getMessage()), display);
 					}
 				}
 			};
