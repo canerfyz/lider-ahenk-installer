@@ -2,9 +2,6 @@ package tr.org.liderahenk.admigration.wizard.pages;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
@@ -20,64 +17,30 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
 public class MigrationConfirmPage extends WizardPage {
 
 	private MigrationConfig config;
-
-	private StyledText ipTextArea;
-	private Label accessLabel;
-	private Label installLabel;
+	private Label lblInfo;
 
 	public MigrationConfirmPage(MigrationConfig config) {
-		super(MigrationConfirmPage.class.getName(), Messages.getString("AHENK_INSTALLATION"), null);
-		setDescription("4.3 " + Messages.getString("AHENK_INSTALLATION_CONFIRM"));
+		super(MigrationConfirmPage.class.getName(), Messages.getString("AD_MIGRATION"), null);
+		setDescription("1.2 " + Messages.getString("MIGRATION_CONFIRM"));
 		this.config = config;
 	}
 
 	@Override
 	public void createControl(Composite parent) {
 
-		Composite container = GUIHelper.createComposite(parent, 1);
-		setControl(container);
+		Composite cmpMain = GUIHelper.createComposite(parent, 1);
+		setControl(cmpMain);
 
-		// IP list label
-		GUIHelper.createLabel(container, Messages.getString("MACHINES_THAT_AHENK_WILL_BE_INSTALLED"));
-
-		// Add a text area for IP list
-		ipTextArea = new StyledText(container, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-
-		GridData txtAreaGd = new GridData(SWT.FILL, SWT.FILL, true, false);
-		txtAreaGd.heightHint = 100;
-
-		ipTextArea.setEditable(false);
-		ipTextArea.setLayoutData(txtAreaGd);
-		ipTextArea.setText("localhost");
-
-		GridData gd = new GridData();
-		gd.widthHint = 500;
-		gd.minimumWidth = 500;
-
-		accessLabel = GUIHelper.createLabel(container);
-		accessLabel.setLayoutData(gd);
-
-		installLabel = GUIHelper.createLabel(container);
-		installLabel.setLayoutData(gd);
-
-		GUIHelper.createLabel(container, Messages.getString("AHENK_WILL_BE_INSTALLED") + " "
-				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
+		lblInfo = GUIHelper.createLabel(cmpMain, Messages.getString("AD_WILL_BE_MIGRATED_", "localhost", "localhost"));
+		GUIHelper.createLabel(cmpMain, Messages.getString("WOULD_YOU_LIKE_TO_CONTINUE"));
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
 		// Set the IP info in the opening of page
-		ipTextArea.setText("TODO");
+		lblInfo.setText(Messages.getString("AD_WILL_BE_MIGRATED_", config.getAdHost(), config.getLdapHost()));
 		((ControlNextEvent) super.getNextPage()).setNextPageEventType(NextPageEventType.CLICK_FROM_PREV_PAGE);
 		return super.getNextPage();
-	}
-
-	public Label getAccessLabel() {
-		return accessLabel;
-	}
-
-	public Label getInstallLabel() {
-		return installLabel;
 	}
 
 }
