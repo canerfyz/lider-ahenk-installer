@@ -144,7 +144,7 @@ public class DatabaseInstallationStatus extends WizardPage
 						SetupUtils.executeCommand(config.getDatabaseIp(), config.getDatabaseAccessUsername(),
 								config.getDatabaseAccessPasswd(), config.getDatabasePort(),
 								config.getDatabaseAccessKeyPath(), config.getDatabaseAccessPassphrase(),
-								"sudo export DEBIAN_FRONTEND='noninteractive'");
+								"export DEBIAN_FRONTEND='noninteractive'");
 						printMessage(Messages.getString("SUCCESSFULLY_SET_DEBIAN_FRONTEND_TO_NONINTERACTIVE"));
 
 						final String[] debconfValues = generateDebconfValues();
