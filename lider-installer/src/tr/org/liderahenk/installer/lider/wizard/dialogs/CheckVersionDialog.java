@@ -34,7 +34,6 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
  */
 public class CheckVersionDialog extends Dialog {
 
-	private final static String VERSION_URL = "http://www.agem.com.tr/installer-version";
 	private Label image;
 	private Label message;
 	private ProgressBar progBar;
@@ -211,7 +210,7 @@ public class CheckVersionDialog extends Dialog {
 
 		// get URL content
 		try {
-			url = new URL(VERSION_URL);
+			url = new URL(PropertyReader.property("installer.version.check.address"));
 			conn = url.openConnection();
 
 			// open the stream and put it into BufferedReader
