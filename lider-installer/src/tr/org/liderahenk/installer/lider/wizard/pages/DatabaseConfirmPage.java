@@ -45,8 +45,8 @@ public class DatabaseConfirmPage extends WizardPage implements IDatabasePage {
 				"- " + Messages.getString(config.getDatabaseAccessMethod() == AccessMethod.PRIVATE_KEY
 						? "ACCESSING_WITH_PRIVATE_KEY" : "ACCESSING_WITH_USERNAME_AND_PASSWORD"));
 
-		GUIHelper.createLabel(container, "- " + Messages.getString(
-				config.getDatabaseInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
+	//	GUIHelper.createLabel(container, "- " + Messages.getString(
+	//			config.getDatabaseInstallMethod() == InstallMethod.APT_GET ? "USE_REPOSITORY" : "USE_GIVEN_DEB"));
 
 		GUIHelper.createLabel(container, Messages.getString("MARIA_DB_WILL_BE_INSTALLED") + " "
 				+ Messages.getString("WANT_TO_CONTINUE_PRESS_NEXT"));
