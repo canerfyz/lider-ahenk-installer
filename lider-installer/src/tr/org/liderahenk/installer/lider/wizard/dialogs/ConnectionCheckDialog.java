@@ -94,7 +94,7 @@ public class ConnectionCheckDialog extends Dialog {
 		progBar.setLayoutData(barGridData);
 
 		// Ok button to close dialog
-		okBtn = GUIHelper.createButton(secondCon, SWT.PUSH, "Ok");
+		okBtn = GUIHelper.createButton(secondCon, SWT.PUSH, Messages.getString("OK"));
 		okBtn.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
