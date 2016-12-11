@@ -188,7 +188,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 
 		// Add items to new menu
 		MenuItem copy = new MenuItem(rightClickMenu, SWT.PUSH);
-		copy.setText("Copy");
+		copy.setText(Messages.getString("COPY"));
 		copy.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -197,7 +197,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		});
 
 		MenuItem paste = new MenuItem(rightClickMenu, SWT.PUSH);
-		paste.setText("Paste");
+		paste.setText(Messages.getString("PASTE"));
 		paste.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -206,7 +206,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		});
 
 		MenuItem cut = new MenuItem(rightClickMenu, SWT.PUSH);
-		cut.setText("Cut");
+		cut.setText(Messages.getString("CUT"));
 		cut.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -215,7 +215,7 @@ public class XmppConfPage extends WizardPage implements IXmppPage {
 		});
 
 		MenuItem selectAll = new MenuItem(rightClickMenu, SWT.PUSH);
-		selectAll.setText("Select All");
+		selectAll.setText(Messages.getString("SELECT_ALL"));
 		selectAll.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
