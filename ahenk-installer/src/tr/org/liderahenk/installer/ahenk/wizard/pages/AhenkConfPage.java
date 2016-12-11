@@ -133,7 +133,7 @@ public class AhenkConfPage extends WizardPage implements ControlNextEvent {
 		GUIHelper.createLabel(lineCont, Messages.getString("AHENK_USE_TLS"));
 		cmbUseSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbUseSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbUseSsl.setItems(new String[] { "false", "true" });
+		cmbUseSsl.setItems(new String[] { Messages.getString("FALSE"), Messages.getString("TRUE") });
 		cmbUseSsl.select(0);
 
 		Composite infoComposite = GUIHelper.createComposite(innerContainer, 1);
