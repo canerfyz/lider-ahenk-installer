@@ -141,7 +141,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		GUIHelper.createLabel(lineCont, Messages.getString("LDAP_USE_SSL"));
 		cmbLdapSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbLdapSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbLdapSsl.setItems(new String[] {"false", "true"});
+		cmbLdapSsl.setItems(new String[] {Messages.getString("FALSE"), Messages.getString("TRUE")});
 		cmbLdapSsl.select(0);
 		
 		//
@@ -178,7 +178,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		GUIHelper.createLabel(lineCont, Messages.getString("XMPP_USE_SSL"));
 		cmbXmppSsl = new Combo(lineCont, SWT.DROP_DOWN | SWT.READ_ONLY);
 		cmbXmppSsl.setLayoutData(new GridData(GridData.FILL, GridData.FILL, true, false));
-		cmbXmppSsl.setItems(new String[] {"false", "true"});
+		cmbXmppSsl.setItems(new String[] {Messages.getString("FALSE"), Messages.getString("TRUE")});
 		cmbXmppSsl.select(0);
 		
 		//
