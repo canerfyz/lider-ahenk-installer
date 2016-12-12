@@ -154,46 +154,61 @@ public class CheckVersionDialog extends Dialog {
 
 				final String latestVersion = getVersionFromUrl();
 				final String currentVersion = PropertyReader.property("installer.version");
-				if (latestVersion.equals(currentVersion)) {
-					isUpToDate = true;
+				if (latestVersion != null) {
+					if (latestVersion.equals(currentVersion)) {
+						isUpToDate = true;
+					} else {
+						isUpToDate = false;
+					}
+
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							if (isUpToDate) {
+								image.setImage(
+										new Image(display, this.getClass().getResourceAsStream("/icons/success.png")));
+								message.setText(Messages.getString("INSTALLER_IS_UP_TO_DATE") + "\n"
+										+ Messages.getString("STARTING_APPLICATION"));
+								progBar.setVisible(false);
+								continueInstallation = true;
+								display.asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										try {
+											Thread.sleep(3000);
+											close();
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+										
+									}
+								});
+								
+							} else {
+								image.setImage(new Image(display, this.getClass().getResourceAsStream("/icons/fail.png")));
+								message.setText(Messages.getString("INSTALLER_IS_OLD") + "\n"
+										+ Messages.getString("LATEST_VERSION") + " " + latestVersion + "\n"
+										+ Messages.getString("CURRENT_VERSION") + " " + currentVersion);
+								progBar.setVisible(false);
+								btnYes.setVisible(true);
+								btnNo.setVisible(true);
+							}
+						}
+					});
 				} else {
-					isUpToDate = false;
+					continueInstallation = true;
+					
+					display.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							close();
+							// TODO
+							// TODO set message to dialog about internet connection or url
+							// TODO
+						}
+					});
 				}
 
-				display.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						if (isUpToDate) {
-							image.setImage(
-									new Image(display, this.getClass().getResourceAsStream("/icons/success.png")));
-							message.setText(Messages.getString("INSTALLER_IS_UP_TO_DATE") + "\n"
-									+ Messages.getString("STARTING_APPLICATION"));
-							progBar.setVisible(false);
-							continueInstallation = true;
-							display.asyncExec(new Runnable() {
-								@Override
-								public void run() {
-									try {
-										Thread.sleep(3000);
-										close();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-
-								}
-							});
-
-						} else {
-							image.setImage(new Image(display, this.getClass().getResourceAsStream("/icons/fail.png")));
-							message.setText(Messages.getString("INSTALLER_IS_OLD") + "\n"
-									+ Messages.getString("LATEST_VERSION") + " " + latestVersion + "\n"
-									+ Messages.getString("CURRENT_VERSION") + " " + currentVersion);
-							progBar.setVisible(false);
-							btnYes.setVisible(true);
-							btnNo.setVisible(true);
-						}
-					}
-				});
 			}
 		};
 		Thread thread = new Thread(runnable);
@@ -235,8 +250,12 @@ public class CheckVersionDialog extends Dialog {
 				}
 			}
 		}
-
-		return urlContent.toString().substring(urlContent.indexOf("<html>") + 6, urlContent.indexOf("</html>"));
+		
+		if (urlContent != null) {
+			return urlContent.toString().substring(urlContent.indexOf("<html>") + 6, urlContent.indexOf("</html>"));
+		} else {
+			return null;
+		}
 
 	}
 
