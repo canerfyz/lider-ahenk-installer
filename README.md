@@ -6,10 +6,10 @@ lider-ahenk-installer is the installation wizard for Ahenk, Lider (and its compo
 
 ## Documentation
 
-* See [Lider Ahenk Installer wiki](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki) to get started!
-* See how to [setup development environment](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/01.-Setup-Development-Environment)
-* Learn how to [build & run](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/02.-Building-&-Running) installer.
-* [Export Lider Ahenk Installer](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/wiki/03.-Exporting-Installer) as custom RCP application.
+* See [Lider Ahenk Installer wiki](https://github.com/Pardus-LiderAhenk/lider-ahenk-installer/wiki) to get started!
+* See how to [setup development environment](https://github.com/Pardus-LiderAhenk/lider-ahenk-installer/wiki/01.-Setup-Development-Environment)
+* Learn how to [build & run](https://github.com/Pardus-LiderAhenk/lider-ahenk-installer/wiki/02.-Building-&-Running) installer.
+* [Export Lider Ahenk Installer](https://github.com/Pardus-LiderAhenk/lider-ahenk-installer/wiki/03.-Exporting-Installer) as custom RCP application.
 
 ## Contribution
 
@@ -21,14 +21,14 @@ We encourage contributions to the project. To contribute:
 
 ## Other Lider Ahenk Projects
 
-* [Lider](https://github.com/Pardus-Kurumsal/lider): Business layer running on Karaf container.
-* [Lider Console](https://github.com/Pardus-Kurumsal/lider-console): Administration console built as Eclipse RCP project.
-* [Ahenk](https://github.com/Pardus-Kurumsal/ahenk): Agent service running on remote machines.
-* [Lider Ahenk Archetype](https://github.com/Pardus-Kurumsal/lider-ahenk-archetype): Maven archetype for easy plugin development.
+* [Lider](https://github.com/Pardus-LiderAhenk/lider): Business layer running on Karaf container.
+* [Lider Console](https://github.com/Pardus-LiderAhenk/lider-console): Administration console built as Eclipse RCP project.
+* [Ahenk](https://github.com/Pardus-LiderAhenk/ahenk): Agent service running on remote machines.
+* [Lider Ahenk Archetype](https://github.com/Pardus-LiderAhenk/lider-ahenk-archetype): Maven archetype for easy plugin development.
 
 ## Changelog
 
-See [changelog](https://github.com/Pardus-Kurumsal/lider/wiki/Changelog) to learn what we have been up to.
+See [changelog](https://github.com/Pardus-LiderAhenk/lider/wiki/Changelog) to learn what we have been up to.
 
 ## Roadmap
 
@@ -54,4 +54,4 @@ See [changelog](https://github.com/Pardus-Kurumsal/lider/wiki/Changelog) to lear
 
 ## License
 
-Lider Ahenk and its sub projects are licensed under the [LGPL v3](https://github.com/Pardus-Kurumsal/lider-ahenk-installer/blob/master/LICENSE).
+Lider Ahenk and its sub projects are licensed under the [LGPL v3](https://github.com/Pardus-LiderAhenk/lider-ahenk-installer/blob/master/LICENSE).
