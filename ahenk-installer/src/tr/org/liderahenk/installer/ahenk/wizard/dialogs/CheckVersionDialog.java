@@ -35,8 +35,8 @@ import tr.org.pardus.mys.liderahenksetup.utils.gui.GUIHelper;
  */
 public class CheckVersionDialog extends Dialog {
 
-	private final static String VERSION_URL = "http://www.agem.com.tr/installer-version";
-	private final static String DOWNLOAD_URL = "http://www.agem.com.tr/sanayi";
+	private final static String VERSION_URL = PropertyReader.property("ahenkversion.url");
+	private final static String DOWNLOAD_URL = PropertyReader.property("ahenkdownload.url");
 	private Label image;
 	private Label message;
 	private ProgressBar progBar;
