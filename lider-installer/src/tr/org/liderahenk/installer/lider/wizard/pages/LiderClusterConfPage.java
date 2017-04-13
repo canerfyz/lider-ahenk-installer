@@ -938,7 +938,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtDatabaseUsername.setText("root");
 		txtDatabasePwd.setText(config.getDatabaseRootPassword() != null ? config.getDatabaseRootPassword() : "");
 
-		txtAgentLdapBaseDn.setText("ou=Uncategorized," + config.getLdapBaseDn());
+		txtAgentLdapBaseDn.setText("ou=Ahenkler," + config.getLdapBaseDn());
 		txtAgentLdapIdAttribute.setText("cn");
 		txtAgentLdapJidAttribute.setText("uid");
 		txtAgentLdapClasses.setText("pardusDevice,device");
@@ -950,7 +950,7 @@ public class LiderClusterConfPage extends WizardPage implements ILiderPage {
 		txtUserGroupLdapClasses.setText("groupOfNames");
 
 		txtFileServerProtocol.setText("ssh");
-		txtFileServerHost.setText("agem.com.tr");
+		txtFileServerHost.setText("liderahenk.org");
 		txtFileServerPort.setText("22");
 		txtFileServerUsername.setText("distro");
 		txtFileServerPwd.setText("!Distr0");

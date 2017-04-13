@@ -147,10 +147,10 @@ objectClass: organizationalRole
 cn: $ADMINCN
 description: $ORGANIZATION Directory Manager
 
-dn: ou=Uncategorized,$BASEDN
+dn: ou=Ahenkler,$BASEDN
 objectClass: top
 objectClass: organizationalUnit
-ou: Uncategorized
+ou: Ahenkler
 
 dn: ou=Groups,$BASEDN
 objectClass: top

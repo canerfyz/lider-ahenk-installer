@@ -418,7 +418,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		dbUsername.setText("root");
 		dbPassword.setText(config.getDatabaseRootPassword() != null && !config.getDatabaseRootPassword().isEmpty()
 				? config.getDatabaseRootPassword() : "qwert123");
-		agentLdapBaseDn.setText("ou=Uncategorized," + config.getLdapBaseDn());
+		agentLdapBaseDn.setText("ou=Ahenkler," + config.getLdapBaseDn());
 		agentLdapIdAttribute.setText("cn");
 		agentLdapJidAttribute.setText("uid");
 		agentLdapObjectClasses.setText("pardusDevice,device");
@@ -429,7 +429,7 @@ public class LiderConfPage extends WizardPage implements ILiderPage, ControlNext
 		groupLdapObjectClasses.setText("groupOfNames");
 		
 		txtFileServerProtocol.setText("ssh");
-		txtFileServerHost.setText("agem.com.tr");
+		txtFileServerHost.setText("liderahenk.org");
 		txtFileServerPort.setText("22");
 		txtFileServerUsername.setText("distro");
 		txtFileServerPwd.setText("!Distr0");

@@ -39,10 +39,10 @@ service slapd restart
 
 ldapadd -x -D "$LDAP_DATABASE_ADMIN_DN" -w $LDAP_DATABASE_ADMIN_PASSWORD << EOL
 
-dn: ou=Uncategorized,$BASE_DN
+dn: ou=Ahenkler,$BASE_DN
 objectClass: top
 objectClass: organizationalUnit
-ou: Uncategorized
+ou: Ahenkler
 EOL
 
 ldapadd -x -D "$LDAP_DATABASE_ADMIN_DN" -w $LDAP_DATABASE_ADMIN_PASSWORD << EOL

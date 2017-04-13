@@ -856,6 +856,7 @@ Public License instead of this License.  But first, please read
       <plugin id="org.eclipse.wst.xsd.core"/>
       <plugin id="org.eclipse.xsd"/>
       <plugin id="org.hamcrest.core"/>
+      <plugin id="org.junit"/>
       <plugin id="org.nmap4j"/>
       <plugin id="org.slf4j.api"/>
       <plugin id="org.slf4j.impl.log4j12" fragment="true"/>
