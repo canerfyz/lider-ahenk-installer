@@ -348,8 +348,8 @@ public class DatabaseClusterInstallationStatus extends WizardPage
 
 			printMessage(Messages.getString("SENDING_DEBIAN_CNF_FROM_", firstNode.getNodeIp(), clusterNode.getNodeIp()), display);
 			manager.execCommand(
-					"sshpass -p \"{0}\" scp -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{1}:/etc/mysql/",
-					new Object[] { clusterNode.getNodeRootPwd(), clusterNode.getNodeIp() });
+				"sshpass -p \"{0}\" scp -P {1} -o StrictHostKeyChecking=no /etc/mysql/debian.cnf root@{2}:/etc/mysql/",
+				new Object[] { clusterNode.getNodeRootPwd(), config.getDatabasePort(), clusterNode.getNodeIp() });
 			printMessage(Messages.getString("SUCCESSFULLY_SENT_DEBIAN_CNF_FROM_", firstNode.getNodeIp(), clusterNode.getNodeIp()), display);
 
 		} catch (SSHConnectionException e) {
